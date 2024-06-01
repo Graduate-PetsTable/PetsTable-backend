@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class AppleLoginRequest {
+public class OAuthLoginRequest {
 
     @NotBlank(message = "공백일 수 없습니다.")
     private String token;

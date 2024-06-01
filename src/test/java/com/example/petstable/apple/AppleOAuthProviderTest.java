@@ -1,14 +1,13 @@
 package com.example.petstable.apple;
 
 import com.example.petstable.global.auth.ios.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.ios.AppleSocialMemberResponse;
+import com.example.petstable.global.auth.ios.OAuthMemberResponse;
 import com.example.petstable.global.auth.ios.jwt.AppleClaimsValidator;
 import com.example.petstable.global.auth.ios.publickey.AppleClient;
 import com.example.petstable.global.auth.ios.publickey.ApplePublicKeys;
 import com.example.petstable.global.auth.ios.publickey.PublicKeyGenerator;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,7 @@ public class AppleOAuthProviderTest {
         when(publicKeyGenerator.generatePublicKey(any(), any())).thenReturn(publicKey);
         when(appleClaimsValidator.isValid(any())).thenReturn(true);
 
-        AppleSocialMemberResponse actual = appleOAuthUserProvider.getAppleMember(identityToken);
+        OAuthMemberResponse actual = appleOAuthUserProvider.getAppleMember(identityToken);
         assertAll(
                 () -> assertThat(actual.getSocialId()).isEqualTo(expected),
                 () -> assertThat(actual.getEmail()).isEqualTo("ssg9505fj22@naver.com")

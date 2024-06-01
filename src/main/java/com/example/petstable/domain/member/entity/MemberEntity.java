@@ -1,9 +1,11 @@
 package com.example.petstable.domain.member.entity;
 
+import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.example.petstable.global.exception.message.MemberMessage.INVALID_NICKNAME;
@@ -36,6 +38,15 @@ public class MemberEntity extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @OneToMany(mappedBy = "member")
+    private List<PetEntity> pets;
+
+    // 연관 관계 메서드
+    public void addPets(PetEntity pet) {
+        pets.add(pet);
+        pet.setMember(this);
+    }
 
     // 닉네임 검증
     private void validateNickname(String nickname) {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-import static com.example.petstable.global.exception.message.AppleLoginMessage.*;
+import static com.example.petstable.global.exception.message.OAuthLoginMessage.*;
 
 @Component
 public class JwtTokenProvider {

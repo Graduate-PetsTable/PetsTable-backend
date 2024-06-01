@@ -22,7 +22,7 @@ class MemberRepositoryTest {
         MemberEntity member = MemberEntity.builder()
                 .email("ssg@apple.com")
                 .nickName("Seung-9")
-                .imageUrl(null)
+                .image_url(null)
                 .socialType(SocialType.APPLE)
                 .socialId("20191476")
                 .build();

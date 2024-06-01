@@ -6,9 +6,9 @@ import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.AuthService;
-import com.example.petstable.global.auth.dto.request.AppleLoginRequest;
+import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.auth.ios.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.ios.AppleSocialMemberResponse;
+import com.example.petstable.global.auth.ios.OAuthMemberResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,9 @@ public class AuthServiceTest {
         String socialId = "20191476";
 
         when(appleOAuthUserProvider.getAppleMember(anyString()))
-                .thenReturn(new AppleSocialMemberResponse(socialId, expected));
+                .thenReturn(new OAuthMemberResponse(socialId, expected));
 
-        TokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token"));
 
         Assertions.assertAll(
                 () -> assertThat(actual.getAccessToken()).isNull(),
@@ -67,9 +67,9 @@ public class AuthServiceTest {
         memberRepository.save(member);
 
         when(appleOAuthUserProvider.getAppleMember(anyString()))
-                .thenReturn(new AppleSocialMemberResponse(socialId, expected));
+                .thenReturn(new OAuthMemberResponse(socialId, expected));
 
-        TokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token"));
 
         assertAll(
                 () -> assertThat(actual.getAccessToken()).isNotNull(),
@@ -92,9 +92,9 @@ public class AuthServiceTest {
                 .build();
         memberRepository.save(member);
 
-        when(appleOAuthUserProvider.getAppleMember(anyString())).thenReturn(new AppleSocialMemberResponse(socialId, expected));
+        when(appleOAuthUserProvider.getAppleMember(anyString())).thenReturn(new OAuthMemberResponse(socialId, expected));
 
-        TokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token"));
 
         assertAll(
                 () -> assertThat(actual.getAccessToken()).isNotNull(),

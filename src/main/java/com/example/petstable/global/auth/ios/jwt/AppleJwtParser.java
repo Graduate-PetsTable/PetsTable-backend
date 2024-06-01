@@ -9,8 +9,8 @@ import java.util.Base64;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
-import static com.example.petstable.global.exception.message.AppleLoginMessage.EXPIRED_ID_TOKEN;
-import static com.example.petstable.global.exception.message.AppleLoginMessage.INVALID_ID_TOKEN;
+import static com.example.petstable.global.exception.message.OAuthLoginMessage.EXPIRED_ID_TOKEN;
+import static com.example.petstable.global.exception.message.OAuthLoginMessage.INVALID_ID_TOKEN;
 
 
 /**

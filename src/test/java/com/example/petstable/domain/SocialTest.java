@@ -21,7 +21,7 @@ public class SocialTest {
     @Test
     @DisplayName("SocialType 올바르지 않으면 예외 반환")
     void fromInvalid() {
-        SocialType expected = SocialType.NOMAL;
+        SocialType expected = SocialType.GOOGLE;
 
         Assertions.assertThatThrownBy(() -> SocialType.from(null))
                 .isInstanceOf(PetsTableException.class);
