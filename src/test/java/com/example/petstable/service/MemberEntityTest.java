@@ -15,15 +15,15 @@ public class MemberEntityTest {
     void registerOAuthMember() {
         MemberEntity member = MemberEntity.builder()
                 .email("ssg@apple.com")
+                .nickName("aa")
                 .socialType(SocialType.APPLE)
                 .socialId("123456789")
                 .build();
 
 
-        member.registerOAuthMember("20191476@apple.com", "Seung");
+        member.updateNickname("Seung");
 
         assertAll(
-                () -> assertThat(member.getEmail()).isEqualTo("20191476@apple.com"),
                 () -> assertThat(member.getNickName()).isEqualTo("Seung")
         );
     }
@@ -37,10 +37,9 @@ public class MemberEntityTest {
                 .socialId("123456789")
                 .build();
 
-        member.registerOAuthMember(null, "Seung");
+        member.updateNickname("Seung");
 
         assertAll(
-                () -> assertThat(member.getEmail()).isNotNull(),
                 () -> assertThat(member.getNickName()).isEqualTo("Seung")
         );
     }

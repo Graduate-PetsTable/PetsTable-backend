@@ -26,16 +26,13 @@ public class MemberService {
         SocialType socialType = SocialType.from(request.getSocialType());
         MemberEntity findMember = memberRepository.findBySocialTypeAndSocialId(socialType, request.getSocialId())
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
-        findMember.registerOAuthMember(request.getEmail(), request.getNickname());
+
+        findMember.updateNickname(request.getNickname());
 
         return new OAuthMemberSignUpResponse(findMember.getId(), findMember.getNickName());
     }
 
     private void validateDuplicateMember(OAuthMemberSignUpRequest memberSignUpRequest) {
-        memberRepository.findByEmail(memberSignUpRequest.getEmail())
-                .ifPresent(member -> {
-                    throw new PetsTableException(INVALID_EMAIL.getStatus(), INVALID_EMAIL.getMessage(), 409);
-                });
         memberRepository.findByNickName(memberSignUpRequest.getNickname())
                 .ifPresent(member -> {
                     throw new PetsTableException(INVALID_NICKNAME.getStatus(), INVALID_NICKNAME.getMessage(), 409);

@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class OAuthMemberSignUpRequest {
 
-    private String email;
-
     @NotBlank(message = "닉네임을 입력해주세요")
     private String nickname;
 

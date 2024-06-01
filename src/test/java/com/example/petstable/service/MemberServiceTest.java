@@ -36,7 +36,7 @@ public class MemberServiceTest {
 
         MemberEntity savedMember = memberRepository.save(member);
 
-        OAuthMemberSignUpRequest request = new OAuthMemberSignUpRequest(null, "Seung", SocialType.APPLE.getValue(), socialId);
+        OAuthMemberSignUpRequest request = new OAuthMemberSignUpRequest("Seung", SocialType.APPLE.getValue(), socialId);
 
         memberService.signUpByOAuthMember(request);
 
@@ -58,7 +58,7 @@ public class MemberServiceTest {
 
         memberRepository.save(savedMember);
 
-        OAuthMemberSignUpRequest request = new OAuthMemberSignUpRequest(null, "Seung", SocialType.APPLE.getValue(), "invalid");
+        OAuthMemberSignUpRequest request = new OAuthMemberSignUpRequest("Seung", SocialType.APPLE.getValue(), "invalid");
 
         assertThatThrownBy(() -> memberService.signUpByOAuthMember(request))
                 .isInstanceOf(PetsTableException.class);

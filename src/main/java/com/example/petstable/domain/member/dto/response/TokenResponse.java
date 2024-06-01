@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class TokenResponse {
 
     private String accessToken;
+    private String refreshToken;
     private String email;
     private Boolean isRegistered;
     private String socialId;

@@ -15,8 +15,8 @@ public class JwtTokenProvider {
     private final long validityAccessTokenInMilliseconds;
     private final JwtParser jwtParser;
 
-    public JwtTokenProvider(@Value("${oauth.secret-key}") String secretKey,
-                            @Value("${oauth.expire-length}") long validityAccessTokenInMilliseconds) {
+    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey,
+                            @Value("${jwt.access-key-expire-length}") long validityAccessTokenInMilliseconds) {
         this.secretKey = secretKey;
         this.validityAccessTokenInMilliseconds = validityAccessTokenInMilliseconds;
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
@@ -34,7 +34,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateAccessToken(String token) {
+    public void validateToken(String token) {
         try {
             jwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
@@ -42,6 +42,15 @@ public class JwtTokenProvider {
         } catch (JwtException e) {
             throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 401);
         }
+    }
+
+    public boolean isExpiredAccessToken(String token) {
+        try {
+            jwtParser.parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+        return false;
     }
 
     public String getPayload(String token) {

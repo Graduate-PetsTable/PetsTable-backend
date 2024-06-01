@@ -20,7 +20,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(LoginUserEmail.class);
+        return parameter.hasParameterAnnotation(LoginUserId.class);
     }
 
     @Override
@@ -28,6 +28,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = AuthorizationExtractor.extractAccessToken(request);
-        return jwtTokenProvider.getPayload(token);
+        String payload = jwtTokenProvider.getPayload(token);
+        return Long.parseLong(payload);
     }
 }

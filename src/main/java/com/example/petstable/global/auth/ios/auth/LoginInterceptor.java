@@ -3,17 +3,15 @@ package com.example.petstable.global.auth.ios.auth;
 import com.example.petstable.global.auth.ios.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
+@RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
-
-    public LoginInterceptor(final JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -21,8 +19,9 @@ public class LoginInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String token = AuthorizationExtractor.extractAccessToken(request);
-        jwtTokenProvider.validateAccessToken(token);
+        String accessToken = AuthorizationExtractor.extractAccessToken(request);
+        jwtTokenProvider.validateToken(accessToken);
+
         return true;
     }
 

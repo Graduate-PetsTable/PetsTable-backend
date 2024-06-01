@@ -4,6 +4,7 @@ import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -56,12 +57,9 @@ public class MemberEntity extends BaseTimeEntity {
     }
 
     // 회원가입 - 이메일, 닉네임으로
-    public void registerOAuthMember(String email, String nickname) {
+    public void updateNickname(String nickname) {
         validateNickname(nickname);
         this.nickName = nickname;
-        if (email != null) {
-            this.email = email;
-        }
     }
 
     public boolean isRegisteredOAuthMember() {

@@ -14,6 +14,7 @@ import static com.example.petstable.global.exception.message.MemberMessage.*;
 @Getter
 public enum SocialType {
 
+    TEST("test"),
     GOOGLE("google"),
     APPLE("apple");
 
