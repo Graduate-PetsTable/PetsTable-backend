@@ -2,11 +2,11 @@ package com.example.petstable.domain.pet.entity;
 
 import com.example.petstable.domain.member.entity.BaseTimeEntity;
 import com.example.petstable.domain.member.entity.MemberEntity;
-import com.example.petstable.domain.pet.dto.request.PetInfoRequest;
+import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
+import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
+import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.*;
 
@@ -41,16 +41,30 @@ public class PetEntity extends BaseTimeEntity {
     }
 
     // 생성 메서드
-    public static PetEntity createPet(PetInfoRequest petInfoRequest) {
-
+    public static PetEntity createPet(PetRegisterRequest petRegisterRequest) {
         return PetEntity.builder()
-                .type(petInfoRequest.getType())
-                .name(petInfoRequest.getName())
-                .age(petInfoRequest.getAge())
-                .size(petInfoRequest.getSize())
-                .kind(petInfoRequest.getKind())
-                .gender(petInfoRequest.getGender())
-                .walk(petInfoRequest.getWalk())
+                .type(petRegisterRequest.getType())
+                .name(petRegisterRequest.getName())
+                .age(petRegisterRequest.getAge())
+                .size(petRegisterRequest.getSize())
+                .kind(petRegisterRequest.getKind())
+                .gender(petRegisterRequest.getGender())
+                .walk(petRegisterRequest.getWalk())
+                .build();
+    }
+
+    // DTO 변환
+    public static PetInfoResponse toPetInfoResponse(PetEntity petEntity) {
+        return PetInfoResponse.builder()
+                .id(petEntity.getId())
+                .type(petEntity.getType())
+                .name(petEntity.getName())
+                .age(petEntity.getAge())
+                .size(petEntity.getSize())
+                .kind(petEntity.getKind())
+                .gender(petEntity.getGender())
+                .walk(petEntity.getWalk())
+                .ownerNickname(petEntity.getMember().getNickName())
                 .build();
     }
 }
