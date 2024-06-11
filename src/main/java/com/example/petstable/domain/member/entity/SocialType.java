@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.example.petstable.global.exception.message.MemberMessage.*;
+import static com.example.petstable.domain.member.message.MemberMessage.*;
 
 @AllArgsConstructor @NoArgsConstructor
 @Getter

@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.petstable.global.exception.message.MemberMessage.*;
+import static com.example.petstable.domain.member.message.MemberMessage.*;
 
 @Tag(name = "사용자 관련 컨트롤러")
 @RestController

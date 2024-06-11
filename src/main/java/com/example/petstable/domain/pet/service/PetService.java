@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import static com.example.petstable.global.exception.message.MemberMessage.*;
-import static com.example.petstable.global.exception.message.PetMessage.*;
+import static com.example.petstable.domain.member.message.MemberMessage.*;
+import static com.example.petstable.domain.pet.message.PetMessage.*;
 
 @Service
 @RequiredArgsConstructor

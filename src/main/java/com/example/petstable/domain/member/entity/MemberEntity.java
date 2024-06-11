@@ -4,12 +4,11 @@ import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.example.petstable.global.exception.message.MemberMessage.INVALID_NICKNAME;
+import static com.example.petstable.domain.member.message.MemberMessage.INVALID_NICKNAME;
 
 @Entity
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,11 +42,6 @@ public class MemberEntity extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<PetEntity> pets;
 
-    // 연관 관계 메서드
-    public void addPets(PetEntity pet) {
-        pets.add(pet);
-        pet.setMember(this);
-    }
 
     // 닉네임 검증
     private void validateNickname(String nickname) {

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Enumeration;
 
-import static com.example.petstable.global.exception.message.OAuthLoginMessage.*;
+import static com.example.petstable.domain.member.message.OAuthLoginMessage.*;
 
 @NoArgsConstructor
 public class AuthorizationExtractor {

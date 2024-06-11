@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.petstable.global.exception.PetsTableException;
-import com.example.petstable.global.exception.message.ErrorResponse;
+import com.example.petstable.global.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

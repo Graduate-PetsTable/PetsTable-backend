@@ -5,7 +5,6 @@ import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
 import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
 import com.example.petstable.domain.pet.service.PetService;
 import com.example.petstable.global.auth.ios.auth.LoginUserId;
-import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static com.example.petstable.global.exception.message.PetMessage.*;
 
 @Tag(name = "반려동물 관련 컨트롤러")
 @RestController

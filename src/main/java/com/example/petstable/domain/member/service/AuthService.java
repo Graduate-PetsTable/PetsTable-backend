@@ -2,7 +2,9 @@ package com.example.petstable.domain.member.service;
 
 import com.example.petstable.domain.member.dto.response.TokenResponse;
 import com.example.petstable.domain.member.entity.MemberEntity;
+import com.example.petstable.domain.member.entity.RoleType;
 import com.example.petstable.domain.member.entity.SocialType;
+import com.example.petstable.domain.member.entity.Status;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.auth.ios.AppleOAuthUserProvider;
@@ -26,8 +28,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import static com.example.petstable.global.exception.message.MemberMessage.*;
-import static com.example.petstable.global.exception.message.OAuthLoginMessage.*;
+import static com.example.petstable.domain.member.message.MemberMessage.*;
+import static com.example.petstable.domain.member.message.OAuthLoginMessage.*;
 
 @Service
 @RequiredArgsConstructor
@@ -105,6 +107,8 @@ public class AuthService {
                             .email(email)
                             .socialType(socialType)
                             .socialId(socialId)
+                            .role(RoleType.MEMBER)
+                            .status(Status.ACTIVE)
                             .build();
                     MemberEntity savedMember = memberRepository.save(oauthMember);
                     String accessToken = issueAccessToken(savedMember);

@@ -1,6 +1,5 @@
 package com.example.petstable.global.exception;
 
-import com.example.petstable.global.exception.message.ResponseMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

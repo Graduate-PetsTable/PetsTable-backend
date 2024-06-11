@@ -1,6 +1,5 @@
 package com.example.petstable.global.exception;
 
-import com.example.petstable.global.exception.message.ResponseMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
