@@ -1,6 +1,5 @@
-package com.example.petstable.domain.tag.entity;
+package com.example.petstable.domain.board.entity;
 
-import com.example.petstable.domain.board.entity.BoardEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

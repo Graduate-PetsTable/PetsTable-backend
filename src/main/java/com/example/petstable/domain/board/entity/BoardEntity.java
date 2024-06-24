@@ -1,16 +1,13 @@
 package com.example.petstable.domain.board.entity;
 
-import com.example.petstable.domain.board.dto.request.BoardRequest;
-import com.example.petstable.domain.board.dto.request.DetailRequest;
 import com.example.petstable.domain.member.entity.BaseTimeEntity;
 import com.example.petstable.domain.member.entity.MemberEntity;
-import com.example.petstable.domain.tag.entity.TagEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -21,7 +18,8 @@ import static jakarta.persistence.FetchType.LAZY;
 @Table(name = "board")
 public class BoardEntity extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
     private Long id;
 
@@ -36,6 +34,7 @@ public class BoardEntity extends BaseTimeEntity {
     private MemberEntity member;
 
     @OneToMany(mappedBy = "post")
+    @BatchSize(size = 10)
     private List<DetailEntity> description; // 상세 설명
 
     @OneToMany(mappedBy = "post")
@@ -53,9 +52,14 @@ public class BoardEntity extends BaseTimeEntity {
     }
 
     // 연관 관계 설정 - 게시글 태그
-    public void addTags(TagEntity tag) {
-        tags.add(tag);
-        tag.setPost(this);
+    public void addTags(List<TagEntity> tagList) {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
+        for (TagEntity tag : tagList) {
+            tag.setPost(this);
+        }
+        tags.addAll(tagList);
     }
 
     // 연관 관계 설정 - 회원
@@ -67,29 +71,6 @@ public class BoardEntity extends BaseTimeEntity {
     // 조회수 증가
     public void increaseViewCount() {
         this.view_count += 1;
-    }
-
-    // 생성 메서드
-    public static BoardEntity createPost(BoardRequest request, List<DetailRequest> detailRequests, TagEntity... tags) {
-        BoardEntity boardEntity = BoardEntity.builder()
-                .title(request.getTitle())
-//                .thumbnail_url(request.getThumbnail_url())
-                .build();
-
-        // 상세 내용 연관 관계 설정
-        List<DetailEntity> details = detailRequests.stream()
-                .map(DetailEntity::createPostDetail)
-                .collect(Collectors.toList());
-
-        boardEntity.addDescriptions(details);
-
-        // 게시글 태그 연관 관계 설정
-        for (TagEntity tag : tags) {
-            boardEntity.addTags(tag);
-        }
-
-
-        return boardEntity;
     }
 }
 

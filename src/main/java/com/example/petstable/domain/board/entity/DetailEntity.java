@@ -1,6 +1,5 @@
 package com.example.petstable.domain.board.entity;
 
-import com.example.petstable.domain.board.dto.request.DetailRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,13 +28,5 @@ public class DetailEntity {
     public void setPost(BoardEntity post) {
         this.post = post;
         post.getDescription().add(this);
-    }
-
-    // 생성 메서드
-    public static DetailEntity createPostDetail(DetailRequest request) {
-        return DetailEntity.builder()
-                .image_url(request.getImage_url())
-                .description(request.getDescription())
-                .build();
     }
 }
