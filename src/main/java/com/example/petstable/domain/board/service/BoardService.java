@@ -50,7 +50,7 @@ public class BoardService {
     }
 
     // 연관관계 설정
-    public BoardEntity createPostWithDetailsAndTags(BoardWithDetailsRequestAndTagRequest request, MemberEntity member) {
+    private BoardEntity createPostWithDetailsAndTags(BoardWithDetailsRequestAndTagRequest request, MemberEntity member) {
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
