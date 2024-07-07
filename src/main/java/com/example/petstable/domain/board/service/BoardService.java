@@ -60,7 +60,6 @@ public class BoardService {
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
-                .thumbnail_url(request.getThumbnail_url())
                 .build();
 
         member.addPost(post);
@@ -76,6 +75,10 @@ public class BoardService {
                             .build();
                 })
                 .toList();
+
+        String thumbnail_url = details.get(details.size() - 1).getImage_url();
+
+        post.setThumbnail_url(thumbnail_url);
 
         post.addDescriptions(details);
         detailRepository.saveAll(details);

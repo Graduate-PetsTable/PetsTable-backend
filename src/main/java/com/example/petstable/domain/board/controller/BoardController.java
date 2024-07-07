@@ -49,6 +49,7 @@ public class BoardController {
 
         BoardWithDetailsRequestAndTagRequest boardWithDetailsRequestAndTagRequest = BoardWithDetailsRequestAndTagRequest.builder()
                 .title(boardRequest.getTitle())
+                .thumbnail_url(images.get(images.size() - 1)) // 일단 마지막 사진을 썸네일로
                 .details(detailRequests)
                 .tags(tagRequests)
                 .build();

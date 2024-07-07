@@ -74,6 +74,11 @@ public class BoardEntity extends BaseTimeEntity {
         this.view_count += 1;
     }
 
+    // 썸네일 이미지 등록
+    public void setThumbnail_url(String image_url) {
+        this.thumbnail_url = image_url;
+    }
+
     public static BoardReadResponse toBoardTitleAndTags(BoardEntity boardEntity) {
         List<String> tagNames = boardEntity.getTags().stream()
                 .map(TagEntity::getName)
