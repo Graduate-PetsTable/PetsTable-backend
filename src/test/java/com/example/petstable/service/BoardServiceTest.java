@@ -3,10 +3,12 @@ package com.example.petstable.service;
 import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
 import com.example.petstable.domain.board.dto.request.DetailRequest;
 import com.example.petstable.domain.board.dto.request.TagRequest;
+import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
 import com.example.petstable.domain.board.entity.TagEntity;
+import com.example.petstable.domain.board.entity.TagType;
 import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.board.repository.DetailRepository;
 import com.example.petstable.domain.board.repository.TagRepository;
@@ -149,4 +151,41 @@ public class BoardServiceTest {
         assertThat(actual.recipes().size()).isEqualTo(3);
     }
 
+    @Test
+    @DisplayName("레시피 내용을 상세 조회에 성공한다.")
+    void getBoardDetail() throws Exception {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("ssg@naver.com")
+                .nickName("Seung-9")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        MockMultipartFile mockMultipartFile1 = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
+
+        DetailRequest detailRequest = DetailRequest.builder()
+                .image_url(mockMultipartFile1)
+                .description("설명1")
+                .build();
+
+        TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
+
+        BoardWithDetailsRequestAndTagRequest request = BoardWithDetailsRequestAndTagRequest.builder()
+                .title("레시피 테스트")
+                .details(List.of(detailRequest))
+                .tags(List.of(tagRequest))
+                .build();
+
+        boardService.writePost(member.getId(), request);
+
+        // when
+        BoardDetailReadResponse actual = boardService.findDetailByBoardId(1L);
+
+        // then
+        assertThat(actual.getDetails().get(0).getImage_url()).isEqualTo("test_img.jpg");
+    }
 }
