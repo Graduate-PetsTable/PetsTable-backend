@@ -1,10 +1,7 @@
 package com.example.petstable.domain.board.service;
 
 import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
-import com.example.petstable.domain.board.dto.response.BoardPostResponse;
-import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
-import com.example.petstable.domain.board.dto.response.BoardReadResponse;
-import com.example.petstable.domain.board.dto.response.PageResponse;
+import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
 import com.example.petstable.domain.board.entity.TagEntity;
@@ -105,5 +102,13 @@ public class BoardService {
             throw new PetsTableException(RECIPE_IS_EMPTY.getStatus(), RECIPE_IS_EMPTY.getMessage(), 204);
         }
         return new BoardReadAllResponse(recipeTitlePage.toList(), pageResponse);
+    }
+
+    public BoardDetailReadResponse findDetailByBoardId(Long boardId) {
+
+        BoardEntity boardEntity = boardRepository.findById(boardId)
+                .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
+
+        return BoardDetailReadResponse.from(boardEntity);
     }
 }

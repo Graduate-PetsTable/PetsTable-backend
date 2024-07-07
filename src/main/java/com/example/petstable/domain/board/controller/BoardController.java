@@ -3,8 +3,10 @@ package com.example.petstable.domain.board.controller;
 import com.example.petstable.domain.board.dto.request.BoardRequest;
 import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
 import com.example.petstable.domain.board.dto.request.DetailRequest;
+import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardPostResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
+import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.board.service.BoardService;
 import com.example.petstable.domain.board.dto.request.TagRequest;
 import com.example.petstable.global.auth.ios.auth.LoginUserId;
@@ -67,5 +69,15 @@ public class BoardController {
         BoardReadAllResponse response = boardService.getAllPost(pageable);
 
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
+    }
+
+    @Operation(summary = "게시글 상세 조회 API")
+    @PostMapping("/{boardId}")
+    @SecurityRequirement(name = "JWT")
+    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@PathVariable("boardId") Long id) {
+
+        BoardDetailReadResponse response = boardService.findDetailByBoardId(id);
+
+        return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 }

@@ -11,6 +11,9 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
+    @EntityGraph(attributePaths = {"description", "tags"})
+    Optional<BoardEntity> findById(Long id);
+
     Optional<BoardEntity> findByTitle(String title);
 
     @Query("SELECT b FROM BoardEntity b JOIN FETCH b.description WHERE b.id = :id")
