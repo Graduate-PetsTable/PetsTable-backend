@@ -2,6 +2,9 @@ package com.example.petstable.domain.board.service;
 
 import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
 import com.example.petstable.domain.board.dto.response.BoardPostResponse;
+import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
+import com.example.petstable.domain.board.dto.response.BoardReadResponse;
+import com.example.petstable.domain.board.dto.response.PageResponse;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
 import com.example.petstable.domain.board.entity.TagEntity;
@@ -14,11 +17,14 @@ import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.example.petstable.domain.board.message.BoardMessage.*;
 import static com.example.petstable.domain.member.message.MemberMessage.MEMBER_NOT_FOUND;
 
 @Service
@@ -54,6 +60,7 @@ public class BoardService {
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
+                .thumbnail_url(request.getThumbnail_url())
                 .build();
 
         member.addPost(post);
@@ -85,5 +92,15 @@ public class BoardService {
         tagRepository.saveAll(tags);
 
         return post;
+    }
+
+    public BoardReadAllResponse getAllPost(Pageable pageable) {
+        Page<BoardReadResponse> recipeTitlePage = boardRepository.findAll(pageable).map(BoardEntity::toBoardTitleAndTags);
+
+        PageResponse pageResponse = new PageResponse(recipeTitlePage);
+        if (recipeTitlePage.isEmpty()) {
+            throw new PetsTableException(RECIPE_IS_EMPTY.getStatus(), RECIPE_IS_EMPTY.getMessage(), 204);
+        }
+        return new BoardReadAllResponse(recipeTitlePage.toList(), pageResponse);
     }
 }

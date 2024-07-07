@@ -1,5 +1,6 @@
 package com.example.petstable.domain.board.entity;
 
+import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.member.entity.BaseTimeEntity;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
@@ -71,6 +72,18 @@ public class BoardEntity extends BaseTimeEntity {
     // 조회수 증가
     public void increaseViewCount() {
         this.view_count += 1;
+    }
+
+    public static BoardReadResponse toBoardTitleAndTags(BoardEntity boardEntity) {
+        List<String> tagNames = boardEntity.getTags().stream()
+                .map(TagEntity::getName)
+                .toList();
+
+        return BoardReadResponse.builder()
+                .title(boardEntity.getTitle())
+                .imageUrl(boardEntity.getThumbnail_url())
+                .tagName(tagNames)
+                .build();
     }
 }
 
