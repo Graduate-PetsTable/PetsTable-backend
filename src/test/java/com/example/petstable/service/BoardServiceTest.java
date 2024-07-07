@@ -1,10 +1,9 @@
 package com.example.petstable.service;
 
-import com.example.petstable.domain.board.dto.request.BoardRequest;
 import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
 import com.example.petstable.domain.board.dto.request.DetailRequest;
 import com.example.petstable.domain.board.dto.request.TagRequest;
-import com.example.petstable.domain.board.dto.response.DetailResponse;
+import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
 import com.example.petstable.domain.board.entity.TagEntity;
@@ -23,8 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -117,4 +117,36 @@ public class BoardServiceTest {
         assertThat(details.get(0).getDescription()).isEqualTo("설명1");
         assertThat(tags.get(0).getName()).isEqualTo("모질개선");
     }
+
+    @Test
+    @DisplayName("게시글 목록 전체 조회 테스트")
+    void readAllRecipePost() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("ssg@naver.com")
+                .nickName("Seunggu")
+                .socialType(SocialType.TEST)
+                .build();
+        memberRepository.save(member);
+
+        BoardEntity post1 = BoardEntity.builder()
+                .title("제목")
+                .build();
+        BoardEntity post2 = BoardEntity.builder()
+                .title("제목2")
+                .build();
+        BoardEntity post3 = BoardEntity.builder()
+                .title("제목3")
+                .build();
+        boardRepository.saveAll(List.of(post1, post2, post3));
+
+        // when
+        Pageable pageable = PageRequest.of(0, 5);
+        BoardReadAllResponse actual = boardService.getAllPost(pageable);
+
+        // then
+        assertThat(actual.recipes().size()).isEqualTo(3);
+    }
+
 }
