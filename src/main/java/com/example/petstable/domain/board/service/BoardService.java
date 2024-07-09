@@ -130,6 +130,7 @@ public class BoardService {
         return new BoardReadAllResponse(recipeTitlePage.toList(), pageResponse);
     }
 
+    @Transactional
     public BoardDetailReadResponse findDetailByBoardId(Long boardId) {
 
         BoardEntity boardEntity = boardRepository.findById(boardId)
