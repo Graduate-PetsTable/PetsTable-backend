@@ -172,4 +172,39 @@ public class BoardServiceTest {
         // then
         assertThat(actual.getDetails().get(0).getImage_url()).isEqualTo("test_img.jpg");
     }
+
+    @Test
+    @DisplayName("레시피 내용을 상세 조회하면 조회수가 증가한다.")
+    void incViewCount() throws Exception {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("ssg@naver.com")
+                .nickName("Seung-9")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+
+        DescriptionRequest descriptionRequest = new DescriptionRequest("설명");
+        TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
+
+        BoardPostRequest request = BoardPostRequest.builder()
+                .title("레시피 테스트")
+                .descriptions(List.of(descriptionRequest))
+                .tags(List.of(tagRequest))
+                .build();
+
+        boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+
+        // when
+        boardService.findDetailByBoardId(1L);
+        BoardEntity actual = boardRepository.findById(1L).orElseThrow();
+
+        // then
+        assertThat(actual.getView_count()).isEqualTo(1);
+    }
 }
