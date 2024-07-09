@@ -7,8 +7,6 @@ import lombok.Getter;
 @Builder
 public class DetailResponse {
 
-    private String title;
-    private int view_count;
     private String image_url;
     private String description;
 }

@@ -135,6 +135,8 @@ public class BoardService {
         BoardEntity boardEntity = boardRepository.findById(boardId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
 
+        boardEntity.increaseViewCount();
+
         return BoardDetailReadResponse.from(boardEntity);
     }
 }

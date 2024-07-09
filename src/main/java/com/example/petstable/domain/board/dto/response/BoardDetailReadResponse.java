@@ -1,8 +1,6 @@
 package com.example.petstable.domain.board.dto.response;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
-import com.example.petstable.domain.board.entity.TagType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,12 +12,13 @@ import java.util.stream.Collectors;
 public class BoardDetailReadResponse {
 
     private String title;
+    private int viewCount;
     private List<DetailResponse> details;
     private List<TagResponse> tags;
 
     public static BoardDetailReadResponse from(BoardEntity boardEntity) {
 
-        List<DetailResponse> details = boardEntity.getDescription().stream()
+        List<DetailResponse> details = boardEntity.getDetails().stream()
                 .map(detail -> DetailResponse.builder()
                         .image_url(detail.getImage_url())
                         .description(detail.getDescription())
@@ -35,6 +34,7 @@ public class BoardDetailReadResponse {
 
         return BoardDetailReadResponse.builder()
                 .title(boardEntity.getTitle())
+                .viewCount(boardEntity.getView_count())
                 .details(details)
                 .tags(tags)
                 .build();
