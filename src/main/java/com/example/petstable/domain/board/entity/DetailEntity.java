@@ -27,6 +27,6 @@ public class DetailEntity {
     // 연관관계 설정
     public void setPost(BoardEntity post) {
         this.post = post;
-        post.getDescription().add(this);
+        post.getDetails().add(this);
     }
 }

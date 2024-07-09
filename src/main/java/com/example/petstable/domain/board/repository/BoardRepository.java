@@ -11,12 +11,12 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
-    @EntityGraph(attributePaths = {"description", "tags"})
+    @EntityGraph(attributePaths = {"details", "tags"})
     Optional<BoardEntity> findById(Long id);
 
     Optional<BoardEntity> findByTitle(String title);
 
-    @Query("SELECT b FROM BoardEntity b JOIN FETCH b.description WHERE b.id = :id")
+    @Query("SELECT b FROM BoardEntity b JOIN FETCH b.details WHERE b.id = :id")
     BoardEntity findByIdWithDetails(@Param("id") Long id);
 
     @Query("select m.id from BoardEntity m where m.title = :title")

@@ -7,9 +7,9 @@ import java.util.List;
 @Getter
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class BoardWithDetailsRequestAndTagRequest {
+public class BoardPostRequest {
 
     private String title;
-    private List<DetailRequest> details;
+    private List<DescriptionRequest> descriptions;
     private List<TagRequest> tags;
 }

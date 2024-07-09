@@ -1,6 +1,6 @@
 package com.example.petstable.domain.board.service;
 
-import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
+import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
@@ -18,8 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.example.petstable.domain.board.message.BoardMessage.*;
 import static com.example.petstable.domain.member.message.MemberMessage.MEMBER_NOT_FOUND;
@@ -36,19 +39,42 @@ public class BoardService {
     private final TagRepository tagRepository;
 
     @Transactional
-    public BoardPostResponse writePost(Long memberId, BoardWithDetailsRequestAndTagRequest request) {
+    public BoardPostResponse writePost(Long memberId, BoardPostRequest request, List<MultipartFile> images) {
 
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
 
-        BoardEntity post = createPostWithDetailsAndTags(request, member);
+        BoardWithDetailsRequestAndTagRequest boardRequest = BoardWithDetailsRequestAndTagRequest.builder()
+                .title(request.getTitle())
+                .details(IntStream.range(0, images.size())
+                        .mapToObj(i -> DetailRequest.builder()
+                                .image_url(images.get(i))
+                                .description(request.getDescriptions().get(i).getDescription())
+                                .build())
+                        .toList())
+                .tags(request.getTags())
+                .build();
+
+        BoardEntity post = createPostWithDetailsAndTags(boardRequest, member);
 
         boardRepository.save(post);
 
         return BoardPostResponse.builder()
                 .title(post.getTitle())
-                .details(request.getDetails())
-                .tags(request.getTags())
+                .details(post.getDetails().stream()
+                        .distinct() // 중복된 객체 제거
+                        .map(detail -> DetailPostResponse.builder()
+                                .image_url(detail.getImage_url())
+                                .description(detail.getDescription())
+                                .build())
+                        .collect(Collectors.toList()))
+                .tags(post.getTags().stream()
+                        .distinct() // 중복된 객체 제거
+                        .map(tag -> TagResponse.builder()
+                                .tagType(tag.getType())
+                                .tagName(tag.getName())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
@@ -65,9 +91,10 @@ public class BoardService {
         List<DetailEntity> details = request.getDetails().stream()
                 .map(detailRequest -> {
                     String imageUrl = awsS3Uploader.uploadImage(detailRequest.getImage_url());
+                    String description = detailRequest.getDescription();
                     return DetailEntity.builder()
                             .image_url(imageUrl)
-                            .description(detailRequest.getDescription())
+                            .description(description)
                             .post(post)
                             .build();
                 })
@@ -76,8 +103,7 @@ public class BoardService {
         String thumbnail_url = details.get(details.size() - 1).getImage_url();
 
         post.setThumbnail_url(thumbnail_url);
-
-        post.addDescriptions(details);
+        post.addDetails(details);
         detailRepository.saveAll(details);
 
         List<TagEntity> tags = request.getTags().stream()

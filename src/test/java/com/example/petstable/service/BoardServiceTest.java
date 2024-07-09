@@ -1,14 +1,13 @@
 package com.example.petstable.service;
 
-import com.example.petstable.domain.board.dto.request.BoardWithDetailsRequestAndTagRequest;
-import com.example.petstable.domain.board.dto.request.DetailRequest;
+import com.example.petstable.domain.board.dto.request.BoardPostRequest;
+import com.example.petstable.domain.board.dto.request.DescriptionRequest;
 import com.example.petstable.domain.board.dto.request.TagRequest;
 import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
 import com.example.petstable.domain.board.entity.TagEntity;
-import com.example.petstable.domain.board.entity.TagType;
 import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.board.repository.DetailRepository;
 import com.example.petstable.domain.board.repository.TagRepository;
@@ -83,30 +82,19 @@ public class BoardServiceTest {
         when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
         when(awsS3Uploader.uploadImage(mockMultipartFile3)).thenReturn("test_img3.jpg");
 
-        DetailRequest detailRequest = DetailRequest.builder()
-                .image_url(mockMultipartFile1)
-                .description("설명1")
-                .build();
-        DetailRequest detailRequest2 = DetailRequest.builder()
-                .image_url(mockMultipartFile2)
-                .description("설명2")
-                .build();
-        DetailRequest detailRequest3 = DetailRequest.builder()
-                .image_url(mockMultipartFile3)
-                .description("설명3")
-                .build();
-
         TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
         TagRequest tagRequest2 = TagRequest.builder().tagType("기능별").tagName("다이어트").build();
-        TagRequest tagRequest3 = TagRequest.builder().tagType("크기별").tagName("소형").build();
+        DescriptionRequest descriptionRequest1 = new DescriptionRequest("설명1");
+        DescriptionRequest descriptionRequest2 = new DescriptionRequest("설명2");
+        DescriptionRequest descriptionRequest3 = new DescriptionRequest("설명3");
 
-        BoardWithDetailsRequestAndTagRequest request = BoardWithDetailsRequestAndTagRequest.builder()
+        BoardPostRequest request = BoardPostRequest.builder()
                 .title("레시피 테스트")
-                .details(List.of(detailRequest, detailRequest2, detailRequest3))
-                .tags(List.of(tagRequest, tagRequest2, tagRequest3))
+                .descriptions(List.of(descriptionRequest1, descriptionRequest2, descriptionRequest3))
+                .tags(List.of(tagRequest, tagRequest2))
                 .build();
 
-        boardService.writePost(member.getId(), request);
+        boardService.writePost(member.getId(), request, List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3));
 
         BoardEntity boardEntity = boardRepository.findByTitle("레시피 테스트").orElseThrow();
         List<DetailEntity> details = detailRepository.findDetailsByPostId(boardEntity.getId());
@@ -115,7 +103,7 @@ public class BoardServiceTest {
 
         assertThat(boardEntity).isNotNull();
         assertThat(details.size()).isEqualTo(3);
-        assertThat(tags.size()).isEqualTo(3);
+        assertThat(tags.size()).isEqualTo(2);
         assertThat(details.get(0).getDescription()).isEqualTo("설명1");
         assertThat(tags.get(0).getName()).isEqualTo("모질개선");
     }
@@ -164,23 +152,19 @@ public class BoardServiceTest {
 
         memberRepository.save(member);
 
-        MockMultipartFile mockMultipartFile1 = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
 
-        DetailRequest detailRequest = DetailRequest.builder()
-                .image_url(mockMultipartFile1)
-                .description("설명1")
-                .build();
-
+        DescriptionRequest descriptionRequest = new DescriptionRequest("설명");
         TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
 
-        BoardWithDetailsRequestAndTagRequest request = BoardWithDetailsRequestAndTagRequest.builder()
+        BoardPostRequest request = BoardPostRequest.builder()
                 .title("레시피 테스트")
-                .details(List.of(detailRequest))
+                .descriptions(List.of(descriptionRequest))
                 .tags(List.of(tagRequest))
                 .build();
 
-        boardService.writePost(member.getId(), request);
+        boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
 
         // when
         BoardDetailReadResponse actual = boardService.findDetailByBoardId(1L);

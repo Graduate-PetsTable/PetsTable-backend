@@ -36,20 +36,20 @@ public class BoardEntity extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post")
     @BatchSize(size = 10)
-    private List<DetailEntity> description; // 상세 설명
+    private List<DetailEntity> details; // 상세 설명
 
     @OneToMany(mappedBy = "post")
     private List<TagEntity> tags; // 게시글 태그 목록
 
     // 연관 관계 설정 - 상세 설명
-    public void addDescriptions(List<DetailEntity> details) {
-        if (description == null) {
-            description = new ArrayList<>();
+    public void addDetails(List<DetailEntity> detailEntities) {
+        if (details == null) {
+            details = new ArrayList<>();
         }
-        for (DetailEntity detail : details) {
+        for (DetailEntity detail : detailEntities) {
             detail.setPost(this);
         }
-        description.addAll(details);
+        details.addAll(detailEntities);
     }
 
     // 연관 관계 설정 - 게시글 태그
