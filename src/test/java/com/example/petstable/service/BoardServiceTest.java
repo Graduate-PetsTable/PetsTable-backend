@@ -1,13 +1,12 @@
 package com.example.petstable.service;
 
-import com.example.petstable.domain.board.dto.request.BoardPostRequest;
-import com.example.petstable.domain.board.dto.request.DescriptionRequest;
-import com.example.petstable.domain.board.dto.request.TagRequest;
+import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.board.entity.DetailEntity;
 import com.example.petstable.domain.board.entity.TagEntity;
+import com.example.petstable.domain.board.entity.TagType;
 import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.board.repository.DetailRepository;
 import com.example.petstable.domain.board.repository.TagRepository;
@@ -17,7 +16,9 @@ import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.MemberService;
+import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -58,6 +61,18 @@ public class BoardServiceTest {
 
     @Autowired
     private TagRepository tagRepository;
+
+    public void clearStore(){
+        tagRepository.deleteAll();
+        detailRepository.deleteAll();
+        boardRepository.deleteAll();
+        memberRepository.deleteAll();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        clearStore();
+    }
 
     @Test
     @DisplayName("게시글에 이미지, 설명, 태그들을 넣고 저장에 성공한다.")
@@ -165,9 +180,10 @@ public class BoardServiceTest {
                 .build();
 
         boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+        BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
-        BoardDetailReadResponse actual = boardService.findDetailByBoardId(1L);
+        BoardDetailReadResponse actual = boardService.findDetailByBoardId(post.getId());
 
         // then
         assertThat(actual.getDetails().get(0).getImage_url()).isEqualTo("test_img.jpg");
@@ -199,12 +215,231 @@ public class BoardServiceTest {
                 .build();
 
         boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+        BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
-        boardService.findDetailByBoardId(1L);
-        BoardEntity actual = boardRepository.findById(1L).orElseThrow();
+        boardService.findDetailByBoardId(post.getId());
+        BoardEntity actual = boardRepository.findById(post.getId()).orElseThrow();
 
         // then
         assertThat(actual.getView_count()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("게시글 제목을 성공적으로 수정한다.")
+    void updatePostTitle() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gamil.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity board = BoardEntity.builder()
+                .title("제목 테스트")
+                .build();
+
+        boardRepository.save(board);
+
+        BoardEntity beforeBoard = boardRepository.findByTitle("제목 테스트").orElseThrow();
+
+        // when
+        BoardUpdateTitleRequest updateTitle = new BoardUpdateTitleRequest("제목 수정 테스트");
+        boardService.updatePostTitle(member.getId(), beforeBoard.getId(), updateTitle);
+
+        BoardEntity after = boardRepository.findById(beforeBoard.getId()).orElseThrow();
+
+        // then
+        assertAll(
+                () -> assertThat(after.getId()).isEqualTo(beforeBoard.getId()),
+                () -> assertThat(after.getTitle()).isEqualTo("제목 수정 테스트")
+        );
+    }
+
+    @Test
+    @DisplayName("게시글 태그를 수정하면 기존에 있던 태그는 삭제되고 새로운 태그들이 등록된다..")
+    void updatePostTag() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gamil.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity post = BoardEntity.builder()
+                .title("태그 테스트")
+                .build();
+
+        TagEntity tag = TagEntity.builder()
+                .type(TagType.AGE)
+                .name("노견")
+                .build();
+
+        boardRepository.save(post);
+        tagRepository.save(tag);
+
+        // when
+        BoardUpdateTagRequest updateTag = new BoardUpdateTagRequest("기능별", "모질개선");
+        boardService.updatePostTags(member.getId(), post.getId(), List.of(updateTag));
+
+        TagEntity beforeTag = tagRepository.findByName("노견");
+        TagEntity newTag = tagRepository.findByName("모질개선");
+
+        // then
+        assertAll(
+                () -> assertThat(beforeTag.getPost()).isNull(),
+                () -> assertThat(newTag.getPost()).isNotNull()
+        );
+    }
+
+    @Test
+    @DisplayName("게시글 상세 내용의 사진만 변경한다..")
+    void updateImageUrl() throws Exception {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gmail.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity post = BoardEntity.builder()
+                .title("상세 내용 변경 테스트")
+                .build();
+
+        boardRepository.save(post);
+
+        DetailEntity detail = DetailEntity.builder()
+                .image_url("static/test")
+                .description("tttt")
+                .build();
+
+        detailRepository.save(detail);
+
+        post.addDetails(List.of(detail));
+        detail.setPost(post);
+
+        MockMultipartFile expected = new MockMultipartFile("test_img", "test_img3.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img3.jpg"));
+        when(awsS3Uploader.uploadImage(expected)).thenReturn("test_img.jpg");
+
+        // when
+        DetailRequest request = DetailRequest.builder() // 사진만 변경
+                .image(expected)
+                .build();
+
+        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request);
+
+        DetailEntity actual = detailRepository.findById(detail.getId()).orElseThrow();
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getDescription()).isEqualTo("tttt"),
+                () -> assertThat(actual.getImage_url()).isEqualTo("test_img.jpg")
+        );
+
+    }
+
+    @Test
+    @DisplayName("게시글 상세 내용의 설명만 변경한다..")
+    void updateDescription() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gmail.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity post = BoardEntity.builder()
+                .title("상세 내용 변경 테스트")
+                .build();
+
+        boardRepository.save(post);
+
+        DetailEntity detail = DetailEntity.builder()
+                .image_url("static/test")
+                .description("tttt")
+                .build();
+
+        detailRepository.save(detail);
+
+        post.addDetails(List.of(detail));
+        detail.setPost(post);
+
+        // when
+        DetailRequest request = DetailRequest.builder() // 설명만 변경
+                .description("변경 테스트")
+                .build();
+
+        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request);
+
+        DetailEntity actual = detailRepository.findById(detail.getId()).orElseThrow();
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getDescription()).isEqualTo("변경 테스트"),
+                () -> assertThat(actual.getImage_url()).isEqualTo("static/test")
+        );
+
+    }
+
+    @Test
+    @DisplayName("게시글 상세 내용의 사진과 설명 모두 변경한다..")
+    void updateImageUrlAndDescription() throws Exception{
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gmail.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity post = BoardEntity.builder()
+                .title("상세 내용 변경 테스트")
+                .build();
+
+        boardRepository.save(post);
+
+        DetailEntity detail = DetailEntity.builder()
+                .image_url("static/test")
+                .description("tttt")
+                .build();
+
+        detailRepository.save(detail);
+
+        post.addDetails(List.of(detail));
+        detail.setPost(post);
+
+        MockMultipartFile expected = new MockMultipartFile("test_img", "test_img3.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img3.jpg"));
+        when(awsS3Uploader.uploadImage(expected)).thenReturn("test_img.jpg");
+
+        // when
+        DetailRequest request = DetailRequest.builder() // 사진만 변경
+                .image(expected)
+                .description("변경 테스트")
+                .build();
+
+        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request);
+
+        DetailEntity actual = detailRepository.findById(detail.getId()).orElseThrow();
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getDescription()).isEqualTo("변경 테스트"),
+                () -> assertThat(actual.getImage_url()).isEqualTo("test_img.jpg")
+        );
+
     }
 }
