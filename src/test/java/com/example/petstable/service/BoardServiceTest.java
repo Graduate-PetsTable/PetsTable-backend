@@ -442,4 +442,86 @@ public class BoardServiceTest {
         );
 
     }
+
+    @Test
+    @DisplayName("게시글 상세 내용을 삭제한다.")
+    void deletePostDetail() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gmail.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity post = BoardEntity.builder()
+                .title("게시글 삭제 테스트")
+                .build();
+
+        boardRepository.save(post);
+
+        DetailEntity detail = DetailEntity.builder()
+                .image_url("static/test")
+                .description("tttt")
+                .build();
+
+        detailRepository.save(detail);
+
+        post.addDetails(List.of(detail));
+        detail.setPost(post);
+
+        // when
+        boardService.deletePostDetail(member.getId(), post.getId(), detail.getId());
+        List<DetailEntity> actual = detailRepository.findDetailsByPostId(post.getId());
+
+        // then
+        assertThat(actual.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("게시글을 삭제한다.")
+    void deletePost() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .email("test@gmail.com")
+                .nickName("test")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        BoardEntity post = BoardEntity.builder()
+                .title("상세 내용 삭제 테스트")
+                .build();
+
+        boardRepository.save(post);
+
+        TagEntity tag = TagEntity.builder()
+                .type(TagType.AGE)
+                .name("노견")
+                .build();
+
+        tagRepository.save(tag);
+
+        DetailEntity detail = DetailEntity.builder()
+                .image_url("static/test")
+                .description("tttt")
+                .build();
+
+        detailRepository.save(detail);
+
+        post.addDetails(List.of(detail));
+        post.addTags(List.of(tag));
+        tag.setPost(post);
+        detail.setPost(post);
+
+        // when
+        boardService.deletePost(member.getId(), post.getId());
+
+        // then
+        assertThatThrownBy(() -> boardService.findDetailByBoardId(post.getId())).isInstanceOf(PetsTableException.class);
+    }
 }
