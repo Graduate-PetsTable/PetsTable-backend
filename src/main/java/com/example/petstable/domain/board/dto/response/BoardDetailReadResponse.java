@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 @Builder
 public class BoardDetailReadResponse {
 
+    private Long id;
     private String title;
     private int viewCount;
     private List<DetailResponse> details;
@@ -33,6 +34,7 @@ public class BoardDetailReadResponse {
                 .collect(Collectors.toList());
 
         return BoardDetailReadResponse.builder()
+                .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
                 .viewCount(boardEntity.getView_count())
                 .details(details)

@@ -96,6 +96,7 @@ public class BoardEntity extends BaseTimeEntity {
                 .toList();
 
         return BoardReadResponse.builder()
+                .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
                 .imageUrl(boardEntity.getThumbnail_url())
                 .tagName(tagNames)

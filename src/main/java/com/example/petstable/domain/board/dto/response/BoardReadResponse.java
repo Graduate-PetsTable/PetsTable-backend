@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public class BoardReadResponse {
 
+    private Long id;
     private String title; // 제목
     private String imageUrl; // 썸네일 이미지
     private List<String> tagName; // 태그 이름 목록
