@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,12 +48,42 @@ public class BoardController {
     }
 
     @Operation(summary = "게시글 상세 조회 API")
-    @PostMapping("/{boardId}")
+    @PostMapping("/{boardId}/detail")
     @SecurityRequirement(name = "JWT")
     public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@PathVariable("boardId") Long id) {
 
         BoardDetailReadResponse response = boardService.findDetailByBoardId(id);
 
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
+    }
+
+    @Operation(summary = "게시글 제목 수정 API", description = "제목만 수정 가능")
+    @PatchMapping(value = "/{boardId}/title")
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<String> updatePostTitle(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @RequestBody BoardUpdateTitleRequest request) {
+
+        boardService.updatePostTitle(userId, boardId, request);
+
+        return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
+    }
+
+    @Operation(summary = "게시글 태그 수정 API", description = "태그만 수정 가능 ( 기존에 있던 태그들 다 지우고 태그만 새로 추가하는 기능 ")
+    @PostMapping(value = "/{boardId}/tag/{tagId}")
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<String> updatePostTag(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @RequestBody List<BoardUpdateTagRequest> request) {
+
+        boardService.updatePostTags(userId, boardId, request);
+
+        return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
+    }
+
+    @Operation(summary = "게시글 상세 내용 수정 API", description = "선택한 단계만 수정 가능 ( 사진, 설명 )")
+    @PatchMapping(value = "/{boardId}/img/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<String> updatePostDetail(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId, @RequestBody DetailRequest request) {
+
+        boardService.updatePostDetail(userId, boardId, detailId, request);
+
+        return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 }

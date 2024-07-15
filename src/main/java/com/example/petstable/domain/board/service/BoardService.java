@@ -48,7 +48,7 @@ public class BoardService {
                 .title(request.getTitle())
                 .details(IntStream.range(0, images.size())
                         .mapToObj(i -> DetailRequest.builder()
-                                .image_url(images.get(i))
+                                .image(images.get(i))
                                 .description(request.getDescriptions().get(i).getDescription())
                                 .build())
                         .toList())
@@ -90,7 +90,7 @@ public class BoardService {
 
         List<DetailEntity> details = request.getDetails().stream()
                 .map(detailRequest -> {
-                    String imageUrl = awsS3Uploader.uploadImage(detailRequest.getImage_url());
+                    String imageUrl = awsS3Uploader.uploadImage(detailRequest.getImage());
                     String description = detailRequest.getDescription();
                     return DetailEntity.builder()
                             .image_url(imageUrl)
@@ -130,6 +130,15 @@ public class BoardService {
         return new BoardReadAllResponse(recipeTitlePage.toList(), pageResponse);
     }
 
+    public BoardEntity validMemberAndPost(Long userId, Long boardId) {
+
+        MemberEntity member = memberRepository.findById(userId)
+                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
+    }
+
     @Transactional
     public BoardDetailReadResponse findDetailByBoardId(Long boardId) {
 
@@ -139,5 +148,60 @@ public class BoardService {
         boardEntity.increaseViewCount();
 
         return BoardDetailReadResponse.from(boardEntity);
+    }
+
+    @Transactional
+    public void updatePostTitle(Long userId, Long boardId, BoardUpdateTitleRequest request) {
+
+        BoardEntity post = validMemberAndPost(userId, boardId);
+
+        post.updateTitle(request.getTitle());
+
+        boardRepository.save(post);
+    }
+
+    @Transactional
+    public void updatePostTags(Long memberId, Long boardId, List<BoardUpdateTagRequest> request) {
+
+        BoardEntity post = validMemberAndPost(memberId, boardId);
+
+        post.clearTags();
+        tagRepository.deleteByPostId(boardId);
+
+        List<TagEntity> newTags = request.stream()
+                .map(tagRequest -> TagEntity.builder()
+                        .type(TagType.from(tagRequest.getTagType()))
+                        .name(tagRequest.getTagName())
+                        .post(post)
+                        .build())
+                .toList();
+
+        post.addTags(newTags);
+        tagRepository.saveAll(newTags);
+    }
+
+    @Transactional
+    public void updatePostDetail(Long userId, Long boardId, Long detailId, DetailRequest request) {
+
+        BoardEntity post = validMemberAndPost(userId, boardId);
+
+        DetailEntity detail = detailRepository.findById(detailId)
+                .orElseThrow(() -> new PetsTableException(POST_NOT_INFO.getStatus(), POST_NOT_INFO.getMessage(), 400));
+
+        String newDescription = request.getDescription();
+
+        if (request.getImage() != null && newDescription != null) { // 사진, 설명 변경
+            String newImageUrl = awsS3Uploader.uploadImage(request.getImage());
+            detail.updateImageUrlAndDescription(newImageUrl, newDescription);
+
+        } else if (request.getImage() != null) { // 사진만 변경
+            String newImageUrl = awsS3Uploader.uploadImage(request.getImage());
+            detail.updateImageUrl(newImageUrl);
+
+        } else { // 설명만 변경
+            detail.updateDescription(newDescription);
+        }
+
+        detailRepository.save(detail);
     }
 }

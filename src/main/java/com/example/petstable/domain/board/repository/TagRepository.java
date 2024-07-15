@@ -13,4 +13,7 @@ public interface TagRepository extends JpaRepository<TagEntity, Long> {
 
     @Query("SELECT t FROM TagEntity t WHERE t.post.id = :postId")
     List<TagEntity> findTagsByPostId(@Param("postId") Long postId);
+
+    @Query("SELECT t FROM TagEntity t WHERE t.name = :tagName")
+    TagEntity findByName(@Param("tagName") String tagName);
 }

@@ -29,4 +29,20 @@ public class DetailEntity {
         this.post = post;
         post.getDetails().add(this);
     }
+
+    // 이미지만 업데이트
+    public void updateImageUrl(String newImageUrl) {
+        this.image_url = newImageUrl;
+    }
+
+    // 설명만 업데이트
+    public void updateDescription(String newDescription) {
+        this.description = newDescription;
+    }
+
+    // 이미지, 설명 둘 다 업데이트
+    public void updateImageUrlAndDescription(String newImageUrl, String newDescription) {
+        this.image_url = newImageUrl;
+        this.description = newDescription;
+    }
 }

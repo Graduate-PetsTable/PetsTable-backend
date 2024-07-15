@@ -63,6 +63,13 @@ public class BoardEntity extends BaseTimeEntity {
         tags.addAll(tagList);
     }
 
+    // 게시글 태그 전체 삭제
+    public void clearTags() {
+        if (tags != null) {
+            this.tags.clear();
+        }
+    }
+
     // 연관 관계 설정 - 회원
     public void setMember(MemberEntity member) {
         this.member = member;
@@ -72,6 +79,10 @@ public class BoardEntity extends BaseTimeEntity {
     // 조회수 증가
     public void increaseViewCount() {
         this.view_count += 1;
+    }
+
+    public void updateTitle(String newTitle) {
+        this.title = newTitle;
     }
 
     // 썸네일 이미지 등록
