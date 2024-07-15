@@ -204,4 +204,32 @@ public class BoardService {
 
         detailRepository.save(detail);
     }
+
+    @Transactional
+    public DetailResponse deletePostDetail(Long userId, Long boardId, Long detailId) {
+
+        BoardEntity post = validMemberAndPost(userId, boardId);
+
+        DetailEntity detail = detailRepository.findById(detailId)
+                .orElseThrow(() -> new PetsTableException(POST_NOT_INFO.getStatus(), POST_NOT_INFO.getMessage(), 400));
+
+        DetailResponse response = DetailResponse.builder()
+                .description(detail.getDescription())
+                .image_url(detail.getImage_url())
+                .build();
+
+        post.getDetails().remove(detail);
+
+        detailRepository.delete(detail);
+
+        return response;
+    }
+
+    @Transactional
+    public void deletePost(Long userId, Long boardId) {
+
+        BoardEntity post = validMemberAndPost(userId, boardId);
+
+        boardRepository.delete(post);
+    }
 }

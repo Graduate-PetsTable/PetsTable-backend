@@ -4,6 +4,7 @@ import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardPostResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
+import com.example.petstable.domain.board.dto.response.DetailResponse;
 import com.example.petstable.domain.board.service.BoardService;
 import com.example.petstable.global.auth.ios.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
@@ -86,4 +87,25 @@ public class BoardController {
 
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
+
+    @Operation(summary = "게시글 상세 내용 삭제 API")
+    @DeleteMapping(value = "/{boardId}/img/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "JWT")
+    public PetsTableApiResponse<DetailResponse> deletePostDetail (@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId) {
+
+        DetailResponse response = boardService.deletePostDetail(userId, boardId, detailId);
+
+        return PetsTableApiResponse.createResponse(response, DELETE_DETAIL_SUCCESS);
+    }
+
+    @Operation(summary = "게시글 삭제 API")
+    @DeleteMapping(value = "/{boardId}")
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<String> deletePostDetail (@LoginUserId Long userId, @PathVariable("boardId") Long boardId) {
+
+        boardService.deletePost(userId, boardId);
+
+        return ResponseEntity.ok(DELETE_POST_SUCCESS.getMessage());
+    }
+
 }
