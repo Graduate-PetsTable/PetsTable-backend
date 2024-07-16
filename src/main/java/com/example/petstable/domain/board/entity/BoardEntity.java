@@ -1,6 +1,7 @@
 package com.example.petstable.domain.board.entity;
 
 import com.example.petstable.domain.board.dto.response.BoardReadResponse;
+import com.example.petstable.domain.bookmark.entity.BookmarkEntity;
 import com.example.petstable.domain.member.entity.BaseTimeEntity;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import jakarta.persistence.*;
@@ -28,7 +29,6 @@ public class BoardEntity extends BaseTimeEntity {
     private String thumbnail_url; // 썸네일 ( 완성 사진 )
 
     private int view_count; // 조회수
-    private int like_count; // 좋아요
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -40,6 +40,9 @@ public class BoardEntity extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post")
     private List<TagEntity> tags; // 게시글 태그 목록
+
+    @OneToMany(mappedBy = "post")
+    private List<BookmarkEntity> bookmarks; // 북마크
 
     // 연관 관계 설정 - 상세 설명
     public void addDetails(List<DetailEntity> detailEntities) {
@@ -61,6 +64,12 @@ public class BoardEntity extends BaseTimeEntity {
             tag.setPost(this);
         }
         tags.addAll(tagList);
+    }
+
+    // 연관 관계 설정 - 북마크
+    public void addBookmark(BookmarkEntity bookmark) {
+        bookmarks.add(bookmark);
+        bookmark.setPost(this);
     }
 
     // 게시글 태그 전체 삭제
