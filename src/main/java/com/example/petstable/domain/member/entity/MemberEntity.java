@@ -1,6 +1,7 @@
 package com.example.petstable.domain.member.entity;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
+import com.example.petstable.domain.bookmark.entity.BookmarkEntity;
 import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.*;
@@ -46,6 +47,9 @@ public class MemberEntity extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<BoardEntity> posts;
 
+    @OneToMany(mappedBy = "member")
+    private List<BookmarkEntity> bookmarks;
+
     // 연관 관계 메서드
     public void addPets(PetEntity pet) {
         pets.add(pet);
@@ -55,6 +59,11 @@ public class MemberEntity extends BaseTimeEntity {
     public void addPost(BoardEntity post) {
         posts.add(post);
         post.setMember(this);
+    }
+
+    public void addBookmark(BookmarkEntity bookmark) {
+        bookmarks.add(bookmark);
+        bookmark.setMember(this);
     }
 
     // 닉네임 검증

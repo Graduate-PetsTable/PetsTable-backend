@@ -148,7 +148,7 @@ public class BoardServiceTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 5);
-        BoardReadAllResponse actual = boardService.getAllPost(pageable);
+        BoardReadAllResponse actual = boardService.getAllPost(pageable, member.getId());
 
         // then
         assertThat(actual.recipes().size()).isEqualTo(3);
@@ -183,7 +183,7 @@ public class BoardServiceTest {
         BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
-        BoardDetailReadResponse actual = boardService.findDetailByBoardId(post.getId());
+        BoardDetailReadResponse actual = boardService.findDetailByBoardId(member.getId(), post.getId());
 
         // then
         assertThat(actual.getDetails().get(0).getImage_url()).isEqualTo("test_img.jpg");
@@ -218,7 +218,7 @@ public class BoardServiceTest {
         BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
-        boardService.findDetailByBoardId(post.getId());
+        boardService.findDetailByBoardId(member.getId(), post.getId());
         BoardEntity actual = boardRepository.findById(post.getId()).orElseThrow();
 
         // then
@@ -522,6 +522,6 @@ public class BoardServiceTest {
         boardService.deletePost(member.getId(), post.getId());
 
         // then
-        assertThatThrownBy(() -> boardService.findDetailByBoardId(post.getId())).isInstanceOf(PetsTableException.class);
+        assertThatThrownBy(() -> boardService.findDetailByBoardId(member.getId(), post.getId())).isInstanceOf(PetsTableException.class);
     }
 }

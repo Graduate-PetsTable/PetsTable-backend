@@ -9,6 +9,7 @@ import com.example.petstable.domain.board.entity.TagType;
 import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.board.repository.DetailRepository;
 import com.example.petstable.domain.board.repository.TagRepository;
+import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.exception.PetsTableException;
@@ -35,6 +36,7 @@ public class BoardService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
     private final DetailRepository detailRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final AwsS3Uploader awsS3Uploader;
     private final TagRepository tagRepository;
 
@@ -120,14 +122,23 @@ public class BoardService {
         return post;
     }
 
-    public BoardReadAllResponse getAllPost(Pageable pageable) {
-        Page<BoardReadResponse> recipeTitlePage = boardRepository.findAll(pageable).map(BoardEntity::toBoardTitleAndTags);
+    public BoardReadAllResponse getAllPost(Pageable pageable, Long memberId) {
+        Page<BoardEntity> postPage = boardRepository.findAll(pageable);
 
-        PageResponse pageResponse = new PageResponse(recipeTitlePage);
-        if (recipeTitlePage.isEmpty()) {
+        List<BoardReadWithBookmarkResponse> postResponses = postPage.stream()
+                .map(post -> {
+                    boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, post.getId());
+                    return new BoardReadWithBookmarkResponse(post, isBookmarked);
+                })
+                .collect(Collectors.toList());
+
+        PageResponse pageResponse = new PageResponse(postPage);
+
+        if (postResponses.isEmpty()) {
             throw new PetsTableException(RECIPE_IS_EMPTY.getStatus(), RECIPE_IS_EMPTY.getMessage(), 204);
         }
-        return new BoardReadAllResponse(recipeTitlePage.toList(), pageResponse);
+
+        return new BoardReadAllResponse(postResponses, pageResponse);
     }
 
     public BoardEntity validMemberAndPost(Long userId, Long boardId) {
@@ -140,14 +151,16 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardDetailReadResponse findDetailByBoardId(Long boardId) {
+    public BoardDetailReadResponse findDetailByBoardId(Long memberId, Long boardId) {
 
         BoardEntity boardEntity = boardRepository.findById(boardId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
 
         boardEntity.increaseViewCount();
 
-        return BoardDetailReadResponse.from(boardEntity);
+        boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
+
+        return BoardDetailReadResponse.from(boardEntity, isBookmarked);
     }
 
     @Transactional

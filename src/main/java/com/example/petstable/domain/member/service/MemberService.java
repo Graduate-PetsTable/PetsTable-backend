@@ -1,6 +1,10 @@
 package com.example.petstable.domain.member.service;
 
+import com.example.petstable.domain.board.entity.BoardEntity;
+import com.example.petstable.domain.board.repository.BoardRepository;
+import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
+import com.example.petstable.domain.member.dto.response.BookmarkMyList;
 import com.example.petstable.domain.member.dto.response.OAuthMemberSignUpResponse;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
@@ -10,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.example.petstable.domain.member.message.MemberMessage.*;
 
 @Service
@@ -18,6 +24,8 @@ import static com.example.petstable.domain.member.message.MemberMessage.*;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final BoardRepository boardRepository;
 
     @Transactional
     public OAuthMemberSignUpResponse signUpByOAuthMember(OAuthMemberSignUpRequest request) {
@@ -37,5 +45,19 @@ public class MemberService {
                 .ifPresent(member -> {
                     throw new PetsTableException(INVALID_NICKNAME.getStatus(), INVALID_NICKNAME.getMessage(), 409);
                 });
+    }
+
+    public void validateMember(Long memberId) {
+
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+    }
+
+    public BookmarkMyList findMyBookmarkList(Long memberId) {
+
+        validateMember(memberId);
+        List<BoardEntity> findMyBookmarkList = bookmarkRepository.findBookmarkedPostsByMemberId(memberId);
+
+        return BookmarkMyList.createBookmarkMyRegisterResponse(findMyBookmarkList);
     }
 }

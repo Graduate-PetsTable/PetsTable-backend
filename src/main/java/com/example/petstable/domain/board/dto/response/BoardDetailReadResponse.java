@@ -14,10 +14,11 @@ public class BoardDetailReadResponse {
     private Long id;
     private String title;
     private int viewCount;
+    private boolean bookmarkStatus;
     private List<DetailResponse> details;
     private List<TagResponse> tags;
 
-    public static BoardDetailReadResponse from(BoardEntity boardEntity) {
+    public static BoardDetailReadResponse from(BoardEntity boardEntity, boolean status) {
 
         List<DetailResponse> details = boardEntity.getDetails().stream()
                 .map(detail -> DetailResponse.builder()
@@ -37,6 +38,7 @@ public class BoardDetailReadResponse {
                 .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
                 .viewCount(boardEntity.getView_count())
+                .bookmarkStatus(status)
                 .details(details)
                 .tags(tags)
                 .build();
