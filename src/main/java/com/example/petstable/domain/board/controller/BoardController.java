@@ -41,9 +41,9 @@ public class BoardController {
     @Operation(summary = "게시글 목록 전체 조회 API")
     @PostMapping("/list")
     @SecurityRequirement(name = "JWT")
-    public PetsTableApiResponse<BoardReadAllResponse> readAllPost(Pageable pageable) {
+    public PetsTableApiResponse<BoardReadAllResponse> readAllPost(Pageable pageable, @LoginUserId Long memberId) {
 
-        BoardReadAllResponse response = boardService.getAllPost(pageable);
+        BoardReadAllResponse response = boardService.getAllPost(pageable, memberId);
 
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
     }
@@ -51,9 +51,9 @@ public class BoardController {
     @Operation(summary = "게시글 상세 조회 API")
     @PostMapping("/{boardId}/detail")
     @SecurityRequirement(name = "JWT")
-    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@PathVariable("boardId") Long id) {
+    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
 
-        BoardDetailReadResponse response = boardService.findDetailByBoardId(id);
+        BoardDetailReadResponse response = boardService.findDetailByBoardId(memberId, boardId);
 
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }

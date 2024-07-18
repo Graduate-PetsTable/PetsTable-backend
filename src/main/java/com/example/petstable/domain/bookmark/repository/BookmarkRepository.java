@@ -19,4 +19,6 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
 
     @Query("SELECT b.post FROM BookmarkEntity b WHERE b.member.id = :memberId")
     List<BoardEntity> findBookmarkedPostsByMemberId(@Param("memberId") Long memberId);
+
+    boolean existsByMemberIdAndPostId(Long memberId, Long postId);
 }
