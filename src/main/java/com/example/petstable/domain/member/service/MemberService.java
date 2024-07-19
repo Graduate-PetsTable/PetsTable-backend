@@ -1,18 +1,20 @@
 package com.example.petstable.domain.member.service;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
 import com.example.petstable.domain.member.dto.response.BookmarkMyList;
+import com.example.petstable.domain.member.dto.response.MemberProfileImageResponse;
 import com.example.petstable.domain.member.dto.response.OAuthMemberSignUpResponse;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.exception.PetsTableException;
+import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final BoardRepository boardRepository;
+    private final AwsS3Uploader awsS3Uploader;
 
     @Transactional
     public OAuthMemberSignUpResponse signUpByOAuthMember(OAuthMemberSignUpRequest request) {
@@ -47,9 +49,9 @@ public class MemberService {
                 });
     }
 
-    public void validateMember(Long memberId) {
+    public MemberEntity validateMember(Long memberId) {
 
-        memberRepository.findById(memberId)
+        return memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
     }
 
@@ -59,5 +61,32 @@ public class MemberService {
         List<BoardEntity> findMyBookmarkList = bookmarkRepository.findBookmarkedPostsByMemberId(memberId);
 
         return BookmarkMyList.createBookmarkMyRegisterResponse(findMyBookmarkList);
+    }
+
+    @Transactional
+    public MemberProfileImageResponse registerProfileImage(Long memberId, MultipartFile multipartFile) {
+
+        MemberEntity member = validateMember(memberId);
+        String imageUrl = awsS3Uploader.uploadImage(multipartFile);
+
+        member.updateProfileImage(imageUrl);
+
+        return MemberProfileImageResponse.builder()
+                .id(member.getId())
+                .imageUrl(imageUrl)
+                .build();
+    }
+
+    @Transactional
+    public MemberProfileImageResponse deleteProfileImage(Long memberId) {
+
+        MemberEntity member = validateMember(memberId);
+
+        member.updateProfileImage(null);
+
+        return MemberProfileImageResponse.builder()
+                .id(member.getId())
+                .imageUrl(null)
+                .build();
     }
 }
