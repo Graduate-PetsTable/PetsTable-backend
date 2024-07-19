@@ -160,4 +160,26 @@ public class MemberServiceTest {
         // then
         assertThat(actual.getImage_url()).isEqualTo("test_img.jpg");
     }
+
+    @DisplayName("사용자가 프로필 이미지를 삭제한다.")
+    @Test
+    void deleteProfileImage() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .nickName("sg")
+                .image_url("static/test_img.jpg")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        // when
+        memberService.deleteProfileImage(member.getId());
+
+        MemberEntity actual = memberRepository.findById(member.getId()).orElseThrow();
+
+        // then
+        assertThat(actual.getImage_url()).isNull();;
+    }
 }
