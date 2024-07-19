@@ -1,19 +1,26 @@
 package com.example.petstable.domain.pet.controller;
 
 import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
+import com.example.petstable.domain.pet.dto.response.PetImageResponse;
 import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
 import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
+import com.example.petstable.domain.pet.message.PetMessage;
 import com.example.petstable.domain.pet.service.PetService;
 import com.example.petstable.global.auth.ios.auth.LoginUserId;
+import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import static com.example.petstable.domain.pet.message.PetMessage.*;
 
 @Tag(name = "반려동물 관련 컨트롤러")
 @RestController
@@ -53,4 +60,23 @@ public class PetController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "반려동물 사진 등록")
+    @PatchMapping(value = "/{petId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "JWT")
+    public PetsTableApiResponse<PetImageResponse> addPetImage(@LoginUserId Long memberId, @PathVariable("petId") Long petId, MultipartFile multipartFile) {
+
+        PetImageResponse response = petService.registerPetImage(memberId, petId, multipartFile);
+
+        return PetsTableApiResponse.createResponse(response, SUCCESS_REGISTER_PET_IMAGE);
+    }
+
+    @Operation(summary = "반려동물 사진 삭제")
+    @DeleteMapping(value = "/{petId}/image")
+    @SecurityRequirement(name = "JWT")
+    public PetsTableApiResponse<PetImageResponse> deletePetImage(@LoginUserId Long memberId, @PathVariable("petId") Long petId) {
+
+        PetImageResponse response = petService.deletePetImage(memberId, petId);
+
+        return PetsTableApiResponse.createResponse(response, SUCCESS_REGISTER_PET_IMAGE);
+    }
 }

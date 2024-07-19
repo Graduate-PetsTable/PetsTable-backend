@@ -13,14 +13,20 @@ import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.domain.pet.repository.PetRepository;
 import com.example.petstable.domain.pet.service.PetService;
 import com.example.petstable.global.exception.PetsTableException;
+import com.example.petstable.global.support.AwsS3Uploader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PetServiceTest {
@@ -31,8 +37,8 @@ public class PetServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private AuthService authService;
+    @MockBean
+    private AwsS3Uploader awsS3Uploader;
 
     @Autowired
     private PetService petService;
@@ -218,6 +224,65 @@ public class PetServiceTest {
         // then
         assertThat(actual.getId()).isEqualTo(expected.getId());
         assertThat(actual.getKind()).isEqualTo(expected.getKind());
+    }
+
+
+    @DisplayName("반려동물 사진 등록에 성공한다.")
+    @Test
+    void addPetImage() throws IOException {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .nickName("sg")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        PetEntity pet = PetEntity.builder()
+                .name("파랑이")
+                .member(member)
+                .build();
+
+        petRepository.save(pet);
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+
+        // when
+        petService.registerPetImage(member.getId(), pet.getId(), mockMultipartFile);
+        PetEntity actual = petRepository.findById(pet.getId()).orElseThrow();
+
+        // then
+        assertThat(actual.getImage_url()).isEqualTo("test_img.jpg");
+    }
+
+    @DisplayName("반려동물 사진 삭제에 성공한다.")
+    @Test
+    void deletePetImage() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .nickName("sg")
+                .socialType(SocialType.TEST)
+                .build();
+
+        memberRepository.save(member);
+
+        PetEntity pet = PetEntity.builder()
+                .name("파랑이")
+                .image_url("test_img.jpg")
+                .member(member)
+                .build();
+
+        petRepository.save(pet);
+
+        // when
+        petService.deletePetImage(member.getId(), pet.getId());
+        PetEntity actual = petRepository.findById(pet.getId()).orElseThrow();
+
+        // then
+        assertThat(actual.getImage_url()).isNull();
     }
 
 }
