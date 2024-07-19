@@ -29,6 +29,7 @@ public class PetEntity extends BaseTimeEntity {
     private String kind; // 품종 ( 푸들, 말티즈, 닥스훈트, ... )
     private String gender; // 성별
     private String walk; // 산책량
+    private String image_url; // 프로필 사진
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -66,5 +67,9 @@ public class PetEntity extends BaseTimeEntity {
                 .walk(petEntity.getWalk())
                 .ownerNickname(petEntity.getMember().getNickName())
                 .build();
+    }
+
+    public void updateImage(String imageUrl) {
+        this.image_url = imageUrl;
     }
 }

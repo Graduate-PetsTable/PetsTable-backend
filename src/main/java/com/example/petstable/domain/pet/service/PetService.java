@@ -3,14 +3,17 @@ package com.example.petstable.domain.pet.service;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
+import com.example.petstable.domain.pet.dto.response.PetImageResponse;
 import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
 import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
 import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.domain.pet.repository.PetRepository;
 import com.example.petstable.global.exception.PetsTableException;
+import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import static com.example.petstable.domain.member.message.MemberMessage.*;
@@ -23,6 +26,7 @@ public class PetService {
 
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
+    private final AwsS3Uploader awsS3Uploader;
 
     @Transactional
     public PetRegisterResponse registerPet(Long memberId, PetRegisterRequest petRegisterRequest) {
@@ -62,5 +66,43 @@ public class PetService {
                 .stream()
                 .map(PetEntity::toPetInfoResponse)
                 .toList();
+    }
+
+    @Transactional
+    public PetImageResponse registerPetImage(Long memberId, Long petId, MultipartFile multipartFile) {
+
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+
+        PetEntity pet = petRepository.findByIdAndMemberId(petId, member.getId())
+                .orElseThrow(() -> new PetsTableException(PET_NOT_FOUND.getStatus(), PETS_NOT_FOUND.getMessage(), 404));
+
+        String imageUrl = awsS3Uploader.uploadImage(multipartFile);
+
+        pet.updateImage(imageUrl);
+
+        return PetImageResponse.builder()
+                .memberId(member.getId())
+                .petId(pet.getId())
+                .image_url(imageUrl)
+                .build();
+    }
+
+    @Transactional
+    public PetImageResponse deletePetImage(Long memberId, Long petId) {
+
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+
+        PetEntity pet = petRepository.findByIdAndMemberId(petId, member.getId())
+                .orElseThrow(() -> new PetsTableException(PET_NOT_FOUND.getStatus(), PETS_NOT_FOUND.getMessage(), 404));
+
+        pet.updateImage(null);
+
+        return PetImageResponse.builder()
+                .memberId(member.getId())
+                .petId(pet.getId())
+                .image_url(null)
+                .build();
     }
 }
