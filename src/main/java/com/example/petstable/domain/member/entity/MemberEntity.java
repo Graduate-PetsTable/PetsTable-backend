@@ -6,6 +6,7 @@ import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,7 +30,7 @@ public class MemberEntity extends BaseTimeEntity {
     private String email; // 이메일
     private String nickName; // 닉네임
 
-    private String image_url;
+    private String image_url; // 프로필 이미지
 
     @Enumerated(value = EnumType.STRING)
     private SocialType socialType; // APPLE, GOOGLE
@@ -81,5 +82,10 @@ public class MemberEntity extends BaseTimeEntity {
 
     public boolean isRegisteredOAuthMember() {
         return nickName != null;
+    }
+
+    // 프로필 사진 등록
+    public void updateProfileImage(String imageUrl) {
+        this.image_url = imageUrl;
     }
 }

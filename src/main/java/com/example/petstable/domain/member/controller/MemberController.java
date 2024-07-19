@@ -2,6 +2,7 @@ package com.example.petstable.domain.member.controller;
 
 import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
 import com.example.petstable.domain.member.dto.response.BookmarkMyList;
+import com.example.petstable.domain.member.dto.response.MemberProfileImageResponse;
 import com.example.petstable.domain.member.dto.response.OAuthMemberSignUpResponse;
 import com.example.petstable.domain.member.service.MemberService;
 import com.example.petstable.global.auth.ios.auth.LoginUserId;
@@ -11,7 +12,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,6 +36,16 @@ public class MemberController {
         OAuthMemberSignUpResponse response = memberService.signUpByOAuthMember(request);
 
         return PetsTableApiResponse.createResponse(response, JOIN_SUCCESS);
+    }
+
+    @Operation(summary = "사용자 프로필 이미지 등록")
+    @PatchMapping(value = "/profile/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "JWT")
+    public PetsTableApiResponse<MemberProfileImageResponse> addProfileImage(@LoginUserId Long memberId, MultipartFile multipartFile) {
+
+        MemberProfileImageResponse response = memberService.registerProfileImage(memberId, multipartFile);
+
+        return PetsTableApiResponse.createResponse(response, SUCCESS_REGISTER_PROFILE_IMAGE);
     }
 
     @Operation(summary = "내 북마크 목록 조회")
