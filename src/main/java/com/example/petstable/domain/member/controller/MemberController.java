@@ -38,7 +38,7 @@ public class MemberController {
         return PetsTableApiResponse.createResponse(response, JOIN_SUCCESS);
     }
 
-    @Operation(summary = "사용자 프로필 이미지 등록")
+    @Operation(summary = "사용자 프로필 이미지 등록 및 수정")
     @PatchMapping(value = "/profile/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "JWT")
     public PetsTableApiResponse<MemberProfileImageResponse> addProfileImage(@LoginUserId Long memberId, MultipartFile multipartFile) {
@@ -46,6 +46,16 @@ public class MemberController {
         MemberProfileImageResponse response = memberService.registerProfileImage(memberId, multipartFile);
 
         return PetsTableApiResponse.createResponse(response, SUCCESS_REGISTER_PROFILE_IMAGE);
+    }
+
+    @Operation(summary = "사용자 프로필 이미지 삭제")
+    @DeleteMapping(value = "/profile/image")
+    @SecurityRequirement(name = "JWT")
+    public PetsTableApiResponse<MemberProfileImageResponse> deleteProfileImage(@LoginUserId Long memberId) {
+
+        MemberProfileImageResponse response = memberService.deleteProfileImage(memberId);
+
+        return PetsTableApiResponse.createResponse(response, SUCCESS_DELETE_PROFILE_IMAGE);
     }
 
     @Operation(summary = "내 북마크 목록 조회")

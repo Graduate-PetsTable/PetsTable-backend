@@ -76,4 +76,17 @@ public class MemberService {
                 .imageUrl(imageUrl)
                 .build();
     }
+
+    @Transactional
+    public MemberProfileImageResponse deleteProfileImage(Long memberId) {
+
+        MemberEntity member = validateMember(memberId);
+
+        member.updateProfileImage(null);
+
+        return MemberProfileImageResponse.builder()
+                .id(member.getId())
+                .imageUrl(null)
+                .build();
+    }
 }
