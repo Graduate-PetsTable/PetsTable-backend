@@ -3,6 +3,7 @@ package com.example.petstable.domain.member.entity;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.bookmark.entity.BookmarkEntity;
 import com.example.petstable.domain.pet.entity.PetEntity;
+import com.example.petstable.domain.report.entity.ReportEntity;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,6 +32,7 @@ public class MemberEntity extends BaseTimeEntity {
     private String nickName; // 닉네임
 
     private String image_url; // 프로필 이미지
+    private int report_count; // 신고 횟수
 
     @Enumerated(value = EnumType.STRING)
     private SocialType socialType; // APPLE, GOOGLE
@@ -50,6 +52,9 @@ public class MemberEntity extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<BookmarkEntity> bookmarks;
+
+    @OneToMany(mappedBy = "reporter")
+    private List<ReportEntity> report;
 
     // 연관 관계 메서드
     public void addPets(PetEntity pet) {
@@ -87,5 +92,10 @@ public class MemberEntity extends BaseTimeEntity {
     // 프로필 사진 등록
     public void updateProfileImage(String imageUrl) {
         this.image_url = imageUrl;
+    }
+
+    // 사용자 신고횟수 증가
+    public void increaseReportCount() {
+        this.report_count++;
     }
 }

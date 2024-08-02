@@ -4,6 +4,7 @@ import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.bookmark.entity.BookmarkEntity;
 import com.example.petstable.domain.member.entity.BaseTimeEntity;
 import com.example.petstable.domain.member.entity.MemberEntity;
+import com.example.petstable.domain.report.entity.ReportEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -20,6 +21,8 @@ import static jakarta.persistence.FetchType.LAZY;
 @Table(name = "board")
 public class BoardEntity extends BaseTimeEntity {
 
+    private static final int REPORT_POST_THRESHOLD_COUNT = 5;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
@@ -27,6 +30,7 @@ public class BoardEntity extends BaseTimeEntity {
 
     private String title; // 제목
     private String thumbnail_url; // 썸네일 ( 완성 사진 )
+    private int reportCount; // 신고 횟수
 
     private int view_count; // 조회수
 
@@ -43,6 +47,9 @@ public class BoardEntity extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post")
     private List<BookmarkEntity> bookmarks; // 북마크
+
+    @OneToMany(mappedBy = "post")
+    private List<ReportEntity> reports; // 신고
 
     // 연관 관계 설정 - 상세 설명
     public void addDetails(List<DetailEntity> detailEntities) {
@@ -83,6 +90,45 @@ public class BoardEntity extends BaseTimeEntity {
     public void setMember(MemberEntity member) {
         this.member = member;
         member.getPosts().add(this);
+    }
+
+    // 연관 관계 설정 - 신고
+    public void addReport(ReportEntity report) {
+        reports.add(report);
+        report.setPost(this);
+        increaseReportCount();
+    }
+
+    public boolean isMemberDeleted() {
+        return this.member == null;
+    }
+
+    public boolean isWrittenBySelf(MemberEntity member) {
+        return this.getMember() != null && this.getMember().equals(member);
+    }
+
+    public boolean hasAlreadyReported(MemberEntity member) {
+        return this.reports.stream()
+                .anyMatch(report -> report.getReporter().equals(member));
+    }
+
+    public boolean isReportThresholdExceeded() {
+        return getReportCount() >= REPORT_POST_THRESHOLD_COUNT;
+    }
+
+    public void increaseReportCount() {
+        this.reportCount++;
+    }
+
+    public void clearPost() {
+        this.title = null;
+        this.thumbnail_url = null;
+        if (this.details != null) {
+            this.details.clear();
+        }
+        if (this.tags != null) {
+            this.tags.clear();
+        }
     }
 
     // 조회수 증가
