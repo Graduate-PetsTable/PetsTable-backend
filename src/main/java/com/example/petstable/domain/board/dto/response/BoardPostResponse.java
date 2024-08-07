@@ -12,4 +12,5 @@ public class BoardPostResponse {
     private String title;
     private List<DetailPostResponse> details;
     private List<TagResponse> tags;
+    private List<IngredientResponse> ingredients;
 }

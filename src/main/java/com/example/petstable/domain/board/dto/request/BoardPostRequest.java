@@ -12,4 +12,5 @@ public class BoardPostRequest {
     private String title;
     private List<DescriptionRequest> descriptions;
     private List<TagRequest> tags;
+    private List<IngredientRequest> ingredients;
 }

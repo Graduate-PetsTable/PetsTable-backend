@@ -17,6 +17,7 @@ public class BoardDetailReadResponse {
     private boolean bookmarkStatus;
     private List<DetailResponse> details;
     private List<TagResponse> tags;
+    private List<IngredientResponse> ingredients;
 
     public static BoardDetailReadResponse from(BoardEntity boardEntity, boolean status) {
 
@@ -34,6 +35,13 @@ public class BoardDetailReadResponse {
                         .build())
                 .collect(Collectors.toList());
 
+        List<IngredientResponse> ingredients = boardEntity.getIngredients().stream()
+                .map(ingredient -> IngredientResponse.builder()
+                        .name(ingredient.getName())
+                        .weight(ingredient.getWeight())
+                        .build())
+                .toList();
+
         return BoardDetailReadResponse.builder()
                 .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
@@ -41,6 +49,7 @@ public class BoardDetailReadResponse {
                 .bookmarkStatus(status)
                 .details(details)
                 .tags(tags)
+                .ingredients(ingredients)
                 .build();
     }
 }
