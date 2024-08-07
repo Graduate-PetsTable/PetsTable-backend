@@ -2,12 +2,10 @@ package com.example.petstable.domain.board.service;
 
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
-import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.DetailEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
-import com.example.petstable.domain.board.entity.TagType;
+import com.example.petstable.domain.board.entity.*;
 import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.board.repository.DetailRepository;
+import com.example.petstable.domain.board.repository.IngredientRepository;
 import com.example.petstable.domain.board.repository.TagRepository;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
@@ -39,6 +37,7 @@ public class BoardService {
     private final BookmarkRepository bookmarkRepository;
     private final AwsS3Uploader awsS3Uploader;
     private final TagRepository tagRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Transactional
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, List<MultipartFile> images) {
@@ -46,7 +45,7 @@ public class BoardService {
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
 
-        BoardWithDetailsRequestAndTagRequest boardRequest = BoardWithDetailsRequestAndTagRequest.builder()
+        BoardWithDetailsAndTagsAndIngredients boardRequest = BoardWithDetailsAndTagsAndIngredients.builder()
                 .title(request.getTitle())
                 .details(IntStream.range(0, images.size())
                         .mapToObj(i -> DetailRequest.builder()
@@ -55,9 +54,10 @@ public class BoardService {
                                 .build())
                         .toList())
                 .tags(request.getTags())
+                .ingredients(request.getIngredients())
                 .build();
 
-        BoardEntity post = createPostWithDetailsAndTags(boardRequest, member);
+        BoardEntity post = createPostWithDetailsAndTagsAndIngredientRequest(boardRequest, member);
 
         boardRepository.save(post);
 
@@ -77,11 +77,18 @@ public class BoardService {
                                 .tagName(tag.getName())
                                 .build())
                         .collect(Collectors.toList()))
+                .ingredients(post.getIngredients().stream()
+                        .distinct()
+                        .map(ingredient -> IngredientResponse.builder()
+                                .name(ingredient.getName())
+                                .weight(ingredient.getWeight())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
     // 연관관계 설정
-    private BoardEntity createPostWithDetailsAndTags(BoardWithDetailsRequestAndTagRequest request, MemberEntity member) {
+    private BoardEntity createPostWithDetailsAndTagsAndIngredientRequest(BoardWithDetailsAndTagsAndIngredients request, MemberEntity member) {
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
@@ -118,6 +125,17 @@ public class BoardService {
 
         post.addTags(tags);
         tagRepository.saveAll(tags);
+
+
+        List<IngredientEntity> ingredients = request.getIngredients().stream()
+                .map(ingredientRequest -> IngredientEntity.builder()
+                        .name(ingredientRequest.getName())
+                        .weight(ingredientRequest.getWeight())
+                        .build())
+                .toList();
+
+        post.addIngredient(ingredients);
+        ingredientRepository.saveAll(ingredients);
 
         return post;
     }

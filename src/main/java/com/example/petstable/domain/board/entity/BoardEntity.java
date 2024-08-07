@@ -51,6 +51,9 @@ public class BoardEntity extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     private List<ReportEntity> reports; // 신고
 
+    @OneToMany(mappedBy = "post")
+    private List<IngredientEntity> ingredients; // 재료
+
     // 연관 관계 설정 - 상세 설명
     public void addDetails(List<DetailEntity> detailEntities) {
         if (details == null) {
@@ -97,6 +100,17 @@ public class BoardEntity extends BaseTimeEntity {
         reports.add(report);
         report.setPost(this);
         increaseReportCount();
+    }
+
+    // 연관 관계 설정 - 재료
+    public void addIngredient(List<IngredientEntity> ingredientEntity) {
+        if (ingredients == null) {
+            ingredients = new ArrayList<>();
+        }
+        for (IngredientEntity ingredient : ingredientEntity) {
+            ingredient.setPost(this);
+        }
+        ingredients.addAll(ingredientEntity);
     }
 
     public boolean isMemberDeleted() {
