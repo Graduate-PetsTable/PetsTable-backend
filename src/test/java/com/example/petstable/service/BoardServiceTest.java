@@ -3,12 +3,10 @@ package com.example.petstable.service;
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
-import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.DetailEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
-import com.example.petstable.domain.board.entity.TagType;
+import com.example.petstable.domain.board.entity.*;
 import com.example.petstable.domain.board.repository.BoardRepository;
 import com.example.petstable.domain.board.repository.DetailRepository;
+import com.example.petstable.domain.board.repository.IngredientRepository;
 import com.example.petstable.domain.board.repository.TagRepository;
 import com.example.petstable.domain.board.service.BoardService;
 import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
@@ -62,9 +60,13 @@ public class BoardServiceTest {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private IngredientRepository ingredientRepository;
+
     public void clearStore(){
         tagRepository.deleteAll();
         detailRepository.deleteAll();
+        ingredientRepository.deleteAll();
         boardRepository.deleteAll();
         memberRepository.deleteAll();
     }
@@ -523,5 +525,48 @@ public class BoardServiceTest {
 
         // then
         assertThatThrownBy(() -> boardService.findDetailByBoardId(member.getId(), post.getId())).isInstanceOf(PetsTableException.class);
+    }
+
+    @DisplayName("게시글 작성 시 재료도 추가한다.")
+    @Test
+    void writePostWithIngredient() throws IOException {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .nickName("g")
+                .build();
+
+        memberRepository.save(member);
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+
+        IngredientRequest ingredientRequest = IngredientRequest.builder()
+                .name("당근")
+                .weight("10g")
+                .build();
+
+        DescriptionRequest descriptionRequest = new DescriptionRequest("설명");
+        TagRequest tagRequest = TagRequest.builder()
+                .tagType("기능별")
+                .tagName("모질개선")
+                .build();
+
+        BoardPostRequest request = BoardPostRequest.builder()
+                .title("gg")
+                .descriptions(List.of(descriptionRequest))
+                .ingredients(List.of(ingredientRequest))
+                .tags(List.of(tagRequest))
+                .build();
+
+        // when
+        boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+        BoardEntity post = boardRepository.findByTitle("gg").orElseThrow();
+        List<IngredientEntity> actual = ingredientRepository.findIngredientEntityByPostId(post.getId());
+
+        // then
+        assertThat(actual.get(0).getName()).isEqualTo("당근");
+        assertThat(actual.get(0).getWeight()).isEqualTo("10g");
+
     }
 }
