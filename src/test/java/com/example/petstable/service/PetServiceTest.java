@@ -6,14 +6,18 @@ import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.AuthService;
 import com.example.petstable.domain.member.service.MemberService;
+import com.example.petstable.domain.pet.dto.request.PetRegisterNewPetRequest;
 import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
+import com.example.petstable.domain.pet.dto.request.PetUpdateRequest;
 import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
+import com.example.petstable.domain.pet.dto.response.PetRegisterNewPetResponse;
 import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
 import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.domain.pet.repository.PetRepository;
 import com.example.petstable.domain.pet.service.PetService;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +27,13 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -64,46 +72,36 @@ public class PetServiceTest {
 
         PetRegisterRequest petRequest = PetRegisterRequest.builder()
                 .name("파랑이")
-                .kind("말티즈")
-                .type("강아지")
+                .size("소형")
                 .build();
 
-        PetRegisterResponse petRegisterResponse = petService.registerPet(member.getId(), petRequest);
+        petService.registerPet(member.getId(), petRequest);
 
         PetEntity actual = petRepository.findByName("파랑이").orElseThrow();
-        assertThat(actual.getKind()).isEqualTo("말티즈");
+        assertThat(actual.getSize()).isEqualTo("소형");
     }
 
     @Test
     @DisplayName("추가로 입력한 반려동물 정보가 이미 회원의 반려동물 정보에 있을 때 ( 중복일 때 )")
     void validDuplicatePet() {
-        String email = "ssg@naver.com";
-        String socialId = "123456789";
-
         MemberEntity member = MemberEntity.builder()
-                .email(email)
-                .socialType(SocialType.APPLE)
-                .socialId(socialId)
+                .nickName("테스트")
                 .build();
-
         memberRepository.save(member);
-        OAuthMemberSignUpRequest request = new OAuthMemberSignUpRequest("Seung", SocialType.APPLE.getValue(), socialId);
-        memberService.signUpByOAuthMember(request);
 
-        PetRegisterRequest petRequest = PetRegisterRequest.builder()
+        PetRegisterNewPetRequest newPetRequest = PetRegisterNewPetRequest.builder()
                 .name("파랑이")
                 .kind("말티즈")
-                .type("강아지")
                 .build();
 
         PetEntity petEntity = PetEntity.builder()
                 .name("파랑이")
                 .kind("말티즈")
-                .type("강아지")
+                .member(member)
                 .build();
 
         petRepository.save(petEntity);
-        assertThatThrownBy(() -> petService.registerPet(member.getId(), petRequest))
+        assertThatThrownBy(() -> petService.registerNewPet(member.getId(), newPetRequest))
                 .isInstanceOf(PetsTableException.class);
     }
 
@@ -126,8 +124,6 @@ public class PetServiceTest {
         PetRegisterRequest petRegisterRequest1 = PetRegisterRequest.builder()
                 .name("파랑이")
                 .age(6)
-                .kind("말티즈")
-                .type("강아지")
                 .size("소형")
                 .build();
 
@@ -135,8 +131,6 @@ public class PetServiceTest {
         PetRegisterRequest petRegisterRequest2 = PetRegisterRequest.builder()
                 .name(expected1)
                 .age(6)
-                .kind("말티즈")
-                .type("강아지")
                 .size("소형")
                 .build();
 
@@ -177,8 +171,6 @@ public class PetServiceTest {
         PetRegisterRequest petRegisterRequest = PetRegisterRequest.builder()
                 .name("파랑이")
                 .age(6)
-                .kind("말티즈")
-                .type("강아지")
                 .size("소형")
                 .build();
 
@@ -210,8 +202,6 @@ public class PetServiceTest {
         PetRegisterRequest registerPet = PetRegisterRequest.builder()
                 .name("파랑이")
                 .age(6)
-                .kind("말티즈")
-                .type("강아지")
                 .size("소형")
                 .build();
 
@@ -285,4 +275,62 @@ public class PetServiceTest {
         assertThat(actual.getImage_url()).isNull();
     }
 
+    @DisplayName("새로운 반려동물 등록에 성공한다. 단, 생년월일을 기입하며 나이도 자동계산 된다.")
+    @Test
+    void registerNewPetWithBirth() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .nickName("회원1")
+                .build();
+
+        memberRepository.save(member);
+
+        String birth = "2020-08-10";
+        LocalDate current = LocalDate.now();
+
+        PetRegisterNewPetRequest request = PetRegisterNewPetRequest.builder()
+                .name("파랑이")
+                .kind("말티즈")
+                .birth(birth)
+                .build();
+
+        petService.registerNewPet(member.getId(), request);
+
+        // when
+        PetEntity actual = petRepository.findByName("파랑이").orElseThrow();
+
+        // then
+        System.out.println(birth);
+        System.out.println(current);
+
+        assertThat(actual.getBirth()).isEqualTo(birth);
+        assertThat(actual.getAge()).isEqualTo(4);
+    }
+
+    @DisplayName("새로운 반려동물 등록에 성공한다. 단, 생년월일이 기억나지 않아 대체나이를 기입한다.")
+    @Test
+    void registerNewPetWithAgeApproximation() {
+
+        // given
+        MemberEntity member = MemberEntity.builder()
+                .nickName("하하")
+                .build();
+        memberRepository.save(member);
+
+        PetRegisterNewPetRequest request = PetRegisterNewPetRequest.builder()
+                .name("파랑이")
+                .kind("말티즈")
+                .ageApproximation("2년 6개월")
+                .build();
+
+        petService.registerNewPet(member.getId(), request);
+
+        // when
+        PetEntity actual = petRepository.findByName("파랑이").orElseThrow();
+
+        // then
+        assertThat(actual.getAgeApproximation()).isEqualTo("2년 6개월");
+        assertThat(actual.getAge()).isEqualTo(2);
+    }
 }
