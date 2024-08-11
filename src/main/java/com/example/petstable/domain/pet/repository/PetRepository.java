@@ -15,4 +15,7 @@ public interface PetRepository extends JpaRepository<PetEntity, Long> {
 
     @Query("select m from PetEntity m where m.id = :id and m.member.id = :memberId")
     Optional<PetEntity> findByIdAndMemberId(@Param("id") Long id, @Param("memberId") Long memberId);
+
+    @Query("select count(m) > 0 from PetEntity  m where m.member.id = :memberId and m.name = :name and m.kind = :kind")
+    boolean existsByMemberIdAndNameAndKind(@Param("memberId") Long memberId, @Param("name") String name, @Param("kind") String kind);
 }
