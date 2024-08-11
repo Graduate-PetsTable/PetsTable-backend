@@ -1,9 +1,9 @@
 package com.example.petstable.domain.pet.controller;
 
+import com.example.petstable.domain.pet.dto.request.PetRegisterNewPetRequest;
 import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
-import com.example.petstable.domain.pet.dto.response.PetImageResponse;
-import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
-import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
+import com.example.petstable.domain.pet.dto.request.PetUpdateRequest;
+import com.example.petstable.domain.pet.dto.response.*;
 import com.example.petstable.domain.pet.message.PetMessage;
 import com.example.petstable.domain.pet.service.PetService;
 import com.example.petstable.global.auth.ios.auth.LoginUserId;
@@ -30,14 +30,34 @@ public class PetController {
 
     private final PetService petService;
 
-    @Operation(summary = "반려동물 추가")
+    @Operation(summary = "초기 반려동물 추가", description = "이름, 크기, 나이 정보만 입력 받는 API")
     @PostMapping()
     @SecurityRequirement(name = "JWT")
-    public ResponseEntity<PetRegisterResponse> addPet(@RequestBody @Valid PetRegisterRequest pet, @LoginUserId Long memberId) {
+    public ResponseEntity<PetRegisterResponse> initAddPet(@RequestBody @Valid PetRegisterRequest pet, @LoginUserId Long memberId) {
 
         PetRegisterResponse response = petService.registerPet(memberId, pet);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "새로운 반려동물 추가", description = "새로운 반려동물 추가 API ( 모든 정보 입력 받음 )")
+    @PostMapping("/pets/new")
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<PetRegisterNewPetResponse> addPet(@RequestBody @Valid PetRegisterNewPetRequest pet, @LoginUserId Long memberId) {
+
+        PetRegisterNewPetResponse response = petService.registerNewPet(memberId, pet);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "반려동물 정보 수정", description = "기존에 등록한 반려동물 정보 수정하는 API")
+    @PatchMapping("/{petId}")
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<String> updatePet(@RequestBody @Valid PetUpdateRequest pet, @PathVariable("petId") Long petId, @LoginUserId Long memberId) {
+
+        petService.updatePet(petId, memberId, pet);
+
+        return ResponseEntity.ok(PET_INFO_UPDATE_SUCCESS.getMessage());
     }
 
     @Operation(summary = "반려동물 상세 정보 조회")

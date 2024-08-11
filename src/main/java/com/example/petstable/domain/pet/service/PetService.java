@@ -2,10 +2,10 @@ package com.example.petstable.domain.pet.service;
 
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
+import com.example.petstable.domain.pet.dto.request.PetRegisterNewPetRequest;
 import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
-import com.example.petstable.domain.pet.dto.response.PetImageResponse;
-import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
-import com.example.petstable.domain.pet.dto.response.PetRegisterResponse;
+import com.example.petstable.domain.pet.dto.request.PetUpdateRequest;
+import com.example.petstable.domain.pet.dto.response.*;
 import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.domain.pet.repository.PetRepository;
 import com.example.petstable.global.exception.PetsTableException;
@@ -30,8 +30,7 @@ public class PetService {
 
     @Transactional
     public PetRegisterResponse registerPet(Long memberId, PetRegisterRequest petRegisterRequest) {
-        MemberEntity memberEntity = memberRepository.findById(memberId)
-                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+        MemberEntity memberEntity = validateMember(memberId);
 
         PetEntity petEntity = PetEntity.createPet(petRegisterRequest);
 
@@ -42,18 +41,61 @@ public class PetService {
 
         return PetRegisterResponse.builder()
                 .id(petEntity.getId())
-                .type(petEntity.getType())
                 .name(petEntity.getName())
                 .kind(petEntity.getKind())
                 .build();
     }
 
-    public PetInfoResponse getMyPetInfo(Long memberId, Long petId) {
-        MemberEntity findMember = memberRepository.findById(memberId)
+    public MemberEntity validateMember(Long id) {
+        return memberRepository.findById(id)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+    }
 
-        PetEntity petEntity = petRepository.findByIdAndMemberId(petId, findMember.getId())
+    public PetEntity validatePet(Long id, Long memberId) {
+        return petRepository.findByIdAndMemberId(id, memberId)
                 .orElseThrow(() -> new PetsTableException(PET_NOT_FOUND.getStatus(), PETS_NOT_FOUND.getMessage(), 404));
+    }
+
+    public boolean duplicatePet(Long memberId, String name, String kind) {
+        return petRepository.existsByMemberIdAndNameAndKind(memberId, name, kind);
+    }
+
+    @Transactional
+    public PetRegisterNewPetResponse registerNewPet(Long memberId, PetRegisterNewPetRequest request) {
+
+        MemberEntity member = validateMember(memberId);
+
+        if (duplicatePet(member.getId(), request.getName(), request.getKind())) {
+            throw new PetsTableException(ALREADY_EXISTS_PET.getStatus(), ALREADY_EXISTS_PET.getMessage(), 400);
+        }
+
+        PetEntity pet = PetEntity.createNewPet(request);
+        pet.setMember(member);
+        member.addPets(pet);
+        petRepository.save(pet);
+
+        return PetRegisterNewPetResponse.builder()
+                .name(pet.getName())
+                .kind(pet.getKind())
+                .gender(pet.getGender())
+                .size(pet.getSize())
+                .age(pet.getAge())
+                .build();
+    }
+
+    @Transactional
+    public void updatePet(Long petId, Long memberId, PetUpdateRequest petUpdateRequest) {
+
+        MemberEntity member = validateMember(memberId);
+        PetEntity pet = validatePet(petId, memberId);
+
+        pet.updatePet(petUpdateRequest);
+    }
+
+    public PetInfoResponse getMyPetInfo(Long memberId, Long petId) {
+        MemberEntity findMember = validateMember(memberId);
+
+        PetEntity petEntity = validatePet(petId, memberId);
 
         return PetEntity.toPetInfoResponse(petEntity);
     }
@@ -71,11 +113,9 @@ public class PetService {
     @Transactional
     public PetImageResponse registerPetImage(Long memberId, Long petId, MultipartFile multipartFile) {
 
-        MemberEntity member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+        MemberEntity member = validateMember(memberId);
 
-        PetEntity pet = petRepository.findByIdAndMemberId(petId, member.getId())
-                .orElseThrow(() -> new PetsTableException(PET_NOT_FOUND.getStatus(), PETS_NOT_FOUND.getMessage(), 404));
+        PetEntity pet = validatePet(petId, memberId);
 
         String imageUrl = awsS3Uploader.uploadImage(multipartFile);
 
@@ -91,11 +131,9 @@ public class PetService {
     @Transactional
     public PetImageResponse deletePetImage(Long memberId, Long petId) {
 
-        MemberEntity member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+        MemberEntity member = validateMember(memberId);
 
-        PetEntity pet = petRepository.findByIdAndMemberId(petId, member.getId())
-                .orElseThrow(() -> new PetsTableException(PET_NOT_FOUND.getStatus(), PETS_NOT_FOUND.getMessage(), 404));
+        PetEntity pet = validatePet(petId, memberId);
 
         pet.updateImage(null);
 

@@ -8,7 +8,6 @@ import lombok.Getter;
 public class PetInfoResponse {
 
     private Long id;
-    private String type;
     private String name;
     private int age;
     private String size;
