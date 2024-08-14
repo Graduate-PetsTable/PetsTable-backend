@@ -12,5 +12,5 @@ public class PetRegisterResponse {
     private Long id;
     private String name; // 이름
     private int age; // 나이
-    private String kind; // 품종 ( 푸들, 말티즈, 닥스훈트, ... )
+    private double weight; // 몸무게
 }

@@ -30,7 +30,7 @@ public class PetController {
 
     private final PetService petService;
 
-    @Operation(summary = "초기 반려동물 추가", description = "이름, 크기, 나이 정보만 입력 받는 API")
+    @Operation(summary = "온보딩 ( 초기 반려동물 추가 )", description = "이름, 나이, 몸무게 정보 입력 받는 API")
     @PostMapping()
     @SecurityRequirement(name = "JWT")
     public ResponseEntity<PetRegisterResponse> initAddPet(@RequestBody @Valid PetRegisterRequest pet, @LoginUserId Long memberId) {
