@@ -72,7 +72,7 @@ public class PetServiceTest {
 
         PetRegisterRequest petRequest = PetRegisterRequest.builder()
                 .name("파랑이")
-                .size("소형")
+                .weight(6.1)
                 .build();
 
         petService.registerPet(member.getId(), petRequest);
@@ -124,14 +124,14 @@ public class PetServiceTest {
         PetRegisterRequest petRegisterRequest1 = PetRegisterRequest.builder()
                 .name("파랑이")
                 .age(6)
-                .size("소형")
+                .weight(2.1)
                 .build();
 
         String expected1 = "테스트";
         PetRegisterRequest petRegisterRequest2 = PetRegisterRequest.builder()
                 .name(expected1)
                 .age(6)
-                .size("소형")
+                .weight(3.2)
                 .build();
 
         petService.registerPet(member.getId(), petRegisterRequest1);
@@ -171,7 +171,7 @@ public class PetServiceTest {
         PetRegisterRequest petRegisterRequest = PetRegisterRequest.builder()
                 .name("파랑이")
                 .age(6)
-                .size("소형")
+                .weight(4.5)
                 .build();
 
 
@@ -202,7 +202,7 @@ public class PetServiceTest {
         PetRegisterRequest registerPet = PetRegisterRequest.builder()
                 .name("파랑이")
                 .age(6)
-                .size("소형")
+                .weight(3.2)
                 .build();
 
         PetRegisterResponse expected = petService.registerPet(member.getId(), registerPet);
@@ -210,10 +210,9 @@ public class PetServiceTest {
         // when
         PetInfoResponse actual = petService.getMyPetInfo(saveMember.getId(), expected.getId());
 
-
         // then
         assertThat(actual.getId()).isEqualTo(expected.getId());
-        assertThat(actual.getKind()).isEqualTo(expected.getKind());
+        assertThat(actual.getWeight()).isEqualTo(expected.getWeight());
     }
 
 

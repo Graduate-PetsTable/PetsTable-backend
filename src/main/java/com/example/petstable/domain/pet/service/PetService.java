@@ -42,7 +42,7 @@ public class PetService {
         return PetRegisterResponse.builder()
                 .id(petEntity.getId())
                 .name(petEntity.getName())
-                .kind(petEntity.getKind())
+                .weight(petEntity.getWeight())
                 .build();
     }
 
@@ -78,8 +78,6 @@ public class PetService {
                 .name(pet.getName())
                 .kind(pet.getKind())
                 .gender(pet.getGender())
-                .size(pet.getSize())
-                .age(pet.getAge())
                 .build();
     }
 

@@ -14,5 +14,5 @@ public class PetRegisterNewPetRequest {
     private String ageApproximation; // 생년월일 모를경우 대체
     private String kind; // 품종 ( 푸들, 말티즈, 닥스훈트, ... )
     private String gender; // 성별
-    private String walk; // 산책량
+//    private String walk; // 산책량
 }

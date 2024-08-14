@@ -29,12 +29,13 @@ public class PetEntity extends BaseTimeEntity {
 
     private String name; // 이름
     private int age; // 나이
+    private double weight; // 몸무게
     private LocalDate birth; // 생년월일
     private String ageApproximation; // 이건 생년월일 정확하지 않을 때 대체
     private String size; // 크기 ( 소형, 중형, 대형 )
     private String kind; // 품종 ( 푸들, 말티즈, 닥스훈트, ... )
     private String gender; // 성별
-    private String walk; // 산책량
+//    private String walk; // 산책량
     private String image_url; // 프로필 사진
 
     @ManyToOne(fetch = LAZY)
@@ -52,7 +53,7 @@ public class PetEntity extends BaseTimeEntity {
         return PetEntity.builder()
                 .name(petRegisterRequest.getName())
                 .age(petRegisterRequest.getAge())
-                .size(petRegisterRequest.getSize())
+                .weight(petRegisterRequest.getWeight())
                 .build();
     }
 
@@ -80,7 +81,7 @@ public class PetEntity extends BaseTimeEntity {
                 .size(petRegisterNewPetRequest.getSize())
                 .kind(petRegisterNewPetRequest.getKind())
                 .gender(petRegisterNewPetRequest.getGender())
-                .walk(petRegisterNewPetRequest.getWalk())
+//                .walk(petRegisterNewPetRequest.getWalk())
                 .build();
 
         pet.setAgeAndBirth(petRegisterNewPetRequest.getBirth(), petRegisterNewPetRequest.getAgeApproximation());
@@ -91,10 +92,13 @@ public class PetEntity extends BaseTimeEntity {
     // 기존 반려동물 정보 업데이트
     public void updatePet(PetUpdateRequest request) {
 
+        this.name = request.getName();
+        this.size = request.getSize();
+        this.weight = request.getWeight();
         this.setAgeAndBirth(request.getBirth(), request.getAgeApproximation());
         this.kind = request.getKind();
         this.gender = request.getGender();
-        this.walk = request.getWalk();
+//        this.walk = request.getWalk();
         this.image_url = request.getImage_url();
     }
 
@@ -128,10 +132,11 @@ public class PetEntity extends BaseTimeEntity {
                 .id(petEntity.getId())
                 .name(petEntity.getName())
                 .age(petEntity.getAge())
+                .weight(petEntity.getWeight())
                 .size(petEntity.getSize())
                 .kind(petEntity.getKind())
                 .gender(petEntity.getGender())
-                .walk(petEntity.getWalk())
+//                .walk(petEntity.getWalk())
                 .ownerNickname(petEntity.getMember().getNickName())
                 .build();
     }
