@@ -45,21 +45,21 @@ public class AuthService {
     public TokenResponse appleOAuthLogin(OAuthLoginRequest request) {
         OAuthMemberResponse appleSocialMember = appleOAuthUserProvider.getAppleMember(request.getToken());
 
-        return generateTokenResponse(SocialType.APPLE, appleSocialMember.getEmail(), appleSocialMember.getSocialId());
+        return generateTokenResponse(SocialType.APPLE, appleSocialMember.getEmail(), appleSocialMember.getSocialId(), request.getFcmToken());
     }
 
-    public TokenResponse googleLogin(String idToken) {
+    public TokenResponse googleLogin(OAuthLoginRequest request) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(List.of(googleClientId))
                 .build();
         try {
-            GoogleIdToken googleIdToken = verifier.verify(idToken);
+            GoogleIdToken googleIdToken = verifier.verify(request.getToken());
 
             if (googleIdToken == null) {
                 throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 409);
             } else {
                 OAuthMemberResponse googleSocialMember = new OAuthMemberResponse(googleIdToken.getPayload());
-                return generateTokenResponse(SocialType.GOOGLE, googleSocialMember.getEmail(), googleSocialMember.getSocialId());
+                return generateTokenResponse(SocialType.GOOGLE, googleSocialMember.getEmail(), googleSocialMember.getSocialId(), request.getFcmToken());
             }
         } catch (GeneralSecurityException | IOException e) {
             throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 409);
@@ -81,24 +81,25 @@ public class AuthService {
             memberRepository.save(member);
         }
 
-        return generateTokenResponse(SocialType.TEST, email, "test");
+        return generateTokenResponse(SocialType.TEST, email, "test", null);
     }
 
-    public TokenResponse generateTokenResponse(SocialType socialType, String email, String socialId) {
+    public TokenResponse generateTokenResponse(SocialType socialType, String email, String socialId, String fcmToken) {
         return memberRepository.findIdBySocialTypeAndSocialId(socialType, socialId)
                 .map(memberId -> {
                     MemberEntity findMember = memberRepository.findById(memberId).orElseThrow(
                             () -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
                     String accessToken = issueAccessToken(findMember);
                     String refreshToken = issueRefreshToken();
+                    findMember.setFcmToken(fcmToken);
 
                     refreshTokenService.saveTokenInfo(memberId, refreshToken, accessToken);
 
                     if (!findMember.isRegisteredOAuthMember()) {
-                        return new TokenResponse(accessToken, refreshToken, findMember.getEmail(), false, socialId);
+                        return new TokenResponse(accessToken, refreshToken, fcmToken, findMember.getEmail(), false, socialId);
                     }
 
-                    return new TokenResponse(accessToken, refreshToken, findMember.getEmail(), true, socialId);
+                    return new TokenResponse(accessToken, refreshToken, fcmToken, findMember.getEmail(), true, socialId);
 
                 }).orElseGet(() -> {
                     // 회원가입 되어있지 않은 경우 유저를 새로 저장하여 토큰 발급
@@ -109,13 +110,14 @@ public class AuthService {
                             .socialId(socialId)
                             .role(RoleType.MEMBER)
                             .status(Status.ACTIVE)
+                            .fcmToken(fcmToken)
                             .build();
                     MemberEntity savedMember = memberRepository.save(oauthMember);
                     String accessToken = issueAccessToken(savedMember);
                     String refreshToken = issueRefreshToken();
 
                     refreshTokenService.saveTokenInfo(savedMember.getId(), refreshToken, accessToken);
-                    return new TokenResponse(accessToken, refreshToken, email, false, socialId);
+                    return new TokenResponse(accessToken, refreshToken, fcmToken, email, false, socialId);
                 });
     }
 
