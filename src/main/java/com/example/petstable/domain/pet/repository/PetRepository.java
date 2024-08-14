@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface PetRepository extends JpaRepository<PetEntity, Long> {
 
     Optional<PetEntity> findByName(String name);
+
     List<PetEntity> findByMemberId(Long id);
 
     @Query("select m from PetEntity m where m.id = :id and m.member.id = :memberId")

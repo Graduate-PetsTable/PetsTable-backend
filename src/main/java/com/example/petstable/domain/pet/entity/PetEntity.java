@@ -117,6 +117,11 @@ public class PetEntity extends BaseTimeEntity {
         return 0;
     }
 
+    // 생일이 지나면 1살 추가
+    public int increaseAge() {
+        return this.age += 1;
+    }
+
     // DTO 변환
     public static PetInfoResponse toPetInfoResponse(PetEntity petEntity) {
         return PetInfoResponse.builder()
