@@ -56,7 +56,7 @@ public class AuthServiceTest {
         when(appleOAuthUserProvider.getAppleMember(anyString()))
                 .thenReturn(new OAuthMemberResponse(socialId, expected));
 
-        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token"));
+        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token", null));
 
         Assertions.assertAll(
                 () -> assertThat(actual.getAccessToken()).isNotNull(),
@@ -85,7 +85,7 @@ public class AuthServiceTest {
         when(appleOAuthUserProvider.getAppleMember(anyString()))
                 .thenReturn(new OAuthMemberResponse(socialId, expected));
 
-        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token"));
+        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token", null));
 
         assertAll(
                 () -> assertThat(actual.getAccessToken()).isNotNull(),
@@ -111,7 +111,7 @@ public class AuthServiceTest {
 
         when(appleOAuthUserProvider.getAppleMember(anyString())).thenReturn(new OAuthMemberResponse(socialId, expected));
 
-        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token"));
+        TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token", null));
 
         assertAll(
                 () -> assertThat(actual.getAccessToken()).isNotNull(),

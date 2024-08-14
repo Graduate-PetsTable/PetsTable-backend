@@ -34,6 +34,8 @@ public class MemberEntity extends BaseTimeEntity {
     private String image_url; // 프로필 이미지
     private int report_count; // 신고 횟수
 
+    private String fcmToken; // Fcm 토큰 ( 사용자의 기기를 구분하기 위한 토큰 )
+
     @Enumerated(value = EnumType.STRING)
     private SocialType socialType; // APPLE, GOOGLE
     private String socialId; // Claims 에 담긴 subject
@@ -83,6 +85,11 @@ public class MemberEntity extends BaseTimeEntity {
     public void updateNickname(String nickname) {
         validateNickname(nickname);
         this.nickName = nickname;
+    }
+
+    // fcm 등록
+    public void setFcmToken(String token) {
+        this.fcmToken = token;
     }
 
     public boolean isRegisteredOAuthMember() {

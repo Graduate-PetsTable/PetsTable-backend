@@ -12,4 +12,7 @@ public class OAuthLoginRequest {
 
     @NotBlank(message = "공백일 수 없습니다.")
     private String token;
+
+    @NotBlank(message = "공백일 수 없습니다.")
+    private String fcmToken;
 }

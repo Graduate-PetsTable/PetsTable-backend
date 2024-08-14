@@ -32,7 +32,7 @@ public class AuthController {
     @Operation(summary = "구글 로그인")
     @PostMapping("/google")
     public PetsTableApiResponse<TokenResponse> loginGoogle(@RequestBody @Valid OAuthLoginRequest request) {
-        TokenResponse response = authService.googleLogin(request.getToken());
+        TokenResponse response = authService.googleLogin(request);
         return PetsTableApiResponse.createResponse(response, LOGIN_SUCCESS);
     }
 
