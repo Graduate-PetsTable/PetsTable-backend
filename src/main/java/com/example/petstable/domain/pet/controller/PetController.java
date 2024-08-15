@@ -83,9 +83,9 @@ public class PetController {
     @Operation(summary = "반려동물 사진 등록")
     @PatchMapping(value = "/{petId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "JWT")
-    public PetsTableApiResponse<PetImageResponse> addPetImage(@LoginUserId Long memberId, @PathVariable("petId") Long petId, MultipartFile multipartFile) {
+    public PetsTableApiResponse<PetImageResponse> addPetImage(@LoginUserId Long memberId, @PathVariable("petId") Long petId, @RequestPart("image") MultipartFile image) {
 
-        PetImageResponse response = petService.registerPetImage(memberId, petId, multipartFile);
+        PetImageResponse response = petService.registerPetImage(memberId, petId, image);
 
         return PetsTableApiResponse.createResponse(response, SUCCESS_REGISTER_PET_IMAGE);
     }
