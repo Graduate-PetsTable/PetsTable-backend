@@ -329,15 +329,11 @@ public class BoardServiceTest {
         post.addDetails(List.of(detail));
         detail.setPost(post);
 
-        MockMultipartFile expected = new MockMultipartFile("test_img", "test_img3.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img3.jpg"));
+        MockMultipartFile expected = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
         when(awsS3Uploader.uploadImage(expected)).thenReturn("test_img.jpg");
 
         // when
-        DetailRequest request = DetailRequest.builder() // 사진만 변경
-                .image(expected)
-                .build();
-
-        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request);
+        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), null, expected);
 
         DetailEntity actual = detailRepository.findById(detail.getId()).orElseThrow();
 
@@ -379,11 +375,11 @@ public class BoardServiceTest {
         detail.setPost(post);
 
         // when
-        DetailRequest request = DetailRequest.builder() // 설명만 변경
+        DetailUpdateRequest request = DetailUpdateRequest.builder()
                 .description("변경 테스트")
                 .build();
 
-        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request);
+        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request, null);
 
         DetailEntity actual = detailRepository.findById(detail.getId()).orElseThrow();
 
@@ -424,16 +420,15 @@ public class BoardServiceTest {
         post.addDetails(List.of(detail));
         detail.setPost(post);
 
-        MockMultipartFile expected = new MockMultipartFile("test_img", "test_img3.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img3.jpg"));
+        MockMultipartFile expected = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
         when(awsS3Uploader.uploadImage(expected)).thenReturn("test_img.jpg");
 
         // when
-        DetailRequest request = DetailRequest.builder() // 사진만 변경
-                .image(expected)
+        DetailUpdateRequest request = DetailUpdateRequest.builder()
                 .description("변경 테스트")
                 .build();
 
-        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request);
+        boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), request, expected);
 
         DetailEntity actual = detailRepository.findById(detail.getId()).orElseThrow();
 

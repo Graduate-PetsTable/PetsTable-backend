@@ -81,9 +81,9 @@ public class BoardController {
     @Operation(summary = "게시글 상세 내용 수정 API", description = "선택한 단계만 수정 가능 ( 사진, 설명 )")
     @PatchMapping(value = "/{boardId}/img/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "JWT")
-    public ResponseEntity<String> updatePostDetail(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId, @RequestBody DetailRequest request) {
+    public ResponseEntity<String> updatePostDetail(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId, @RequestPart(name = "request", required = false) DetailUpdateRequest request, @RequestPart(name = "image", required = false) MultipartFile image) {
 
-        boardService.updatePostDetail(userId, boardId, detailId, request);
+        boardService.updatePostDetail(userId, boardId, detailId, request, image);
 
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }

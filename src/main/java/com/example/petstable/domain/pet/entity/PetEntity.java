@@ -136,6 +136,7 @@ public class PetEntity extends BaseTimeEntity {
                 .size(petEntity.getSize())
                 .kind(petEntity.getKind())
                 .gender(petEntity.getGender())
+                .imageUrl(petEntity.getImage_url())
 //                .walk(petEntity.getWalk())
                 .ownerNickname(petEntity.getMember().getNickName())
                 .build();

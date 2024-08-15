@@ -14,6 +14,7 @@ public class PetInfoResponse {
     private String size;
     private String kind;
     private String gender;
+    private String imageUrl;
 //    private String walk;
     private String ownerNickname;
 }
