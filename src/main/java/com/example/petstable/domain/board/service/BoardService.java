@@ -212,7 +212,7 @@ public class BoardService {
     }
 
     @Transactional
-    public void updatePostDetail(Long userId, Long boardId, Long detailId, DetailRequest request) {
+    public void updatePostDetail(Long userId, Long boardId, Long detailId, DetailUpdateRequest request, MultipartFile image) {
 
         BoardEntity post = validMemberAndPost(userId, boardId);
 
@@ -221,12 +221,12 @@ public class BoardService {
 
         String newDescription = request.getDescription();
 
-        if (request.getImage() != null && newDescription != null) { // 사진, 설명 변경
-            String newImageUrl = awsS3Uploader.uploadImage(request.getImage());
+        if (image != null && newDescription != null) { // 사진, 설명 변경
+            String newImageUrl = awsS3Uploader.uploadImage(image);
             detail.updateImageUrlAndDescription(newImageUrl, newDescription);
 
-        } else if (request.getImage() != null) { // 사진만 변경
-            String newImageUrl = awsS3Uploader.uploadImage(request.getImage());
+        } else if (image != null) { // 사진만 변경
+            String newImageUrl = awsS3Uploader.uploadImage(image);
             detail.updateImageUrl(newImageUrl);
 
         } else { // 설명만 변경
