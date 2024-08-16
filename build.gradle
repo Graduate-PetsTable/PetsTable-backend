@@ -65,6 +65,9 @@ dependencies {
     // Jackson Data Bind
     implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'
 
+    // Slack
+    implementation 'com.slack.api:slack-api-client:1.39.0'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
