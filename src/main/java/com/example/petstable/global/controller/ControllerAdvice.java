@@ -7,6 +7,9 @@ import java.util.Map;
 
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.exception.ErrorResponse;
+import com.example.petstable.global.support.SlackService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class ControllerAdvice {
+
+    private final SlackService slackService;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, List<String>>> handleInputFieldException(MethodArgumentNotValidException e, BindingResult result) {
@@ -60,5 +66,13 @@ public class ControllerAdvice {
     @ExceptionHandler(PetsTableException.class)
     public ResponseEntity<ErrorResponse> handlePetsTableException(PetsTableException e) {
         return ResponseEntity.status(e.getHttpStatus()).body(new ErrorResponse(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> unhandledException(Exception e, HttpServletRequest request) {
+        log.error("UnhandledException: {} {} errMessage={}\n", request.getMethod(), request.getRequestURI(), e.getMessage());
+        slackService.sendSlackError(e, request);
+        return ResponseEntity.internalServerError()
+                .body(new ErrorResponse(9999, "접속이 원활하지 않습니다. 잠시 기다려주세요."));
     }
 }
