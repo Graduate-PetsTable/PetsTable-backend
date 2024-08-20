@@ -1,9 +1,8 @@
 package com.example.petstable.domain.bookmark.controller;
 
 import com.example.petstable.domain.bookmark.dto.response.BookmarkRegisterResponse;
-import com.example.petstable.domain.bookmark.message.BookmarkMessage;
 import com.example.petstable.domain.bookmark.service.BookmarkService;
-import com.example.petstable.global.auth.ios.auth.LoginUserId;
+import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

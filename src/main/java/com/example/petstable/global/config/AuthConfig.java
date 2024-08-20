@@ -1,7 +1,7 @@
 package com.example.petstable.global.config;
 
-import com.example.petstable.global.auth.ios.auth.AuthenticationPrincipalArgumentResolver;
-import com.example.petstable.global.auth.ios.auth.LoginInterceptor;
+import com.example.petstable.global.auth.AuthenticationPrincipalArgumentResolver;
+import com.example.petstable.global.auth.LoginInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

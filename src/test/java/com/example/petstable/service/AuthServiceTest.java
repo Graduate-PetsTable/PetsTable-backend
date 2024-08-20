@@ -7,14 +7,9 @@ import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.AuthService;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
-import com.example.petstable.global.auth.ios.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.ios.OAuthMemberResponse;
-import com.example.petstable.global.refresh.dto.request.RefreshTokenRequest;
-import com.example.petstable.global.refresh.dto.response.ReissueTokenResponse;
-import com.example.petstable.global.refresh.entity.RefreshToken;
+import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
+import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
 import com.example.petstable.global.refresh.service.RefreshTokenService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;

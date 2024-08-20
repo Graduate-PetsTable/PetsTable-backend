@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.auth;
+package com.example.petstable.global.auth;
 
 import io.swagger.v3.oas.annotations.Hidden;
 

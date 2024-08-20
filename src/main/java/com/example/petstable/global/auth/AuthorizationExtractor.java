@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.auth;
+package com.example.petstable.global.auth;
 
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.servlet.http.HttpServletRequest;

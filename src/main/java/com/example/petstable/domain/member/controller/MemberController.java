@@ -5,7 +5,7 @@ import com.example.petstable.domain.member.dto.response.BookmarkMyList;
 import com.example.petstable.domain.member.dto.response.MemberProfileImageResponse;
 import com.example.petstable.domain.member.dto.response.OAuthMemberSignUpResponse;
 import com.example.petstable.domain.member.service.MemberService;
-import com.example.petstable.global.auth.ios.auth.LoginUserId;
+import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 import static com.example.petstable.domain.bookmark.message.BookmarkMessage.SUCCESS_GET_MY_BOOKMARK;
 import static com.example.petstable.domain.member.message.MemberMessage.*;

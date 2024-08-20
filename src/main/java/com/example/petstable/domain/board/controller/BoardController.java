@@ -6,7 +6,7 @@ import com.example.petstable.domain.board.dto.response.BoardPostResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
 import com.example.petstable.domain.board.dto.response.DetailResponse;
 import com.example.petstable.domain.board.service.BoardService;
-import com.example.petstable.global.auth.ios.auth.LoginUserId;
+import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

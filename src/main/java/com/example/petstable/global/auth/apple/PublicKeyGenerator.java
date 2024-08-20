@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.publickey;
+package com.example.petstable.global.auth.apple;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;

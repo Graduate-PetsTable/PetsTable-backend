@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.jwt;
+package com.example.petstable.global.auth;
 
 import com.example.petstable.global.exception.PetsTableException;
 import io.jsonwebtoken.*;

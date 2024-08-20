@@ -1,6 +1,6 @@
 package com.example.petstable.apple;
 
-import com.example.petstable.global.auth.ios.jwt.AppleClaimsValidator;
+import com.example.petstable.global.auth.apple.AppleClaimsValidator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import java.util.HashMap;

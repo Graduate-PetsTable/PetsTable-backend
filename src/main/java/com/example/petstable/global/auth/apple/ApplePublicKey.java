@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.publickey;
+package com.example.petstable.global.auth.apple;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
