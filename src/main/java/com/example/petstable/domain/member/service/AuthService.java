@@ -7,9 +7,9 @@ import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.entity.Status;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
-import com.example.petstable.global.auth.ios.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.ios.OAuthMemberResponse;
-import com.example.petstable.global.auth.ios.jwt.JwtTokenProvider;
+import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
+import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
+import com.example.petstable.global.auth.JwtTokenProvider;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.refresh.dto.request.RefreshTokenRequest;
 import com.example.petstable.global.refresh.dto.response.ReissueTokenResponse;
@@ -29,7 +29,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import static com.example.petstable.domain.member.message.MemberMessage.*;
-import static com.example.petstable.domain.member.message.OAuthLoginMessage.*;
+import static com.example.petstable.domain.member.message.DefaultMessage.*;
 
 @Service
 @RequiredArgsConstructor
@@ -122,7 +122,7 @@ public class AuthService {
     }
 
     private String issueAccessToken(final MemberEntity findMember) {
-        return jwtTokenProvider.createAccessToken(findMember.getId());
+        return jwtTokenProvider.createAccessToken(findMember.getId(), findMember.getEmail(), findMember.getSocialType().getValue(), RoleType.MEMBER);
     }
 
     private String issueRefreshToken() {

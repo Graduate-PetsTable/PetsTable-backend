@@ -1,8 +1,8 @@
 package com.example.petstable.apple;
 
-import com.example.petstable.global.auth.ios.publickey.AppleClient;
-import com.example.petstable.global.auth.ios.publickey.ApplePublicKey;
-import com.example.petstable.global.auth.ios.publickey.ApplePublicKeys;
+import com.example.petstable.global.auth.apple.AppleClient;
+import com.example.petstable.global.auth.apple.ApplePublicKey;
+import com.example.petstable.global.auth.apple.ApplePublicKeys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,5 @@
-package com.example.petstable.global.auth.ios.auth;
+package com.example.petstable.global.auth;
 
-import com.example.petstable.global.auth.ios.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

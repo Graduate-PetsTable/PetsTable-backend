@@ -1,10 +1,6 @@
-package com.example.petstable.global.auth.ios;
+package com.example.petstable.global.auth.apple;
 
-import com.example.petstable.global.auth.ios.jwt.AppleClaimsValidator;
-import com.example.petstable.global.auth.ios.jwt.AppleJwtParser;
-import com.example.petstable.global.auth.ios.publickey.AppleClient;
-import com.example.petstable.global.auth.ios.publickey.ApplePublicKeys;
-import com.example.petstable.global.auth.ios.publickey.PublicKeyGenerator;
+import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
 import com.example.petstable.global.exception.PetsTableException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.security.PublicKey;
 import java.util.Map;
 
-import static com.example.petstable.domain.member.message.OAuthLoginMessage.INVALID_ID_TOKEN;
+import static com.example.petstable.domain.member.message.DefaultMessage.INVALID_ID_TOKEN;
 
 @Component
 @RequiredArgsConstructor

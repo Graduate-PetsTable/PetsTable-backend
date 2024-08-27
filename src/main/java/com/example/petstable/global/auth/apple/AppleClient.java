@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.publickey;
+package com.example.petstable.global.auth.apple;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

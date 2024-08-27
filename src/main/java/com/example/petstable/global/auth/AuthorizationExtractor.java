@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios.auth;
+package com.example.petstable.global.auth;
 
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Enumeration;
 
-import static com.example.petstable.domain.member.message.OAuthLoginMessage.*;
+import static com.example.petstable.domain.member.message.DefaultMessage.*;
 
 @NoArgsConstructor
 public class AuthorizationExtractor {

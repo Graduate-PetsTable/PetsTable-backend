@@ -1,11 +1,11 @@
 package com.example.petstable.apple;
 
-import com.example.petstable.global.auth.ios.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.ios.OAuthMemberResponse;
-import com.example.petstable.global.auth.ios.jwt.AppleClaimsValidator;
-import com.example.petstable.global.auth.ios.publickey.AppleClient;
-import com.example.petstable.global.auth.ios.publickey.ApplePublicKeys;
-import com.example.petstable.global.auth.ios.publickey.PublicKeyGenerator;
+import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
+import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
+import com.example.petstable.global.auth.apple.AppleClaimsValidator;
+import com.example.petstable.global.auth.apple.AppleClient;
+import com.example.petstable.global.auth.apple.ApplePublicKeys;
+import com.example.petstable.global.auth.apple.PublicKeyGenerator;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.DisplayName;

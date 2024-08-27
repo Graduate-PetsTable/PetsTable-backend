@@ -1,4 +1,4 @@
-package com.example.petstable.global.auth.ios;
+package com.example.petstable.global.auth.dto.response;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.AccessLevel;

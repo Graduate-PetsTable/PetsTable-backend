@@ -3,7 +3,7 @@ package com.example.petstable.domain.report.controller;
 import com.example.petstable.domain.report.dto.request.ReportPostRequest;
 import com.example.petstable.domain.report.dto.response.ReportPostResponse;
 import com.example.petstable.domain.report.service.ReportService;
-import com.example.petstable.global.auth.ios.auth.LoginUserId;
+import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
