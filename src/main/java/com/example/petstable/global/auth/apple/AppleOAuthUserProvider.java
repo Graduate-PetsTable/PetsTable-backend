@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.security.PublicKey;
 import java.util.Map;
 
-import static com.example.petstable.domain.member.message.OAuthLoginMessage.INVALID_ID_TOKEN;
+import static com.example.petstable.domain.member.message.DefaultMessage.INVALID_ID_TOKEN;
 
 @Component
 @RequiredArgsConstructor

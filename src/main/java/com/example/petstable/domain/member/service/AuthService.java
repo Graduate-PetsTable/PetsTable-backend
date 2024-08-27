@@ -29,7 +29,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import static com.example.petstable.domain.member.message.MemberMessage.*;
-import static com.example.petstable.domain.member.message.OAuthLoginMessage.*;
+import static com.example.petstable.domain.member.message.DefaultMessage.*;
 
 @Service
 @RequiredArgsConstructor
@@ -122,7 +122,7 @@ public class AuthService {
     }
 
     private String issueAccessToken(final MemberEntity findMember) {
-        return jwtTokenProvider.createAccessToken(findMember.getId());
+        return jwtTokenProvider.createAccessToken(findMember.getId(), findMember.getEmail(), findMember.getSocialType().getValue(), RoleType.MEMBER);
     }
 
     private String issueRefreshToken() {
