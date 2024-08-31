@@ -29,7 +29,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import static com.example.petstable.domain.member.message.MemberMessage.*;
-import static com.example.petstable.domain.member.message.DefaultMessage.*;
+import static com.example.petstable.domain.member.message.AuthMessage.*;
 
 @Service
 @RequiredArgsConstructor

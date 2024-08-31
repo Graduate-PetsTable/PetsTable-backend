@@ -9,8 +9,8 @@ import java.util.Base64;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
-import static com.example.petstable.domain.member.message.DefaultMessage.EXPIRED_ID_TOKEN;
-import static com.example.petstable.domain.member.message.DefaultMessage.INVALID_ID_TOKEN;
+import static com.example.petstable.domain.member.message.AuthMessage.EXPIRED_ID_TOKEN;
+import static com.example.petstable.domain.member.message.AuthMessage.INVALID_ID_TOKEN;
 
 /**
  * Identity Token 의 헤더에서 alg, kid 값 추출
