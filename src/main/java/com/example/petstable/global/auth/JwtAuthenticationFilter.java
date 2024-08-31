@@ -14,9 +14,10 @@ import java.io.IOException;
 
 /**
  * Spring Security 적용을 위해 JwtFilter 구현
+ * Jwt 추출 후 유효성 검증 및 Authentication 객체 생성 후 Security Context 에 등록
  */
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_TOKEN_PREFIX = "Bearer ";
     private final JwtTokenProvider jwtTokenProvider;

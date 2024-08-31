@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.petstable.domain.member.message.MemberMessage.MEMBER_NOT_FOUND;
-import static com.example.petstable.domain.member.message.DefaultMessage.*;
+import static com.example.petstable.domain.member.message.AuthMessage.*;
 
 @Service
 public class RefreshTokenService {

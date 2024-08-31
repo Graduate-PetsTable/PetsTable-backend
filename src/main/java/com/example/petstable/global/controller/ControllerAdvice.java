@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.exception.ErrorResponse;
+import com.example.petstable.global.support.RequestInfo;
 import com.example.petstable.global.support.SlackService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -70,8 +71,9 @@ public class ControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> unhandledException(Exception e, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request.getRequestURL(), request.getMethod(), request.getRemoteAddr(), request.getHeader("X-FORWARDED-FOR"));
         log.error("UnhandledException: {} {} errMessage={}\n", request.getMethod(), request.getRequestURI(), e.getMessage());
-        slackService.sendSlackError(e, request);
+        slackService.sendSlackError(e, requestInfo);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse(9999, "접속이 원활하지 않습니다. 잠시 기다려주세요."));
     }

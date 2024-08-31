@@ -22,21 +22,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
-    private final AccessDeniedHandler customAccessDeniedHandler;
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-
-        return new BCryptPasswordEncoder();
-    }
-    @Bean
-    public WebSecurityCustomizer configure() {
-        return (web -> {
-            web.ignoring()
-                    .requestMatchers(String.valueOf(PathRequest.toStaticResources().atCommonLocations())); // 정적 리소스들
-        });
-    }
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final JwtExceptionFilter jwtExceptionFilter;
+    private static final String[] whiteList = {
+            "/login/**",
+            "/",
+            "/**",
+            "/swagger-ui/**",
+            "/error",
+            "/v3/api-docs/**"
+    };
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,8 +44,8 @@ public class SecurityConfig {
                 // exception handling 할 때 만든 클래스를 추가
                 .exceptionHandling(exceptionHandlingConfigurer-> {
                     exceptionHandlingConfigurer
-                            .accessDeniedHandler(customAccessDeniedHandler) // 토큰 인중 후 권한을 확인하는 과정에서 통과하지 못하는 예외가 발생하는 경우 예외를 전달한다.
-                            .authenticationEntryPoint(customJwtAuthenticationEntryPoint); // 토큰 인증 과정에서 예외가 발생할 경우 예외를 전달한다.
+                            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 토큰 인증 과정에서 예외가 발생할 경우 예외를 전달한다.
+                            .accessDeniedHandler(accessDeniedHandler); // 토큰 인중 후 권한을 확인하는 과정에서 통과하지 못하는 예외가 발생하는 경우 예외를 전달한다.
                 })
                 //세션 설정을 Stateless 로 설정
                 .sessionManagement(sessionManagement ->
@@ -57,12 +53,16 @@ public class SecurityConfig {
                 )
                 //권한 설정
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
-                    authorizationManagerRequestMatcherRegistry.requestMatchers("login/**").permitAll();
                     authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
                 })
-                // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용.
-                // ExceptionFilter 는 JwtFilter 에서 validateToken 으로 검증하기 때문에 등록 안 해도 됨
-                .addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                // jwtExceptionFilter -> JwtAuthenticationFilter -> UsernamePasswordAuthenticationFilter 순서로 처리
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().requestMatchers(whiteList);
     }
 }

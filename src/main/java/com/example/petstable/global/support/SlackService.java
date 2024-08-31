@@ -26,7 +26,7 @@ public class SlackService {
     private String webhookUrl;
 
     @Async
-    public void sendSlackError(Exception e, HttpServletRequest request) {
+    public void sendSlackError(Exception e, RequestInfo request) {
         try {
             slackClient.send(webhookUrl, payload(p -> p
                     .text("서버 에러 발생") // 메시지 제목
@@ -39,9 +39,9 @@ public class SlackService {
         }
     }
 
-    private Attachment generateSlackAttachment(Exception e, HttpServletRequest request) {
+    private Attachment generateSlackAttachment(Exception e, RequestInfo request) {
         String requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").format(LocalDateTime.now());
-        String xffHeader = request.getHeader("X-FORWARDED-FOR");
+        String xffHeader = request.getHeader();
         return Attachment.builder()
                 .color("FCCC00") // 색상
                 .title(requestTime + " 발생 에러 로그") // 메시지 본문 내용
