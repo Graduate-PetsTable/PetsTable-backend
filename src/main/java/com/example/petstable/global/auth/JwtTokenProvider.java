@@ -5,6 +5,7 @@ import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.global.auth.dto.CustomUserDetails;
 import com.example.petstable.global.exception.PetsTableException;
 import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,9 +18,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
-import static com.example.petstable.domain.member.message.DefaultMessage.*;
+import static com.example.petstable.domain.member.message.AuthMessage.*;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private final String secretKey;
@@ -58,9 +60,17 @@ public class JwtTokenProvider {
         try {
             jwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new PetsTableException(EXPIRED_ID_TOKEN.getStatus(), EXPIRED_ID_TOKEN.getMessage(), 401);
-        } catch (JwtException e) {
-            throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 401);
+            log.info("Expired JWT token.");
+            throw new PetsTableException(EXPIRED_TOKEN.getStatus(), EXPIRED_TOKEN.getMessage(), 401);
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT token.");
+            throw new PetsTableException(UNSUPPORTED_TOKEN.getStatus(), UNSUPPORTED_TOKEN.getMessage(), 401);
+        } catch (MalformedJwtException e) {
+            log.info("Invalid JWT token.");
+            throw new PetsTableException(INVALID_TOKEN.getStatus(), INVALID_TOKEN.getMessage(), 401);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT token compact of handler are invalid.");
+            throw new PetsTableException(EMPTY_TOKEN.getStatus(), EMPTY_TOKEN.getMessage(), 401);
         }
     }
 
