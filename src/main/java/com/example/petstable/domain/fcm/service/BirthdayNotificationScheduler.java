@@ -1,5 +1,6 @@
 package com.example.petstable.domain.fcm.service;
 
+import com.example.petstable.domain.fcm.dto.request.BirthDayNotificationRequest;
 import com.example.petstable.domain.pet.entity.PetEntity;
 import com.example.petstable.domain.pet.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,12 @@ public class BirthdayNotificationScheduler {
         List<PetEntity> birthdayPets = petRepository.findByBirth(today);
 
         for (PetEntity pet : birthdayPets) {
-            fcmService.sendBirthdayMessage(pet.getName(), pet.increaseAge(), pet.getMember().getId());
+            BirthDayNotificationRequest request = BirthDayNotificationRequest.builder()
+                    .name(pet.getName())
+                    .age(pet.increaseAge())
+                    .memberId(pet.getMember().getId())
+                    .build();
+            fcmService.sendBirthdayMessage(request);
         }
     }
 }

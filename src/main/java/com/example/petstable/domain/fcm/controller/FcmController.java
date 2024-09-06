@@ -1,5 +1,6 @@
 package com.example.petstable.domain.fcm.controller;
 
+import com.example.petstable.domain.fcm.dto.request.BirthDayNotificationRequest;
 import com.example.petstable.domain.fcm.dto.request.NotificationRequest;
 import com.example.petstable.domain.fcm.service.FcmService;
 import com.example.petstable.global.exception.PetsTableApiResponse;
@@ -16,24 +17,22 @@ import static com.example.petstable.domain.fcm.message.FcmMessage.*;
 @RestController
 @RequestMapping("/fcm")
 @RequiredArgsConstructor
-public class FcmController {
+public class FcmController implements FcmApi {
 
     private final FcmService fcmService;
 
-    @Operation(summary = "알림 전송", description = "원하는 내용 전송")
     @PostMapping("/message")
-    public PetsTableApiResponse<String> pushMessage(@RequestBody NotificationRequest request, Long memberId) {
+    public PetsTableApiResponse<String> pushMessage(@RequestBody NotificationRequest request) {
 
-        fcmService.sendMessage(request, memberId);
+        fcmService.sendMessage(request);
 
         return PetsTableApiResponse.createResponse("메시지 전송 성공", SUCCESS_SEND_MESSAGE);
     }
 
-    @Operation(summary = "생일 알림 전송", description = "생일 메세지 전송. !! 실제로 생일 알림은 스케줄러 사용해서 00시에 자동으로 전송됨!!")
     @PostMapping("/birthday")
-    public PetsTableApiResponse<String> pushBirthdayMessage(String petName, int age, Long memberId) {
+    public PetsTableApiResponse<String> pushBirthdayMessage(@RequestBody BirthDayNotificationRequest birthDayNotificationRequest) {
 
-        fcmService.sendBirthdayMessage(petName, age, memberId);
+        fcmService.sendBirthdayMessage(birthDayNotificationRequest);
 
         return PetsTableApiResponse.createResponse("메시지 전송 성공", SUCCESS_SEND_MESSAGE);
     }

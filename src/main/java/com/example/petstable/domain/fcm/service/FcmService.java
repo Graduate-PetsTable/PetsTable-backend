@@ -1,5 +1,6 @@
 package com.example.petstable.domain.fcm.service;
 
+import com.example.petstable.domain.fcm.dto.request.BirthDayNotificationRequest;
 import com.example.petstable.domain.fcm.dto.request.NotificationRequest;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.exception.PetsTableException;
@@ -18,10 +19,10 @@ public class FcmService {
 
     private final MemberRepository memberRepository;
 
-    public void sendMessage(NotificationRequest request, Long memberId) {
+    public void sendMessage(NotificationRequest request) {
 
         // 사용자의 fcm 토큰 값을 조회
-        String fcmToken = validateFcmToken(memberId);
+        String fcmToken = validateFcmToken(request.getMemberId());
 
         // 메시지 생성
         Message message = Message.builder()
@@ -64,15 +65,16 @@ public class FcmService {
         }
     }
 
-    public void sendBirthdayMessage(String name, int age, Long memberId) {
-        String title = name + "의 생일을 축하합니다!";
-        String body = "오늘은 " + name + "의 " + age + "번째 생일입니다.\n" + "맛있는 간식을 만들어주세요~!";
+    public void sendBirthdayMessage(BirthDayNotificationRequest birthDayNotificationRequest) {
+        String title = birthDayNotificationRequest.getName() + "의 생일을 축하합니다!";
+        String body = "오늘은 " + birthDayNotificationRequest.getName() + "의 " + birthDayNotificationRequest.getAge() + "번째 생일입니다.\n" + "맛있는 간식을 만들어주세요~!";
         NotificationRequest request = NotificationRequest.builder()
+                .memberId(birthDayNotificationRequest.getMemberId())
                 .title(title)
                 .body(body)
                 .build();
 
-        sendMessage(request, memberId);
+        sendMessage(request);
     }
 
     public String validateFcmToken(Long memberId) {
