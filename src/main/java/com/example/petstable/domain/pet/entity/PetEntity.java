@@ -50,11 +50,31 @@ public class PetEntity extends BaseTimeEntity {
 
     // 생성 메서드 - 로그인 이후 최초 반려동물 등록
     public static PetEntity createPet(PetRegisterRequest petRegisterRequest) {
-        return PetEntity.builder()
+
+        PetEntity.PetEntityBuilder builder = PetEntity.builder()
                 .name(petRegisterRequest.getName())
-                .age(petRegisterRequest.getAge())
-                .weight(petRegisterRequest.getWeight())
-                .build();
+                .weight(petRegisterRequest.getWeight());
+
+        // 생일이 제공된 경우
+        if (petRegisterRequest.getBirth() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate birthDate = LocalDate.parse(petRegisterRequest.getBirth(), formatter);
+            builder.birth(birthDate);
+            builder.age(getAge(birthDate, LocalDate.now())); // 나이 계산
+        }
+
+        // 대체 나이가 제공된 경우
+        if (petRegisterRequest.getAgeApproximation() != null) {
+            builder.ageApproximation(petRegisterRequest.getAgeApproximation());
+            builder.age(getAgeApprox(petRegisterRequest.getAgeApproximation())); // 대체 나이로 나이 설정
+        }
+
+        // 생일도 대체 나이도 없는 경우
+        if (petRegisterRequest.getBirth() == null && petRegisterRequest.getAgeApproximation() == null) {
+            builder.age(0); // 나이를 0으로 설정
+        }
+
+        return builder.build();
     }
 
     // 생년월일 혹은 대체 생년월일 설정 및 나이 계산
@@ -77,11 +97,9 @@ public class PetEntity extends BaseTimeEntity {
 
         PetEntity pet = PetEntity.builder()
                 .name(petRegisterNewPetRequest.getName())
-                .age(petRegisterNewPetRequest.getAge())
                 .size(petRegisterNewPetRequest.getSize())
                 .kind(petRegisterNewPetRequest.getKind())
                 .gender(petRegisterNewPetRequest.getGender())
-//                .walk(petRegisterNewPetRequest.getWalk())
                 .build();
 
         pet.setAgeAndBirth(petRegisterNewPetRequest.getBirth(), petRegisterNewPetRequest.getAgeApproximation());
@@ -98,7 +116,6 @@ public class PetEntity extends BaseTimeEntity {
         this.setAgeAndBirth(request.getBirth(), request.getAgeApproximation());
         this.kind = request.getKind();
         this.gender = request.getGender();
-//        this.walk = request.getWalk();
         this.image_url = request.getImage_url();
     }
 
@@ -137,7 +154,6 @@ public class PetEntity extends BaseTimeEntity {
                 .kind(petEntity.getKind())
                 .gender(petEntity.getGender())
                 .imageUrl(petEntity.getImage_url())
-//                .walk(petEntity.getWalk())
                 .ownerNickname(petEntity.getMember().getNickName())
                 .build();
     }

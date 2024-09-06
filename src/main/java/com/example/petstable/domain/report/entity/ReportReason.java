@@ -15,13 +15,13 @@ import static com.example.petstable.domain.report.message.ReportMessage.*;
 @Getter
 public enum ReportReason {
 
-    FISHING_HARASSMENT_SPAM("fishing_harassment_spam"),
-    LEAKING_FRAUD("leaking_fraud"),
-    PORNOGRAPHY("pornography"),
-    INAPPROPRIATE_CONTENT("inappropriate_content"),
-    INSULT("insult"),
-    COMMERCIAL_AD("commercial_ad"),
-    POLITICAL_CONTENT("political_content");
+    FISHING_HARASSMENT_SPAM("스팸"),
+    LEAKING_FRAUD("정보유출"),
+    PORNOGRAPHY("성적인 내용"),
+    INAPPROPRIATE_CONTENT("부적절한 컨텐츠"),
+    INSULT("모욕"),
+    COMMERCIAL_AD("광고"),
+    POLITICAL_CONTENT("정치적 발언");
 
     private String value;
 

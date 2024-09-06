@@ -1,5 +1,6 @@
 package com.example.petstable.domain.member.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,8 +15,10 @@ public class OAuthMemberSignUpRequest {
     private String nickname;
 
     @NotBlank(message = "공백일 수 없습니다.")
+    @Schema(description = "소셜 타입", example = "apple", allowableValues = {"test", "google", "apple"})
     private String socialType;
 
     @NotBlank(message = "공백일 수 없습니다.")
+    @Schema(description = "Claims에 담긴 subject", example = "123456789")
     private String socialId;
 }
