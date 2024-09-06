@@ -123,14 +123,12 @@ public class PetServiceTest {
 
         PetRegisterRequest petRegisterRequest1 = PetRegisterRequest.builder()
                 .name("파랑이")
-                .age(6)
                 .weight(2.1)
                 .build();
 
         String expected1 = "테스트";
         PetRegisterRequest petRegisterRequest2 = PetRegisterRequest.builder()
                 .name(expected1)
-                .age(6)
                 .weight(3.2)
                 .build();
 
@@ -170,7 +168,6 @@ public class PetServiceTest {
 
         PetRegisterRequest petRegisterRequest = PetRegisterRequest.builder()
                 .name("파랑이")
-                .age(6)
                 .weight(4.5)
                 .build();
 
@@ -201,7 +198,6 @@ public class PetServiceTest {
 
         PetRegisterRequest registerPet = PetRegisterRequest.builder()
                 .name("파랑이")
-                .age(6)
                 .weight(3.2)
                 .build();
 
