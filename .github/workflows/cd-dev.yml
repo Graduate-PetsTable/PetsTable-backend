@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Create application.yml for Dev or Prod
+      - name: Create application.yml and application-oauth.yml for Dev or Prod
         run: |
           cd ./src/main/resources
           touch ./application.yml
@@ -27,6 +27,13 @@ jobs:
             echo "${{ secrets.YML_DEV }}" > ./application.yml
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "${{ secrets.YML_PROD }}" > ./application.yml
+          fi
+          
+          touch ./application-oauth.yml
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "${{ secrets.OAUTH_YML_DEV }}" > ./application-oauth.yml
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "${{ secrets.OAUTH_YML_PROD }}" > ./application-oauth.yml
           fi
         shell: bash
 
@@ -68,7 +75,6 @@ jobs:
           port: ${{ secrets.WAS_SSH_PORT }}
           script: |
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker rm -f $(sudo docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             sudo docker run -d -p 8080:8080 --network ${{ secrets.WAS_NETWORK }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             sudo docker image prune -f
