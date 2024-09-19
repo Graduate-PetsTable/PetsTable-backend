@@ -19,7 +19,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Create application.yml and application-oauth.yml for Dev or Prod
+      - name: Create application-oauth.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-oauth.yml
+          echo "${{ secrets.OAUTH_YML }}" > ./application-oauth.yml
+        shell: bash
+
+
+      - name: Create application.yml
         run: |
           cd ./src/main/resources
           touch ./application.yml
@@ -27,13 +35,6 @@ jobs:
             echo "${{ secrets.YML_DEV }}" > ./application.yml
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "${{ secrets.YML_PROD }}" > ./application.yml
-          fi
-          
-          touch ./application-oauth.yml
-          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-            echo "${{ secrets.OAUTH_YML_DEV }}" > ./application-oauth.yml
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "${{ secrets.OAUTH_YML_PROD }}" > ./application-oauth.yml
           fi
         shell: bash
 
