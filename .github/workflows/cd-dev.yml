@@ -77,8 +77,4 @@ jobs:
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             sudo docker run -d -p 8080:8080 --network ${{ secrets.WAS_NETWORK }} -- name spring ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
-            sudo docker image prune -f
-
-      - name: NGINX Restart
-        run: |
-          sudo docker restart nginx
+            sudo docker image prune -ft nginx
