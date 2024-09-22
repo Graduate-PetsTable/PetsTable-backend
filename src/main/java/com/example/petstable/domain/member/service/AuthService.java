@@ -8,7 +8,8 @@ import com.example.petstable.domain.member.entity.Status;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
+import com.example.petstable.global.auth.dto.response.AppleMemberResponse;
+import com.example.petstable.global.auth.dto.response.GoogleMemberResponse;
 import com.example.petstable.global.auth.JwtTokenProvider;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.refresh.dto.request.RefreshTokenRequest;
@@ -43,7 +44,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
 
     public TokenResponse appleOAuthLogin(OAuthLoginRequest request) {
-        OAuthMemberResponse appleSocialMember = appleOAuthUserProvider.getAppleMember(request.getToken());
+        AppleMemberResponse appleSocialMember = appleOAuthUserProvider.getAppleMember(request.getToken());
 
         return generateTokenResponse(SocialType.APPLE, appleSocialMember.getEmail(), appleSocialMember.getSocialId(), request.getFcmToken());
     }
@@ -58,7 +59,7 @@ public class AuthService {
             if (googleIdToken == null) {
                 throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 409);
             } else {
-                OAuthMemberResponse googleSocialMember = new OAuthMemberResponse(googleIdToken.getPayload());
+                GoogleMemberResponse googleSocialMember = new GoogleMemberResponse(googleIdToken.getPayload());
                 return generateTokenResponse(SocialType.GOOGLE, googleSocialMember.getEmail(), googleSocialMember.getSocialId(), request.getFcmToken());
             }
         } catch (GeneralSecurityException | IOException e) {

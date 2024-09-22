@@ -1,9 +1,10 @@
 package com.example.petstable.global.auth.apple;
 
-import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
+import com.example.petstable.global.auth.dto.response.AppleMemberResponse;
 import com.example.petstable.global.exception.PetsTableException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.security.PublicKey;
@@ -20,7 +21,7 @@ public class AppleOAuthUserProvider {
     private final PublicKeyGenerator publicKeyGenerator;
     private final AppleClaimsValidator appleClaimsValidator;
 
-    public OAuthMemberResponse getAppleMember(String identityToken) {
+    public AppleMemberResponse getAppleMember(String identityToken) {
         Map<String, String> headers = appleJwtParser.parseHeaders(identityToken);
         ApplePublicKeys applePublicKeys = appleClient.getApplePublicKeys();
 
@@ -29,7 +30,7 @@ public class AppleOAuthUserProvider {
         Claims claims = appleJwtParser.parsePublicKeyAndGetClaims(identityToken, publicKey);
         validateClaims(claims);
 
-        return new OAuthMemberResponse(claims.getSubject(), claims.get("email", String.class));
+        return new AppleMemberResponse(claims.getSubject(), claims.get("email", String.class));
     }
 
     private void validateClaims(Claims claims) {

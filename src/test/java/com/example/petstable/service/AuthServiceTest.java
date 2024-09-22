@@ -8,7 +8,7 @@ import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.AuthService;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
+import com.example.petstable.global.auth.dto.response.AppleMemberResponse;
 import com.example.petstable.global.refresh.service.RefreshTokenService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +47,7 @@ public class AuthServiceTest {
         String socialId = "20191476";
 
         when(appleOAuthUserProvider.getAppleMember(anyString()))
-                .thenReturn(new OAuthMemberResponse(socialId, expected));
+                .thenReturn(new AppleMemberResponse(socialId, expected));
 
         TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token", null));
 
@@ -76,7 +76,7 @@ public class AuthServiceTest {
         memberRepository.save(member);
 
         when(appleOAuthUserProvider.getAppleMember(anyString()))
-                .thenReturn(new OAuthMemberResponse(socialId, expected));
+                .thenReturn(new AppleMemberResponse(socialId, expected));
 
         TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token", null));
 
@@ -102,7 +102,7 @@ public class AuthServiceTest {
                 .build();
         memberRepository.save(member);
 
-        when(appleOAuthUserProvider.getAppleMember(anyString())).thenReturn(new OAuthMemberResponse(socialId, expected));
+        when(appleOAuthUserProvider.getAppleMember(anyString())).thenReturn(new AppleMemberResponse(socialId, expected));
 
         TokenResponse actual = authService.appleOAuthLogin(new OAuthLoginRequest("token", null));
 

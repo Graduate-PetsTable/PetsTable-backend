@@ -1,7 +1,7 @@
 package com.example.petstable.apple;
 
 import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
-import com.example.petstable.global.auth.dto.response.OAuthMemberResponse;
+import com.example.petstable.global.auth.dto.response.AppleMemberResponse;
 import com.example.petstable.global.auth.apple.AppleClaimsValidator;
 import com.example.petstable.global.auth.apple.AppleClient;
 import com.example.petstable.global.auth.apple.ApplePublicKeys;
@@ -62,7 +62,7 @@ public class AppleOAuthProviderTest {
         when(publicKeyGenerator.generatePublicKey(any(), any())).thenReturn(publicKey);
         when(appleClaimsValidator.isValid(any())).thenReturn(true);
 
-        OAuthMemberResponse actual = appleOAuthUserProvider.getAppleMember(identityToken);
+        AppleMemberResponse actual = appleOAuthUserProvider.getAppleMember(identityToken);
         assertAll(
                 () -> assertThat(actual.getSocialId()).isEqualTo(expected),
                 () -> assertThat(actual.getEmail()).isEqualTo("ssg9505fj22@naver.com")
