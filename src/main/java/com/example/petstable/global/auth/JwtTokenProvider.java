@@ -28,8 +28,8 @@ public class JwtTokenProvider {
     private final long validityAccessTokenInMilliseconds;
     private final JwtParser jwtParser;
 
-    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey,
-                            @Value("${jwt.access-key-expire-length}") long validityAccessTokenInMilliseconds) {
+    public JwtTokenProvider(@Value("${spring.jwt.secret-key}") String secretKey,
+                            @Value("${spring.jwt.access-key-expire-length}") long validityAccessTokenInMilliseconds) {
         this.secretKey = secretKey;
         this.validityAccessTokenInMilliseconds = validityAccessTokenInMilliseconds;
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
