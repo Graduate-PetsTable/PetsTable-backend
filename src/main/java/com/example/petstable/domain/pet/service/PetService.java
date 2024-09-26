@@ -43,6 +43,7 @@ public class PetService {
                 .id(petEntity.getId())
                 .name(petEntity.getName())
                 .weight(petEntity.getWeight())
+                .age(petEntity.getAge())
                 .build();
     }
 
