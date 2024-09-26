@@ -32,7 +32,7 @@ public class MemberService {
     @Transactional
     public OAuthMemberSignUpResponse signUpByOAuthMember(OAuthMemberSignUpRequest request) {
 
-        validateDuplicateMember(request);
+//        validateDuplicateMember(request);
         SocialType socialType = SocialType.from(request.getSocialType());
         MemberEntity findMember = memberRepository.findBySocialTypeAndSocialId(socialType, request.getSocialId())
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
