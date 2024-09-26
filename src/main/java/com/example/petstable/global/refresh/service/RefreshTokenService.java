@@ -20,7 +20,7 @@ public class RefreshTokenService {
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public RefreshTokenService(@Value("${jwt.refresh-key-expire-length}")
+    public RefreshTokenService(@Value("${spring.jwt.refresh-key-expire-length}")
                                long validityRefreshTokenInMilliseconds,
                                MemberRepository memberRepository,
                                RedisTemplate<String, Object> redisTemplate) {
