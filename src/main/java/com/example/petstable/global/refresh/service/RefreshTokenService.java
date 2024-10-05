@@ -37,7 +37,8 @@ public class RefreshTokenService {
                 .expiration(validityRefreshTokenInMilliseconds)
                 .build();
 
-        redisTemplate.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.NANOSECONDS);
+        redisTemplate.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set("memberId:" + memberId, refreshToken, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
     }
 
     public MemberEntity getMemberFromRefreshToken(String refreshToken) {
@@ -60,5 +61,7 @@ public class RefreshTokenService {
 
     public void updateToken(RefreshToken token) {
         redisTemplate.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
+        redisTemplate.delete("memberId:" + token.getId());
+        redisTemplate.opsForValue().set("memberId:" + token.getId(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
     }
 }
