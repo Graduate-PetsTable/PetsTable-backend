@@ -147,4 +147,11 @@ public class AuthService {
         }
         throw new PetsTableException(NOT_EXPIRED_ACCESS_TOKEN.getStatus(), NOT_EXPIRED_ACCESS_TOKEN.getMessage(), 400);
     }
+
+    @Transactional
+    public void logout(Long memberId) {
+        MemberEntity member = memberRepository.findById(memberId).orElseThrow(
+                () -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+        refreshTokenService.deleteRefreshTokenByMemberId(member.getId());
+    }
 }

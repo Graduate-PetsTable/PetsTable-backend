@@ -19,6 +19,7 @@ public enum MemberMessage implements ResponseMessage {
     SUCCESS_DELETE_PROFILE_IMAGE("프로필 이미지 삭제 성공", HttpStatus.OK),
     SUCCESS_TOKEN("토큰 재발급 완료.", HttpStatus.OK),
     LOGIN_SUCCESS("로그인 성공", HttpStatus.OK),
+    SUCCESS_LOGOUT("로그아웃 성공", HttpStatus.OK),
     JOIN_SUCCESS("회원가입 성공", HttpStatus.OK);
 
     private final String message;

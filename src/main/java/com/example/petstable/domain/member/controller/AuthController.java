@@ -2,6 +2,7 @@ package com.example.petstable.domain.member.controller;
 
 import com.example.petstable.domain.member.dto.response.TokenResponse;
 import com.example.petstable.domain.member.service.AuthService;
+import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import com.example.petstable.global.refresh.dto.request.RefreshTokenRequest;
@@ -14,24 +15,24 @@ import static com.example.petstable.domain.member.message.MemberMessage.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/login")
+@RequestMapping("/")
 public class AuthController implements AuthApi{
 
     private final AuthService authService;
 
-    @PostMapping("/apple")
+    @PostMapping("/login/apple")
     public PetsTableApiResponse<TokenResponse> loginApple(@RequestBody @Valid OAuthLoginRequest request) {
         TokenResponse response = authService.appleOAuthLogin(request);
         return PetsTableApiResponse.createResponse(response, LOGIN_SUCCESS);
     }
 
-    @PostMapping("/google")
+    @PostMapping("/login/google")
     public PetsTableApiResponse<TokenResponse> loginGoogle(@RequestBody @Valid OAuthLoginRequest request) {
         TokenResponse response = authService.googleLogin(request);
         return PetsTableApiResponse.createResponse(response, LOGIN_SUCCESS);
     }
 
-    @PostMapping("/test")
+    @PostMapping("/login/test")
     public PetsTableApiResponse<TokenResponse> testLogin() {
         TokenResponse response = authService.testLogin();
         return PetsTableApiResponse.createResponse(response, LOGIN_SUCCESS);
@@ -43,4 +44,9 @@ public class AuthController implements AuthApi{
         return PetsTableApiResponse.createResponse(response, SUCCESS_TOKEN);
     }
 
+    @DeleteMapping("/logout")
+    public PetsTableApiResponse<Void> logout(@LoginUserId Long memberId) {
+        authService.logout(memberId);
+        return PetsTableApiResponse.createResponse(null, SUCCESS_LOGOUT);
+    }
 }

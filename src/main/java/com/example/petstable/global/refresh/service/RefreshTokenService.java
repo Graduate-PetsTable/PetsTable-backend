@@ -64,4 +64,14 @@ public class RefreshTokenService {
         redisTemplate.delete("memberId:" + token.getId());
         redisTemplate.opsForValue().set("memberId:" + token.getId(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
     }
+
+    public void deleteRefreshTokenByMemberId (Long memberId) {
+        String refreshToken = (String) redisTemplate.opsForValue().get("memberId:" + memberId);
+        if (refreshToken != null) {
+            redisTemplate.delete("memberId:" + memberId);
+            redisTemplate.delete(refreshToken);
+        } else {
+            throw new PetsTableException(INVALID_REFRESH_TOKEN.getStatus(), INVALID_REFRESH_TOKEN.getMessage(), 401);
+        }
+    }
 }
