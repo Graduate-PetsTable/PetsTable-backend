@@ -19,6 +19,10 @@ public enum MemberMessage implements ResponseMessage {
     SUCCESS_DELETE_PROFILE_IMAGE("프로필 이미지 삭제 성공", HttpStatus.OK),
     SUCCESS_TOKEN("토큰 재발급 완료.", HttpStatus.OK),
     LOGIN_SUCCESS("로그인 성공", HttpStatus.OK),
+    SUCCESS_LOGOUT("로그아웃 성공", HttpStatus.OK),
+    SUCCESS_WITHDRAW("회원탈퇴 성공", HttpStatus.OK),
+    FAILED_APPLE_REVOKE("애플유저 회원탈퇴 실패", HttpStatus.BAD_REQUEST),
+    FAILED_GOOGLE_REVOKE("구글유저 회원탈퇴 실패", HttpStatus.BAD_REQUEST),
     JOIN_SUCCESS("회원가입 성공", HttpStatus.OK);
 
     private final String message;

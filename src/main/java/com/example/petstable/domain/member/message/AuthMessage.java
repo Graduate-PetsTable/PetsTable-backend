@@ -16,6 +16,8 @@ public enum AuthMessage implements ResponseMessage {
     NOT_EXPIRED_ACCESS_TOKEN("아직 만료되지 않은 액세스 토큰입니다", HttpStatus.BAD_REQUEST),
     EXPIRED_ID_TOKEN("Id Token 이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN("토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+    APPLE_TOKEN_REQUEST_FAILED("Apple 의 AccessToken 요청에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    GOOGLE_ID_TOKEN_VERIFY_FAILED("Google Id Token 검증에 실패하였습니다.", HttpStatus.BAD_REQUEST),
     INVALID_CLAIMS("Apple OAuth Claims 값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     INVALID_BEARER("로그인이 필요한 서비스입니다.", HttpStatus.UNAUTHORIZED),
     INTERNAL_SERVER_ERROR("서버 내부 오류", HttpStatus.INTERNAL_SERVER_ERROR),

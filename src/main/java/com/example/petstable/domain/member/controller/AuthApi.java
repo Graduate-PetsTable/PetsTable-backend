@@ -1,17 +1,21 @@
 package com.example.petstable.domain.member.controller;
 
+import com.example.petstable.domain.member.dto.request.AppleAndGoogleWithdrawAuthCodeRequest;
 import com.example.petstable.domain.member.dto.response.TokenResponse;
+import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import com.example.petstable.global.refresh.dto.request.RefreshTokenRequest;
 import com.example.petstable.global.refresh.dto.response.ReissueTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -93,5 +97,29 @@ public interface AuthApi {
     })
     PetsTableApiResponse<ReissueTokenResponse> refreshAccessToken(
             @RequestBody(description = "토큰 재발급 요청 데이터", required = true) @Valid RefreshTokenRequest request
+    );
+
+    @Operation(summary = "로그아웃", description = "사용자가 로그아웃을 합니다.")
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "401", description = "RefreshToken이 올바르지 않습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    PetsTableApiResponse<Void> logout(
+            @Parameter(description = "사용자 ID", required = true, hidden = true) @LoginUserId Long memberId
+    );
+
+    @Operation(summary = "회원탈퇴", description = "사용자가 회원을 탈퇴합니다.")
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    PetsTableApiResponse<Void> withdraw(
+            @Parameter(description = "사용자 ID", required = true, hidden = true) @LoginUserId Long memberId,
+            @RequestBody(description = "탈퇴 요청 데이터", required = true) AppleAndGoogleWithdrawAuthCodeRequest request
     );
 }

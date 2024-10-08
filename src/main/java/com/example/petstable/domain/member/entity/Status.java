@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 public enum Status {
 
     ACTIVE("active"),
-    INACTIVE("inactive");
+    INACTIVE("inactive"),
+    DELETED("deleted");
 
     private String value;
 }

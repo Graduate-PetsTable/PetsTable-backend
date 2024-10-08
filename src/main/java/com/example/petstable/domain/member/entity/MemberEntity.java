@@ -105,4 +105,12 @@ public class MemberEntity extends BaseTimeEntity {
     public void increaseReportCount() {
         this.report_count++;
     }
+
+    // 유저 정보 삭제
+    public void deleteMemberAccount() {
+        pets.forEach(PetEntity::removePet);
+
+        this.image_url = null;
+        this.nickName = "삭제된유저";
+    }
 }

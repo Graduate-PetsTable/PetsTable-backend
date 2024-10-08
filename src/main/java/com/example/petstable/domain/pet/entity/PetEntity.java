@@ -161,4 +161,11 @@ public class PetEntity extends BaseTimeEntity {
     public void updateImage(String imageUrl) {
         this.image_url = imageUrl;
     }
+
+    public void removePet() {
+        if (this.member != null) {
+            this.member.getPets().remove(this);
+            this.member = null;
+        }
+    }
 }
