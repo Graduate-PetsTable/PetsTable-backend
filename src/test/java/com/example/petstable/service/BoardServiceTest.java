@@ -30,10 +30,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -174,10 +176,12 @@ public class BoardServiceTest {
 
         DescriptionRequest descriptionRequest = new DescriptionRequest("설명");
         TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
+        IngredientRequest ingredientRequest = IngredientRequest.builder().name("당근").weight("30g").build();
 
         BoardPostRequest request = BoardPostRequest.builder()
                 .title("레시피 테스트")
                 .descriptions(List.of(descriptionRequest))
+                .ingredients(List.of(ingredientRequest))
                 .tags(List.of(tagRequest))
                 .build();
 
@@ -186,9 +190,14 @@ public class BoardServiceTest {
 
         // when
         BoardDetailReadResponse actual = boardService.findDetailByBoardId(member.getId(), post.getId());
+        LocalDateTime expectedCreatedTime = post.getCreatedTime();
 
         // then
-        assertThat(actual.getDetails().get(0).getImage_url()).isEqualTo("test_img.jpg");
+        assertAll(
+                () -> assertThat(actual.getDetails().get(0).getImage_url()).isEqualTo("test_img.jpg"),
+                () -> assertThat(actual.getAuthor()).isEqualTo("Seung-9"),
+                () -> assertThat(actual.getCreatedAt()).isEqualTo(expectedCreatedTime)
+        );
     }
 
     @Test
