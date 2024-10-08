@@ -1,5 +1,6 @@
 package com.example.petstable.domain.member.controller;
 
+import com.example.petstable.domain.member.dto.request.AppleAndGoogleWithdrawAuthCodeRequest;
 import com.example.petstable.domain.member.dto.response.TokenResponse;
 import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
@@ -108,5 +109,17 @@ public interface AuthApi {
     })
     PetsTableApiResponse<Void> logout(
             @Parameter(description = "사용자 ID", required = true, hidden = true) @LoginUserId Long memberId
+    );
+
+    @Operation(summary = "회원탈퇴", description = "사용자가 회원을 탈퇴합니다.")
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+    })
+    PetsTableApiResponse<Void> withdraw(
+            @Parameter(description = "사용자 ID", required = true, hidden = true) @LoginUserId Long memberId,
+            @RequestBody(description = "탈퇴 요청 데이터", required = true) AppleAndGoogleWithdrawAuthCodeRequest request
     );
 }

@@ -1,5 +1,6 @@
 package com.example.petstable.domain.member.service;
 
+import com.example.petstable.domain.member.dto.request.AppleAndGoogleWithdrawAuthCodeRequest;
 import com.example.petstable.domain.member.dto.response.TokenResponse;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.RoleType;
@@ -11,6 +12,7 @@ import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
 import com.example.petstable.global.auth.dto.response.AppleMemberResponse;
 import com.example.petstable.global.auth.dto.response.GoogleMemberResponse;
 import com.example.petstable.global.auth.JwtTokenProvider;
+import com.example.petstable.global.auth.google.GoogleOAuthUserProvider;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.refresh.dto.request.RefreshTokenRequest;
 import com.example.petstable.global.refresh.dto.response.ReissueTokenResponse;
@@ -34,6 +36,7 @@ import static com.example.petstable.domain.member.message.AuthMessage.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
 
     @Value("${google.client-id}")
@@ -41,6 +44,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
+    private final GoogleOAuthUserProvider googleOAuthUserProvider;
     private final RefreshTokenService refreshTokenService;
 
     public TokenResponse appleOAuthLogin(OAuthLoginRequest request) {
@@ -55,7 +59,6 @@ public class AuthService {
                 .build();
         try {
             GoogleIdToken googleIdToken = verifier.verify(request.getToken());
-
             if (googleIdToken == null) {
                 throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 409);
             } else {
@@ -65,7 +68,6 @@ public class AuthService {
         } catch (GeneralSecurityException | IOException e) {
             throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 409);
         }
-
     }
 
     public TokenResponse testLogin() {
@@ -153,5 +155,21 @@ public class AuthService {
         MemberEntity member = memberRepository.findById(memberId).orElseThrow(
                 () -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
         refreshTokenService.deleteRefreshTokenByMemberId(member.getId());
+    }
+
+    @Transactional
+    public void withdraw(Long memberId, AppleAndGoogleWithdrawAuthCodeRequest appleWithdrawAuthCodeRequest) {
+        MemberEntity member = memberRepository.findById(memberId).orElseThrow(
+                () -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+        if (member.getSocialType() == SocialType.APPLE) {
+            appleOAuthUserProvider.revoke(appleWithdrawAuthCodeRequest.getAuthCode());
+        } else if (member.getSocialType() == SocialType.GOOGLE) {
+            refreshTokenService.deleteRefreshTokenByMemberId(member.getId());
+            googleOAuthUserProvider.revoke(appleWithdrawAuthCodeRequest.getAuthCode());
+        } else {
+            throw new PetsTableException(INVALID_SOCIAL.getStatus(), INVALID_SOCIAL.getMessage(), 400);
+        }
+        member.deleteMemberAccount();
+        refreshTokenService.deleteRefreshTokenByMemberId(memberId);
     }
 }

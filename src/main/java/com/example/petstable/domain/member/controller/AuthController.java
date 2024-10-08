@@ -1,5 +1,6 @@
 package com.example.petstable.domain.member.controller;
 
+import com.example.petstable.domain.member.dto.request.AppleAndGoogleWithdrawAuthCodeRequest;
 import com.example.petstable.domain.member.dto.response.TokenResponse;
 import com.example.petstable.domain.member.service.AuthService;
 import com.example.petstable.global.auth.LoginUserId;
@@ -48,5 +49,11 @@ public class AuthController implements AuthApi{
     public PetsTableApiResponse<Void> logout(@LoginUserId Long memberId) {
         authService.logout(memberId);
         return PetsTableApiResponse.createResponse(null, SUCCESS_LOGOUT);
+    }
+
+    @DeleteMapping("/withdraw")
+    public PetsTableApiResponse<Void> withdraw(@LoginUserId Long memberId, @RequestBody AppleAndGoogleWithdrawAuthCodeRequest appleAndGoogleWithdrawAuthCodeRequest) {
+        authService.withdraw(memberId, appleAndGoogleWithdrawAuthCodeRequest);
+        return PetsTableApiResponse.createResponse(null, SUCCESS_WITHDRAW);
     }
 }

@@ -1,11 +1,14 @@
 package com.example.petstable.service;
 
 
+import com.example.petstable.domain.member.dto.request.AppleAndGoogleWithdrawAuthCodeRequest;
+import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
 import com.example.petstable.domain.member.dto.response.TokenResponse;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.AuthService;
+import com.example.petstable.domain.member.service.MemberService;
 import com.example.petstable.global.auth.dto.request.OAuthLoginRequest;
 import com.example.petstable.global.auth.apple.AppleOAuthUserProvider;
 import com.example.petstable.global.auth.dto.response.AppleMemberResponse;
@@ -19,9 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,8 +36,10 @@ public class AuthServiceTest {
     private AuthService authService;
     @Autowired
     private RefreshTokenService refreshTokenService;
+    @Autowired
+    private MemberService memberService;
 
-    @Value("${jwt.secret-key}")
+    @Value("${spring.jwt.secret-key}")
     private String secretKey;
 
     @MockBean
@@ -113,6 +118,33 @@ public class AuthServiceTest {
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getSocialId()).isEqualTo(socialId)
         );
+    }
+
+    @Test
+    @DisplayName("Apple 로그인 후 탈퇴시 닉네임이 삭제된유저로 변경되며 리프래시 토큰이 삭제된다")
+    void appleRevoke() {
+        // given
+        String expected = "삭제된유저";
+
+        MemberEntity member = MemberEntity.builder()
+                .email("ssg@apple.com")
+                .socialType(SocialType.APPLE)
+                .socialId("492013")
+                .build();
+        memberRepository.save(member);
+
+        OAuthMemberSignUpRequest oAuthMemberSignUpRequest = new OAuthMemberSignUpRequest("테스트", "apple", "492013");
+        memberService.signUpByOAuthMember(oAuthMemberSignUpRequest);
+
+        // when
+        AppleAndGoogleWithdrawAuthCodeRequest appleAndGoogleWithdrawAuthCodeRequest = new AppleAndGoogleWithdrawAuthCodeRequest("authCode");
+        authService.withdraw(member.getId(), appleAndGoogleWithdrawAuthCodeRequest);
+
+        MemberEntity updatedMember = memberRepository.findById(member.getId()).orElseThrow();
+
+        // then
+        assertThat(expected).isEqualTo(updatedMember.getNickName());
+        verify(refreshTokenService).deleteRefreshTokenByMemberId(member.getId());
     }
 //
 //    @Test
