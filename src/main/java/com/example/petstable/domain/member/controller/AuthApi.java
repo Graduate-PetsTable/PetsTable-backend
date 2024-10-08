@@ -29,7 +29,7 @@ public interface AuthApi {
                     examples = @ExampleObject(value = """
             {
                 "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-                "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                "refreshToken": "4a9acc82-450b-45bf-b94e-08c98503f35b",
                 "fcmToken": "some_fcm_token",
                 "email": "user@example.com",
                 "isRegistered": true,
@@ -50,7 +50,7 @@ public interface AuthApi {
                     examples = @ExampleObject(value = """
             {
                 "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-                "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                "refreshToken": "4a9acc82-450b-45bf-b94e-08c98503f35b",
                 "fcmToken": "some_fcm_token",
                 "email": "user@example.com",
                 "isRegistered": true,
@@ -71,7 +71,7 @@ public interface AuthApi {
                     examples = @ExampleObject(value = """
             {
                 "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-                "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                "refreshToken": "4a9acc82-450b-45bf-b94e-08c98503f35b",
                 "fcmToken": "some_fcm_token",
                 "email": "user@example.com",
                 "isRegistered": true,
@@ -102,10 +102,18 @@ public interface AuthApi {
     @Operation(summary = "로그아웃", description = "사용자가 로그아웃을 합니다.")
     @SecurityRequirement(name = "JWT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
-            @ApiResponse(responseCode = "401", description = "RefreshToken이 올바르지 않습니다."),
-            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공", content = @Content(
+                    examples = @ExampleObject(value = """
+                            {
+                              "data": null,
+                              "message": "로그아웃 성공",
+                              "code": "SUCCESS_LOGOUT"
+                            }
+                            """)
+            )),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "RefreshToken이 올바르지 않습니다.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.", content = @Content())
     })
     PetsTableApiResponse<Void> logout(
             @Parameter(description = "사용자 ID", required = true, hidden = true) @LoginUserId Long memberId
@@ -114,9 +122,17 @@ public interface AuthApi {
     @Operation(summary = "회원탈퇴", description = "사용자가 회원을 탈퇴합니다.")
     @SecurityRequirement(name = "JWT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
-            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공", content = @Content(
+                    examples = @ExampleObject(value = """
+                            {
+                              "data": null,
+                              "message": "회원탈퇴 성공",
+                              "code": "SUCCESS_WITHDRAW"
+                            }
+                            """)
+            )),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.", content = @Content())
     })
     PetsTableApiResponse<Void> withdraw(
             @Parameter(description = "사용자 ID", required = true, hidden = true) @LoginUserId Long memberId,
