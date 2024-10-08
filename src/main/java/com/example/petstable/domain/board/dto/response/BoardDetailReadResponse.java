@@ -4,6 +4,7 @@ import com.example.petstable.domain.board.entity.BoardEntity;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,9 @@ public class BoardDetailReadResponse {
 
     private Long id;
     private String title;
+    private String author;
     private int viewCount;
+    private LocalDateTime createdAt;
     private boolean bookmarkStatus;
     private List<DetailResponse> details;
     private List<TagResponse> tags;
@@ -45,7 +48,9 @@ public class BoardDetailReadResponse {
         return BoardDetailReadResponse.builder()
                 .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
+                .author(boardEntity.getMember().getNickName())
                 .viewCount(boardEntity.getView_count())
+                .createdAt(boardEntity.getCreatedTime())
                 .bookmarkStatus(status)
                 .details(details)
                 .tags(tags)
