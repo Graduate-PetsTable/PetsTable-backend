@@ -164,7 +164,6 @@ public class AuthService {
         if (member.getSocialType() == SocialType.APPLE) {
             appleOAuthUserProvider.revoke(appleWithdrawAuthCodeRequest.getAuthCode());
         } else if (member.getSocialType() == SocialType.GOOGLE) {
-            refreshTokenService.deleteRefreshTokenByMemberId(member.getId());
             googleOAuthUserProvider.revoke(appleWithdrawAuthCodeRequest.getAuthCode());
         } else {
             throw new PetsTableException(INVALID_SOCIAL.getStatus(), INVALID_SOCIAL.getMessage(), 400);
