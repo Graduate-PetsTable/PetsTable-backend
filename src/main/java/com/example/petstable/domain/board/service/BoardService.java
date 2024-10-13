@@ -10,6 +10,7 @@ import com.example.petstable.domain.board.repository.TagRepository;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
+import com.example.petstable.domain.point.service.PointService;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class BoardService {
     private final AwsS3Uploader awsS3Uploader;
     private final TagRepository tagRepository;
     private final IngredientRepository ingredientRepository;
+    private final PointService pointService;
 
     @Transactional
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, List<MultipartFile> images) {
@@ -60,6 +62,9 @@ public class BoardService {
         BoardEntity post = createPostWithDetailsAndTagsAndIngredientRequest(boardRequest, member);
 
         boardRepository.save(post);
+
+        // 포인트 증가
+        pointService.increasePoints(memberId);
 
         return BoardPostResponse.builder()
                 .title(post.getTitle())
