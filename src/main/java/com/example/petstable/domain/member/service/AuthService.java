@@ -53,6 +53,7 @@ public class AuthService {
         return generateTokenResponse(SocialType.APPLE, appleSocialMember.getEmail(), appleSocialMember.getSocialId(), request.getFcmToken());
     }
 
+    @Transactional
     public TokenResponse googleLogin(OAuthLoginRequest request) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(List.of(googleClientId))
@@ -87,7 +88,6 @@ public class AuthService {
         return generateTokenResponse(SocialType.TEST, email, "test", null);
     }
 
-    @Transactional
     public TokenResponse generateTokenResponse(SocialType socialType, String email, String socialId, String fcmToken) {
         return memberRepository.findIdBySocialTypeAndSocialId(socialType, socialId)
                 .map(memberId -> {
