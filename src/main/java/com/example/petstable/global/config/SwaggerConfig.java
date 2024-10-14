@@ -15,7 +15,7 @@ import java.util.List;
 @OpenAPIDefinition(
         servers = @Server(url = "/", description = "Default Server URL"),
         info = @Info(
-                title = "PetsTable 백엔드 API 명세",
+                title = "DogKer 백엔드 API 명세",
                 description = "springdoc을 이용한 Swagger API 문서입니다.",
                 version = "1.0",
                 contact = @Contact(
