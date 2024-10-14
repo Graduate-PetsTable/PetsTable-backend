@@ -65,7 +65,7 @@ public class AuthService {
                 GoogleMemberResponse googleSocialMember = new GoogleMemberResponse(googleIdToken.getPayload());
                 return generateTokenResponse(SocialType.GOOGLE, googleSocialMember.getEmail(), googleSocialMember.getSocialId(), request.getFcmToken());
             }
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
             throw new PetsTableException(INVALID_ID_TOKEN.getStatus(), INVALID_ID_TOKEN.getMessage(), 409);
         }
     }
