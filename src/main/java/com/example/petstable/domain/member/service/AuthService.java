@@ -87,6 +87,7 @@ public class AuthService {
         return generateTokenResponse(SocialType.TEST, email, "test", null);
     }
 
+    @Transactional
     public TokenResponse generateTokenResponse(SocialType socialType, String email, String socialId, String fcmToken) {
         return memberRepository.findIdBySocialTypeAndSocialId(socialType, socialId)
                 .map(memberId -> {
