@@ -8,9 +8,6 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class BoardPostResponse {
-
+    private Long id;
     private String title;
-    private List<DetailPostResponse> details;
-    private List<TagResponse> tags;
-    private List<IngredientResponse> ingredients;
 }

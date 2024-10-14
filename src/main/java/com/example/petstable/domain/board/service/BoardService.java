@@ -67,28 +67,8 @@ public class BoardService {
         pointService.increasePoints(memberId);
 
         return BoardPostResponse.builder()
+                .id(post.getId())
                 .title(post.getTitle())
-                .details(post.getDetails().stream()
-                        .distinct() // 중복된 객체 제거
-                        .map(detail -> DetailPostResponse.builder()
-                                .image_url(detail.getImage_url())
-                                .description(detail.getDescription())
-                                .build())
-                        .collect(Collectors.toList()))
-                .tags(post.getTags().stream()
-                        .distinct() // 중복된 객체 제거
-                        .map(tag -> TagResponse.builder()
-                                .tagType(tag.getType())
-                                .tagName(tag.getName())
-                                .build())
-                        .collect(Collectors.toList()))
-                .ingredients(post.getIngredients().stream()
-                        .distinct()
-                        .map(ingredient -> IngredientResponse.builder()
-                                .name(ingredient.getName())
-                                .weight(ingredient.getWeight())
-                                .build())
-                        .collect(Collectors.toList()))
                 .build();
     }
 
