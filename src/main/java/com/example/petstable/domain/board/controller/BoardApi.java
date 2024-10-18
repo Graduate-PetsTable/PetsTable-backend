@@ -1,13 +1,7 @@
 package com.example.petstable.domain.board.controller;
 
-import com.example.petstable.domain.board.dto.request.BoardPostRequest;
-import com.example.petstable.domain.board.dto.request.BoardUpdateTagRequest;
-import com.example.petstable.domain.board.dto.request.BoardUpdateTitleRequest;
-import com.example.petstable.domain.board.dto.request.DetailUpdateRequest;
-import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
-import com.example.petstable.domain.board.dto.response.BoardPostResponse;
-import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
-import com.example.petstable.domain.board.dto.response.DetailResponse;
+import com.example.petstable.domain.board.dto.request.*;
+import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -117,6 +112,66 @@ public interface BoardApi {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
     })
     PetsTableApiResponse<BoardReadAllResponse> readAllPost(
+            Pageable pageable,
+            @Parameter(hidden = true) @LoginUserId Long memberId
+    );
+
+    @Operation(summary = "특정 조건으로 검색 및 정렬된 레시피 게시글 조회 API",
+            description = "제목 또는 내용 혹은 태그 이름과 재료로 레시피 게시글을 검색합니다.\n 인기순/최신순 으로 정렬하기 위해선 sort 에 createdTime / mostViewed 넣으면 됩니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            content = @Content(
+                                    schema = @Schema(implementation = BoardReadWithBookmarkResponse.class),
+                                    examples = @ExampleObject(value = """
+                                     {
+                                       "recipes": [
+                                         {
+                                           "id": 1,
+                                           "title": "건강한 수제 간식 만들기",
+                                           "imageUrl": "https://example.com/image1.jpg",
+                                           "bookmarkStatus": true,
+                                           "tagName": [
+                                             "모질개선",
+                                             "저알러지"
+                                           ]
+                                         },
+                                         {
+                                           "id": 2,
+                                           "title": "포메라니안을 위한 건강 수프",
+                                           "imageUrl": "https://example.com/image2.jpg",
+                                           "bookmarkStatus": false,
+                                           "tagName": [
+                                             "체중조절",
+                                             "영양강화"
+                                           ]
+                                         }
+                                       ],
+                                       "pageResponse": {
+                                         "totalPages": 10,
+                                         "currentPage": 1,
+                                         "totalElements": 100,
+                                         "isPageLast": false,
+                                         "size": 10,
+                                         "numberOfElements": 10,
+                                         "isPageFirst": true,
+                                         "isEmpty": false
+                                       }
+                                     }
+                                     """)
+                            ),
+                            description = "레시피 게시글 조회에 성공하였습니다."
+                    ),
+                    @ApiResponse(responseCode = "401",
+                            description = "액세스 토큰이 올바르지 않습니다.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500",
+                            description = "서버 내부 오류입니다.",
+                            content = @Content)
+            })
+    PetsTableApiResponse<List<BoardReadWithBookmarkResponse>> readPostsByFiltering(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> tagNames,
+            @RequestParam(required = false) List<String> ingredientNames,
             Pageable pageable,
             @Parameter(hidden = true) @LoginUserId Long memberId
     );

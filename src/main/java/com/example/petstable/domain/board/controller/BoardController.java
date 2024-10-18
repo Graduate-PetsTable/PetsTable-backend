@@ -1,10 +1,7 @@
 package com.example.petstable.domain.board.controller;
 
 import com.example.petstable.domain.board.dto.request.*;
-import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
-import com.example.petstable.domain.board.dto.response.BoardPostResponse;
-import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
-import com.example.petstable.domain.board.dto.response.DetailResponse;
+import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.service.BoardService;
 import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
@@ -42,6 +39,22 @@ public class BoardController implements BoardApi {
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
     }
 
+    @GetMapping("/search")
+    public PetsTableApiResponse<List<BoardReadWithBookmarkResponse>> readPostsByFiltering(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "tagNames", required = false) List<String> tagNames,
+            @RequestParam(value = "ingredientNames", required = false) List<String> ingredientNames,
+            Pageable pageable, @LoginUserId Long memberId) {
+        BoardFilteringRequest request = new BoardFilteringRequest(keyword, tagNames, ingredientNames);
+        if (request.getKeyword() != null) {
+            List<BoardReadWithBookmarkResponse> response = boardService.findPostsByTitleAndContent(request, pageable, memberId);
+            return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
+        } else {
+            List<BoardReadWithBookmarkResponse> response = boardService.findPostsByTagAndIngredients(request, pageable, memberId);
+            return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
+        }
+    }
+
     @GetMapping("/{boardId}")
     public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
 
@@ -49,6 +62,7 @@ public class BoardController implements BoardApi {
 
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
+
 
     @DeleteMapping(value = "/{boardId}")
     public ResponseEntity<String> deletePostDetail (@LoginUserId Long userId, @PathVariable("boardId") Long boardId) {
