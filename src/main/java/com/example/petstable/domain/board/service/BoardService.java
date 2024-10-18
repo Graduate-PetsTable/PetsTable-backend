@@ -3,10 +3,7 @@ package com.example.petstable.domain.board.service;
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.entity.*;
-import com.example.petstable.domain.board.repository.BoardRepository;
-import com.example.petstable.domain.board.repository.DetailRepository;
-import com.example.petstable.domain.board.repository.IngredientRepository;
-import com.example.petstable.domain.board.repository.TagRepository;
+import com.example.petstable.domain.board.repository.*;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
@@ -142,6 +139,14 @@ public class BoardService {
         }
 
         return new BoardReadAllResponse(postResponses, pageResponse);
+    }
+
+    public List<BoardReadWithBookmarkResponse> findPostsByTitleAndContent(BoardFilteringRequest request, Pageable pageable, Long memberId) {
+        return boardRepository.findRecipesByQueryDslWithTitleAndContent(request, memberId, pageable);
+    }
+
+    public List<BoardReadWithBookmarkResponse> findPostsByTagAndIngredients(BoardFilteringRequest request, Pageable pageable, Long memberId) {
+        return boardRepository.findRecipesByQueryDslWithTagAndIngredients(request, memberId, pageable);
     }
 
     public BoardEntity validMemberAndPost(Long userId, Long boardId) {
