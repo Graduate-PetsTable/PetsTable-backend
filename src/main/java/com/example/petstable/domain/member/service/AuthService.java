@@ -25,7 +25,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -36,7 +35,6 @@ import static com.example.petstable.domain.member.message.AuthMessage.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuthService {
 
     @Value("${google.client-id}")
@@ -53,7 +51,6 @@ public class AuthService {
         return generateTokenResponse(SocialType.APPLE, appleSocialMember.getEmail(), appleSocialMember.getSocialId(), request.getFcmToken());
     }
 
-    @Transactional
     public TokenResponse googleLogin(OAuthLoginRequest request) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(List.of(googleClientId))
@@ -133,7 +130,6 @@ public class AuthService {
         return RefreshToken.createRefreshToken();
     }
 
-    @Transactional
     public ReissueTokenResponse reissueAccessToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         MemberEntity member = refreshTokenService.getMemberFromRefreshToken(refreshToken);
@@ -151,14 +147,12 @@ public class AuthService {
         throw new PetsTableException(NOT_EXPIRED_ACCESS_TOKEN.getStatus(), NOT_EXPIRED_ACCESS_TOKEN.getMessage(), 400);
     }
 
-    @Transactional
     public void logout(Long memberId) {
         MemberEntity member = memberRepository.findById(memberId).orElseThrow(
                 () -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
         refreshTokenService.deleteRefreshTokenByMemberId(member.getId());
     }
 
-    @Transactional
     public void withdraw(Long memberId, AppleAndGoogleWithdrawAuthCodeRequest appleWithdrawAuthCodeRequest) {
         MemberEntity member = memberRepository.findById(memberId).orElseThrow(
                 () -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
