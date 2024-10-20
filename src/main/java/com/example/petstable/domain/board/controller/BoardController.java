@@ -24,9 +24,9 @@ public class BoardController implements BoardApi {
     private final BoardService boardService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public PetsTableApiResponse<BoardPostResponse> createPost(@LoginUserId Long memberId, @RequestPart("request") BoardPostRequest request, @RequestPart("images") List<MultipartFile> images) {
+    public PetsTableApiResponse<BoardPostResponse> createPost(@LoginUserId Long memberId, @RequestPart("request") BoardPostRequest request, @RequestPart("thumbnail") MultipartFile thumbnail, @RequestPart("images") List<MultipartFile> images) {
 
-        BoardPostResponse response = boardService.writePost(memberId, request, images);
+        BoardPostResponse response = boardService.writePost(memberId, request, thumbnail, images);
 
         return PetsTableApiResponse.createResponse(response, WRITE_SUCCESS);
     }

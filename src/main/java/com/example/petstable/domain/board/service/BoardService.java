@@ -39,13 +39,14 @@ public class BoardService {
     private final PointService pointService;
 
     @Transactional
-    public BoardPostResponse writePost(Long memberId, BoardPostRequest request, List<MultipartFile> images) {
+    public BoardPostResponse writePost(Long memberId, BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
 
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
 
         BoardWithDetailsAndTagsAndIngredients boardRequest = BoardWithDetailsAndTagsAndIngredients.builder()
                 .title(request.getTitle())
+                .thumbnail(thumbnail)
                 .details(IntStream.range(0, images.size())
                         .mapToObj(i -> DetailRequest.builder()
                                 .image(images.get(i))
@@ -74,6 +75,7 @@ public class BoardService {
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
+                .thumbnail_url(awsS3Uploader.uploadImage(request.getThumbnail()))
                 .build();
 
         member.addPost(post);
