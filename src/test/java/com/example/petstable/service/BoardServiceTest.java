@@ -113,7 +113,7 @@ public class BoardServiceTest {
                 .tags(List.of(tagRequest, tagRequest2))
                 .build();
 
-        boardService.writePost(member.getId(), request, List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3));
+        boardService.writePost(member.getId(), request, mockMultipartFile1, List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3));
 
         BoardEntity boardEntity = boardRepository.findByTitle("레시피 테스트").orElseThrow();
         List<DetailEntity> details = detailRepository.findDetailsByPostId(boardEntity.getId());
@@ -185,7 +185,7 @@ public class BoardServiceTest {
                 .tags(List.of(tagRequest))
                 .build();
 
-        boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+        boardService.writePost(member.getId(), request, mockMultipartFile, List.of(mockMultipartFile));
         BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
@@ -225,7 +225,7 @@ public class BoardServiceTest {
                 .tags(List.of(tagRequest))
                 .build();
 
-        boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+        boardService.writePost(member.getId(), request, mockMultipartFile, List.of(mockMultipartFile));
         BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
@@ -564,7 +564,7 @@ public class BoardServiceTest {
                 .build();
 
         // when
-        boardService.writePost(member.getId(), request, List.of(mockMultipartFile));
+        boardService.writePost(member.getId(), request, mockMultipartFile, List.of(mockMultipartFile));
         BoardEntity post = boardRepository.findByTitle("gg").orElseThrow();
         List<IngredientEntity> actual = ingredientRepository.findIngredientEntityByPostId(post.getId());
 

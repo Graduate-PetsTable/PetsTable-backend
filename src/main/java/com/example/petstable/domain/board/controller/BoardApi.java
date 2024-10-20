@@ -63,6 +63,7 @@ public interface BoardApi {
     PetsTableApiResponse<BoardPostResponse> createPost(
             @Parameter(hidden = true) @LoginUserId Long memberId,
             @RequestPart("request") @Parameter(description = "레시피 내용 요청 데이터") BoardPostRequest request,
+            @RequestPart("thumbnail") @Parameter(description = "썸네일 이미지") MultipartFile thumbnail,
             @RequestPart("images") @Parameter(description = "내용에 알맞는 이미지들") List<MultipartFile> images
     );
 

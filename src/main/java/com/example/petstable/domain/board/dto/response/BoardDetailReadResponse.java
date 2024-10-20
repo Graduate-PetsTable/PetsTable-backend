@@ -15,6 +15,7 @@ public class BoardDetailReadResponse {
     private Long id;
     private String title;
     private String author;
+    private String thumbnail;
     private int viewCount;
     private LocalDateTime createdAt;
     private boolean bookmarkStatus;
@@ -48,6 +49,7 @@ public class BoardDetailReadResponse {
         return BoardDetailReadResponse.builder()
                 .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
+                .thumbnail(boardEntity.getThumbnail_url())
                 .author(boardEntity.getMember().getNickName())
                 .viewCount(boardEntity.getView_count())
                 .createdAt(boardEntity.getCreatedTime())
