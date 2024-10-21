@@ -48,22 +48,22 @@ public class AppleOAuthUserProvider {
     public void revoke(String authCode) {
         try {
             String clientSecret = clientSecretGenerator.createClientSecret();
-            String accessToken = getAppleAccess(clientSecret, authCode);
-            appleClient.revokeMember(clientId, clientSecret, accessToken,"access_token");
+            String refreshToken = getRefreshToken(clientSecret, authCode);
+            appleClient.revokeMember(clientId, clientSecret, refreshToken,"refresh_token");
         } catch (Exception e) {
             throw new PetsTableException(FAILED_APPLE_REVOKE.getStatus(), FAILED_APPLE_REVOKE.getMessage(), 400);
         }
     }
 
-    private String getAppleAccess(String clientSecret, String authCode) {
+    private String getRefreshToken(String clientSecret, String authCode) {
         try {
             AppleTokenResponse appleTokenResponse = appleClient.getAppleToken(
+                    clientId,
                     clientSecret,
-                    authCode,
                     "authorization_code",
-                    clientId
+                    authCode
             );
-            return appleTokenResponse.access_token();
+            return appleTokenResponse.refresh_token();
         } catch (Exception e){
             throw new PetsTableException(APPLE_TOKEN_REQUEST_FAILED.getStatus(), APPLE_TOKEN_REQUEST_FAILED.getMessage(), 400);
         }
