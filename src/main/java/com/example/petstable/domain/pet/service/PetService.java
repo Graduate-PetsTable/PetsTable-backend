@@ -116,7 +116,7 @@ public class PetService {
 
         PetEntity pet = validatePet(petId, memberId);
 
-        String imageUrl = awsS3Uploader.uploadImage(multipartFile);
+        String imageUrl = awsS3Uploader.uploadImage("pet", multipartFile);
 
         pet.updateImage(imageUrl);
 

@@ -97,9 +97,9 @@ public class BoardServiceTest {
         MockMultipartFile mockMultipartFile1 = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
         MockMultipartFile mockMultipartFile2 = new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
         MockMultipartFile mockMultipartFile3 = new MockMultipartFile("test_img3", "test_img3.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img3.jpg"));
-        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
-        when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
-        when(awsS3Uploader.uploadImage(mockMultipartFile3)).thenReturn("test_img3.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile1)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile2)).thenReturn("test_img2.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile3)).thenReturn("test_img3.jpg");
 
         TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
         TagRequest tagRequest2 = TagRequest.builder().tagType("기능별").tagName("다이어트").build();
@@ -172,7 +172,7 @@ public class BoardServiceTest {
         memberRepository.save(member);
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile)).thenReturn("test_img.jpg");
 
         DescriptionRequest descriptionRequest = new DescriptionRequest("설명");
         TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
@@ -214,7 +214,7 @@ public class BoardServiceTest {
         memberRepository.save(member);
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile)).thenReturn("test_img.jpg");
 
         DescriptionRequest descriptionRequest = new DescriptionRequest("설명");
         TagRequest tagRequest = TagRequest.builder().tagType("기능별").tagName("모질개선").build();
@@ -339,7 +339,7 @@ public class BoardServiceTest {
         detail.setPost(post);
 
         MockMultipartFile expected = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(expected)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", expected)).thenReturn("test_img.jpg");
 
         // when
         boardService.updatePostDetail(member.getId(), post.getId(), detail.getId(), null, expected);
@@ -430,7 +430,7 @@ public class BoardServiceTest {
         detail.setPost(post);
 
         MockMultipartFile expected = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(expected)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", expected)).thenReturn("test_img.jpg");
 
         // when
         DetailUpdateRequest request = DetailUpdateRequest.builder()
@@ -543,7 +543,7 @@ public class BoardServiceTest {
         memberRepository.save(member);
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile)).thenReturn("test_img.jpg");
 
         IngredientRequest ingredientRequest = IngredientRequest.builder()
                 .name("당근")

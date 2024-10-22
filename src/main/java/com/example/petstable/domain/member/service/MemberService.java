@@ -72,7 +72,7 @@ public class MemberService {
     public MemberProfileImageResponse registerProfileImage(Long memberId, MultipartFile multipartFile) {
 
         MemberEntity member = validateMember(memberId);
-        String imageUrl = awsS3Uploader.uploadImage(multipartFile);
+        String imageUrl = awsS3Uploader.uploadImage("member", multipartFile);
 
         member.updateProfileImage(imageUrl);
 
@@ -86,8 +86,9 @@ public class MemberService {
     public MemberProfileImageResponse deleteProfileImage(Long memberId) {
 
         MemberEntity member = validateMember(memberId);
-
+        String imageUrl = member.getImage_url();
         member.updateProfileImage(null);
+        awsS3Uploader.deleteImage("member", imageUrl);
 
         return MemberProfileImageResponse.builder()
                 .id(member.getId())

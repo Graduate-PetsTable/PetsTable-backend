@@ -75,7 +75,7 @@ public class BoardService {
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
-                .thumbnail_url(awsS3Uploader.uploadImage(request.getThumbnail()))
+                .thumbnail_url(awsS3Uploader.uploadImage("recipe", request.getThumbnail()))
                 .build();
 
         member.addPost(post);
@@ -83,7 +83,7 @@ public class BoardService {
 
         List<DetailEntity> details = request.getDetails().stream()
                 .map(detailRequest -> {
-                    String imageUrl = awsS3Uploader.uploadImage(detailRequest.getImage());
+                    String imageUrl = awsS3Uploader.uploadImage("recipe", detailRequest.getImage());
                     String description = detailRequest.getDescription();
                     return DetailEntity.builder()
                             .image_url(imageUrl)
@@ -214,11 +214,11 @@ public class BoardService {
         String newDescription = request.getDescription();
 
         if (image != null && newDescription != null) { // 사진, 설명 변경
-            String newImageUrl = awsS3Uploader.uploadImage(image);
+            String newImageUrl = awsS3Uploader.uploadImage("recipe", image);
             detail.updateImageUrlAndDescription(newImageUrl, newDescription);
 
         } else if (image != null) { // 사진만 변경
-            String newImageUrl = awsS3Uploader.uploadImage(image);
+            String newImageUrl = awsS3Uploader.uploadImage("recipe", image);
             detail.updateImageUrl(newImageUrl);
 
         } else { // 설명만 변경
