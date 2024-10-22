@@ -54,6 +54,12 @@ jobs:
           name: dogreceipe-72f1e-firebase-adminsdk-dg78f-618c87953b.json
           path: ./src/main/resources/firebase/firebaseConfig.json
 
+      - name: Upload apple client private key
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuthKey_429GC4ZPQU.p8
+          path: ./src/main/resources/static/apple/AuthKey_429GC4ZPQU.p8
+
       - name: Gradle Cache
         uses: actions/cache@v3
         with:
