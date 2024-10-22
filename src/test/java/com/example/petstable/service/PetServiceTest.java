@@ -232,7 +232,7 @@ public class PetServiceTest {
         petRepository.save(pet);
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
-        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage("test", mockMultipartFile)).thenReturn("test_img.jpg");
 
         // when
         petService.registerPetImage(member.getId(), pet.getId(), mockMultipartFile);
