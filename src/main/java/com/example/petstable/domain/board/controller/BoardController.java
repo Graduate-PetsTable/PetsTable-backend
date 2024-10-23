@@ -40,19 +40,25 @@ public class BoardController implements BoardApi {
     }
 
     @GetMapping("/search")
-    public PetsTableApiResponse<List<BoardReadWithBookmarkResponse>> readPostsByFiltering(
+    public PetsTableApiResponse<List<BoardReadResponse>> readPostsByFiltering(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "tagNames", required = false) List<String> tagNames,
             @RequestParam(value = "ingredientNames", required = false) List<String> ingredientNames,
             Pageable pageable, @LoginUserId Long memberId) {
         BoardFilteringRequest request = new BoardFilteringRequest(keyword, tagNames, ingredientNames);
         if (request.getKeyword() != null) {
-            List<BoardReadWithBookmarkResponse> response = boardService.findPostsByTitleAndContent(request, pageable, memberId);
+            List<BoardReadResponse> response = boardService.findPostsByTitleAndContent(request, pageable, memberId);
             return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
         } else {
-            List<BoardReadWithBookmarkResponse> response = boardService.findPostsByTagAndIngredients(request, pageable, memberId);
+            List<BoardReadResponse> response = boardService.findPostsByTagAndIngredients(request, pageable, memberId);
             return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
         }
+    }
+
+    @GetMapping("/my")
+    public PetsTableApiResponse<BoardResponse> getAllByMyRecipe(@LoginUserId Long memberId) {
+        BoardResponse response = boardService.getMyRecipe(memberId);
+        return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 
     @GetMapping("/{boardId}")

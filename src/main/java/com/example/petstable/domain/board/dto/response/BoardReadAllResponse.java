@@ -4,7 +4,7 @@ import java.util.List;
 
 public record BoardReadAllResponse(
 
-        List<BoardReadWithBookmarkResponse> recipes,
+        List<BoardReadResponse> recipes,
         PageResponse pageResponse
 ) {
 }

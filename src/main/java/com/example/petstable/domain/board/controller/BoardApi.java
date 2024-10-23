@@ -169,7 +169,7 @@ public interface BoardApi {
                             description = "서버 내부 오류입니다.",
                             content = @Content)
             })
-    PetsTableApiResponse<List<BoardReadWithBookmarkResponse>> readPostsByFiltering(
+    PetsTableApiResponse<List<BoardReadResponse>> readPostsByFiltering(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tagNames,
             @RequestParam(required = false) List<String> ingredientNames,

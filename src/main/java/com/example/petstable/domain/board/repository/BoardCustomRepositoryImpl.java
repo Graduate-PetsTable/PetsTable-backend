@@ -1,7 +1,7 @@
 package com.example.petstable.domain.board.repository;
 
 import com.example.petstable.domain.board.dto.request.BoardFilteringRequest;
-import com.example.petstable.domain.board.dto.response.BoardReadWithBookmarkResponse;
+import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.board.entity.BoardEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -30,7 +30,7 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
     }
 
     @Override
-    public List<BoardReadWithBookmarkResponse> findRecipesByQueryDslWithTitleAndContent(BoardFilteringRequest filteringRequest, Long memberId, Pageable pageable) {
+    public List<BoardReadResponse> findRecipesByQueryDslWithTitleAndContent(BoardFilteringRequest filteringRequest, Long memberId, Pageable pageable) {
         List<BoardEntity> recipeList = jpaQueryFactory
                 .selectFrom(boardEntity)
                 .leftJoin(detailEntity).on(detailEntity.post.eq(boardEntity))
@@ -43,12 +43,12 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
                 .fetch();
 
         return recipeList.stream()
-                .map(board -> new BoardReadWithBookmarkResponse(board, checkBookmarkStatus(board, memberId)))
+                .map(board -> new BoardReadResponse(board, checkBookmarkStatus(board, memberId)))
                 .toList();
     }
 
     @Override
-    public List<BoardReadWithBookmarkResponse> findRecipesByQueryDslWithTagAndIngredients(BoardFilteringRequest filteringRequest, Long memberId, Pageable pageable) {
+    public List<BoardReadResponse> findRecipesByQueryDslWithTagAndIngredients(BoardFilteringRequest filteringRequest, Long memberId, Pageable pageable) {
         List<BoardEntity> recipeList = jpaQueryFactory
                 .selectFrom(boardEntity)
                 .leftJoin(tagEntity).on(tagEntity.post.eq(boardEntity))
@@ -63,7 +63,7 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
                 .fetch();
 
         return recipeList.stream()
-                .map(board -> new BoardReadWithBookmarkResponse(board, checkBookmarkStatus(board, memberId)))
+                .map(board -> new BoardReadResponse(board, checkBookmarkStatus(board, memberId)))
                 .toList();
     }
 

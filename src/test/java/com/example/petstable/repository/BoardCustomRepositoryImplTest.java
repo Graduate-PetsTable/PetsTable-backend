@@ -1,7 +1,7 @@
 package com.example.petstable.repository;
 
 import com.example.petstable.domain.board.dto.request.*;
-import com.example.petstable.domain.board.dto.response.BoardReadWithBookmarkResponse;
+import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.board.entity.*;
 import com.example.petstable.domain.board.repository.*;
 import com.example.petstable.domain.member.entity.MemberEntity;
@@ -65,7 +65,7 @@ public class BoardCustomRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdTime").descending());
 
         // when
-        List<BoardReadWithBookmarkResponse> actual = boardCustomRepositoryImpl.findRecipesByQueryDslWithTitleAndContent(requestOnlyTitle, member.getId(), pageable);
+        List<BoardReadResponse> actual = boardCustomRepositoryImpl.findRecipesByQueryDslWithTitleAndContent(requestOnlyTitle, member.getId(), pageable);
 
         // then
         Assertions.assertThat(actual).isNotEmpty();
@@ -134,7 +134,7 @@ public class BoardCustomRepositoryImplTest {
                 .build();
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdTime").descending());
 
-        List<BoardReadWithBookmarkResponse> actual = boardCustomRepositoryImpl.findRecipesByQueryDslWithTagAndIngredients(request, member.getId(), pageable);
+        List<BoardReadResponse> actual = boardCustomRepositoryImpl.findRecipesByQueryDslWithTagAndIngredients(request, member.getId(), pageable);
 
         // then
         Assertions.assertThat(actual).isNotEmpty();
