@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 import java.util.List;
+
+import static com.example.petstable.domain.board.message.BoardMessage.GET_POST_DETAIL_SUCCESS;
 
 @Tag(name = "레시피 관련 API")
 @SecurityRequirement(name = "JWT")
@@ -174,6 +177,51 @@ public interface BoardApi {
             @RequestParam(required = false) List<String> tagNames,
             @RequestParam(required = false) List<String> ingredientNames,
             Pageable pageable,
+            @Parameter(hidden = true) @LoginUserId Long memberId
+    );
+
+    @Operation(summary = "내가 작성한 레시피 조회 API", description = "내가 작성했던 레시피를 모두 조회하는 API 입니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            content = @Content(
+                                    schema = @Schema(implementation = BoardResponse.class),
+                                    examples = @ExampleObject(value = """
+                                    {
+                                        "count": 2,
+                                        "recipes": [
+                                            {
+                                                "id": 32,
+                                                "title": "건강한 수제 간식 만들기1",
+                                                "imageUrl": "https://example.com/image1.jpg",
+                                                "bookmarkStatus": true,
+                                                "tagName": ["모질개선", "소화촉진"],
+                                                "ingredient": ["당근", "양상추"]
+                                            },
+                                            {
+                                                "id": 41,
+                                                "title": "건강한 수제 간식 만들기2",
+                                                "imageUrl": "https://example.com/image1.jpg",
+                                                "bookmarkStatus": true,
+                                                "tagName": ["어쩌고어쩌고", "탈모개선"],
+                                                "ingredient": ["양배추", "양상추"]
+                                            }
+                                        ]
+                                    }
+                                    """)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401",
+                            description = "액세스 토큰이 올바르지 않습니다.",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404",
+                            description = "나의 레시피가 존재하지 않습니다..",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500",
+                            description = "서버 내부 오류입니다.",
+                            content = @Content)
+            }
+    )
+    PetsTableApiResponse<BoardResponse> getAllByMyRecipe(
             @Parameter(hidden = true) @LoginUserId Long memberId
     );
 
