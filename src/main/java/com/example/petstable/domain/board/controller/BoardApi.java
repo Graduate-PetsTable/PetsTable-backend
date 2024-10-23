@@ -122,7 +122,7 @@ public interface BoardApi {
             responses = {
                     @ApiResponse(responseCode = "200",
                             content = @Content(
-                                    schema = @Schema(implementation = BoardReadWithBookmarkResponse.class),
+                                    schema = @Schema(implementation = BoardReadResponse.class),
                                     examples = @ExampleObject(value = """
                                      {
                                        "recipes": [
