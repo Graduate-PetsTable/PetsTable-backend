@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<BoardEntity, Long>, BoardCustomRepository {
@@ -14,6 +15,9 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, Board
     Optional<BoardEntity> findById(Long id);
 
     Optional<BoardEntity> findByTitle(String title);
+
+    @Query("select b from BoardEntity b where b.member.id = :memberId")
+    List<BoardEntity> findAllByMemberId(@Param("memberId") Long memberId);
 
     @Query("SELECT b FROM BoardEntity b JOIN FETCH b.details WHERE b.id = :id")
     BoardEntity findByIdWithDetails(@Param("id") Long id);

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -127,10 +128,10 @@ public class BoardService {
     public BoardReadAllResponse getAllPost(Pageable pageable, Long memberId) {
         Page<BoardEntity> postPage = boardRepository.findAll(pageable);
 
-        List<BoardReadWithBookmarkResponse> postResponses = postPage.stream()
+        List<BoardReadResponse> postResponses = postPage.stream()
                 .map(post -> {
                     boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, post.getId());
-                    return new BoardReadWithBookmarkResponse(post, isBookmarked);
+                    return new BoardReadResponse(post, isBookmarked);
                 })
                 .collect(Collectors.toList());
 
@@ -143,11 +144,11 @@ public class BoardService {
         return new BoardReadAllResponse(postResponses, pageResponse);
     }
 
-    public List<BoardReadWithBookmarkResponse> findPostsByTitleAndContent(BoardFilteringRequest request, Pageable pageable, Long memberId) {
+    public List<BoardReadResponse> findPostsByTitleAndContent(BoardFilteringRequest request, Pageable pageable, Long memberId) {
         return boardRepository.findRecipesByQueryDslWithTitleAndContent(request, memberId, pageable);
     }
 
-    public List<BoardReadWithBookmarkResponse> findPostsByTagAndIngredients(BoardFilteringRequest request, Pageable pageable, Long memberId) {
+    public List<BoardReadResponse> findPostsByTagAndIngredients(BoardFilteringRequest request, Pageable pageable, Long memberId) {
         return boardRepository.findRecipesByQueryDslWithTagAndIngredients(request, memberId, pageable);
     }
 
@@ -254,5 +255,20 @@ public class BoardService {
         BoardEntity post = validMemberAndPost(userId, boardId);
 
         boardRepository.delete(post);
+    }
+
+    public BoardResponse getMyRecipe(Long memberId) {
+        List<BoardEntity> myRecipe = boardRepository.findAllByMemberId(memberId);
+        if (myRecipe == null || myRecipe.isEmpty()) {
+            throw new PetsTableException(MY_RECIPE_NOT_FOUND.getStatus(), MY_RECIPE_NOT_FOUND.getMessage(), 404);
+        }
+        List<BoardReadResponse> recipes = myRecipe
+                .stream()
+                .map(recipe -> new BoardReadResponse(recipe))
+                .toList();
+        return BoardResponse.builder()
+                .count(recipes.size())
+                .recipes(recipes)
+                .build();
     }
 }
