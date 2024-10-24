@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,22 +43,10 @@ public class BoardService {
 
     @Transactional
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
-
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
 
-        BoardWithDetailsAndTagsAndIngredients boardRequest = BoardWithDetailsAndTagsAndIngredients.builder()
-                .title(request.getTitle())
-                .thumbnail(thumbnail)
-                .details(IntStream.range(0, images.size())
-                        .mapToObj(i -> DetailRequest.builder()
-                                .image(images.get(i))
-                                .description(request.getDescriptions().get(i).getDescription())
-                                .build())
-                        .toList())
-                .tags(request.getTags())
-                .ingredients(request.getIngredients())
-                .build();
+        BoardWithDetailsAndTagsAndIngredients boardRequest = createBoardRequest(request, thumbnail, images);
 
         BoardEntity post = createPostWithDetailsAndTagsAndIngredientRequest(boardRequest, member);
 
@@ -71,34 +61,76 @@ public class BoardService {
                 .build();
     }
 
-    // 연관관계 설정
+    private BoardWithDetailsAndTagsAndIngredients createBoardRequest(BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
+        List<DetailRequest> details = Optional.ofNullable(request.getDescriptions())
+                .map(descriptions -> {
+                    int size = Optional.ofNullable(images).map(List::size).orElse(0);
+                    int maxSize = Math.max(size, descriptions.size());
+                    return IntStream.range(0, maxSize)
+                            .mapToObj(i -> {
+                                String description = (i < descriptions.size()) ? descriptions.get(i).getDescription() : null;
+                                MultipartFile image = (i < size) ? images.get(i) : null;
+                                if (image == null && description != null) { // 이미지가 없고 설명이 있을 경우 설명만 반환
+                                    return DetailRequest.builder()
+                                            .image(null) // 이미지 필드는 null
+                                            .description(description)
+                                            .build();
+                                } else if (image != null && description == null) { // 설명이 없고 이미지가 있을 경우 이미지만 반환
+                                    return DetailRequest.builder()
+                                            .image(image)
+                                            .description(null) // 설명 필드는 null
+                                            .build();
+                                } else if (image != null && description != null) { // 둘 다 있는 경우
+                                    return DetailRequest.builder()
+                                            .image(image)
+                                            .description(description)
+                                            .build();
+                                }
+                                return null; // 둘 다 없는 경우는 null 반환
+                            })
+                            .filter(Objects::nonNull) // null이 아닌 항목만 필터링
+                            .toList();
+                }).orElse(Collections.emptyList());
+        List<TagRequest> tags = Optional.ofNullable(request.getTags()).orElse(Collections.emptyList());
+        List<IngredientRequest> ingredients = Optional.ofNullable(request.getIngredients()).orElse(Collections.emptyList());
+
+        return BoardWithDetailsAndTagsAndIngredients.builder()
+                .title(request.getTitle())
+                .thumbnail(Optional.ofNullable(thumbnail).orElse(null))
+                .details(details)
+                .tags(tags)
+                .ingredients(ingredients)
+                .build();
+    }
+
     private BoardEntity createPostWithDetailsAndTagsAndIngredientRequest(BoardWithDetailsAndTagsAndIngredients request, MemberEntity member) {
+        String thumbnailUrl = Optional.ofNullable(request.getThumbnail())
+                .map(thumbnail -> awsS3Uploader.uploadImage("recipe", thumbnail))
+                .orElse(null);
 
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
-                .thumbnail_url(awsS3Uploader.uploadImage("recipe", request.getThumbnail()))
+                .thumbnail_url(thumbnailUrl)
                 .build();
 
         member.addPost(post);
         post.setMember(member);
 
-        List<DetailEntity> details = request.getDetails().stream()
-                .map(detailRequest -> {
-                    String imageUrl = awsS3Uploader.uploadImage("recipe", detailRequest.getImage());
-                    String description = detailRequest.getDescription();
-                    return DetailEntity.builder()
-                            .image_url(imageUrl)
-                            .description(description)
-                            .post(post)
-                            .build();
-                })
-                .toList();
-
-        String thumbnail_url = details.get(details.size() - 1).getImage_url();
-
-        post.setThumbnail_url(thumbnail_url);
-        post.addDetails(details);
-        detailRepository.saveAll(details);
+        Optional.ofNullable(request.getDetails())
+                .ifPresent(details -> {
+                    List<DetailEntity> detailEntities = details.stream()
+                            .map(detailRequest -> {
+                                String imageUrl = awsS3Uploader.uploadImage("recipe", detailRequest.getImage());
+                                return DetailEntity.builder()
+                                        .image_url(imageUrl)
+                                        .description(detailRequest.getDescription())
+                                        .post(post)
+                                        .build();
+                            })
+                            .toList();
+                    post.addDetails(detailEntities);
+                    detailRepository.saveAll(detailEntities);
+                });
 
         List<TagEntity> tags = request.getTags().stream()
                 .map(tagRequest -> TagEntity.builder()
@@ -107,10 +139,8 @@ public class BoardService {
                         .post(post)
                         .build())
                 .toList();
-
         post.addTags(tags);
         tagRepository.saveAll(tags);
-
 
         List<IngredientEntity> ingredients = request.getIngredients().stream()
                 .map(ingredientRequest -> IngredientEntity.builder()
@@ -118,7 +148,6 @@ public class BoardService {
                         .weight(ingredientRequest.getWeight())
                         .build())
                 .toList();
-
         post.addIngredient(ingredients);
         ingredientRepository.saveAll(ingredients);
 
