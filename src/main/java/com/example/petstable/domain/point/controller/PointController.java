@@ -20,7 +20,13 @@ public class PointController implements PointApi {
 
     @GetMapping
     public PetsTableApiResponse<PointResponse> getMyPoint(@LoginUserId Long memberId) {
-        PointResponse response = pointService.getPointByMemberId(memberId);
+        PointResponse currentPoint = pointService.getPointBalance(memberId);
+        return PetsTableApiResponse.createResponse(currentPoint, SUCCESS_GET_POINT);
+    }
+
+    @GetMapping("/history")
+    public PetsTableApiResponse<PointResponse> getMyPointHistory(@LoginUserId Long memberId) {
+        PointResponse response = pointService.getPointHistoryByMemberId(memberId);
         return PetsTableApiResponse.createResponse(response, SUCCESS_GET_POINT);
     }
 }
