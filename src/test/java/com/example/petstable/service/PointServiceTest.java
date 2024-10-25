@@ -45,8 +45,8 @@ public class PointServiceTest {
         int expected = 100;
 
         pointService.increasePoints(member, 100, "회원가입");
-        int actual = pointService.getPointHistoryByMemberId(member.getId()).getPoint();
-        int actual2 = pointRepository.findByMemberId(member.getId()).orElseThrow().getPoint();
+        int actual = pointService.getPointHistoryByMemberId(member.getId()).get(0).getPoint();
+        int actual2 = pointRepository.findByMemberId(member.getId()).get(0).getPoint();
 
         // then
         assertThat(actual).isEqualTo(expected);

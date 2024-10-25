@@ -1,6 +1,7 @@
 package com.example.petstable.domain.point.service;
 
 import com.example.petstable.domain.member.entity.MemberEntity;
+import com.example.petstable.domain.point.dto.response.PointMyBalanceResponse;
 import com.example.petstable.domain.point.dto.response.PointResponse;
 import com.example.petstable.domain.point.entity.PointEntity;
 import com.example.petstable.domain.point.entity.TransactionType;
@@ -9,6 +10,9 @@ import com.example.petstable.global.exception.PetsTableException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.petstable.domain.point.message.PointMessage.*;
 
@@ -19,22 +23,25 @@ public class PointService {
 
     private final PointRepository pointRepository;
 
-    public PointResponse getPointHistoryByMemberId(Long memberId) {
-        PointEntity pointEntity = pointRepository.findByMemberId(memberId).orElseThrow(
-                () -> new PetsTableException(POINT_NOT_FOUND.getStatus(), POINT_NOT_FOUND.getMessage(), 404));
-
-        return PointResponse.builder()
-                .point(pointEntity.getPoint())
-                .description(pointEntity.getDescription())
-                .transactionType(pointEntity.getTransactionType().getDescription())
-                .createTime(pointEntity.getCreatedTime())
-                .build();
+    public List<PointResponse> getPointHistoryByMemberId(Long memberId) {
+        List<PointEntity> pointEntities = pointRepository.findByMemberId(memberId);
+        if (pointEntities.isEmpty()) {
+            throw new PetsTableException(POINT_NOT_FOUND.getStatus(), POINT_NOT_FOUND.getMessage(), 404);
+        }
+        return pointEntities.stream()
+                .map(pointEntity -> PointResponse.builder()
+                        .point(pointEntity.getPoint())
+                        .description(pointEntity.getDescription())
+                        .transactionType(pointEntity.getTransactionType().getDescription())
+                        .createTime(pointEntity.getCreatedTime())
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    public PointResponse getPointBalance(Long memberId) {
+    public PointMyBalanceResponse getPointBalance(Long memberId) {
         PointEntity point = pointRepository.findFirstByMemberIdOrderByCreatedTimeDesc(memberId);
         int balance = (point != null) ? point.getBalance() : 0;
-        return PointResponse.builder()
+        return PointMyBalanceResponse.builder()
                 .point(balance)
                 .build();
     }
