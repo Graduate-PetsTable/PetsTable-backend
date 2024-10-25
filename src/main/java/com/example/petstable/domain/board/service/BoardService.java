@@ -120,9 +120,12 @@ public class BoardService {
                 .ifPresent(details -> {
                     List<DetailEntity> detailEntities = details.stream()
                             .map(detailRequest -> {
-                                String imageUrl = awsS3Uploader.uploadImage("recipe", detailRequest.getImage());
+                                String imageUrl = null;
+                                if (detailRequest.getImage() != null) {
+                                    imageUrl = awsS3Uploader.uploadImage("recipe", detailRequest.getImage());
+                                }
                                 return DetailEntity.builder()
-                                        .image_url(imageUrl)
+                                        .image_url(imageUrl) // imageUrl이 null일 수 있음
                                         .description(detailRequest.getDescription())
                                         .post(post)
                                         .build();
