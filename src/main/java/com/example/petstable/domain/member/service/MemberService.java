@@ -9,8 +9,6 @@ import com.example.petstable.domain.member.dto.response.OAuthMemberSignUpRespons
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
-import com.example.petstable.domain.point.entity.PointEntity;
-import com.example.petstable.domain.point.repository.PointRepository;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +27,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final PointRepository pointRepository;
     private final AwsS3Uploader awsS3Uploader;
 
     @Transactional
     public OAuthMemberSignUpResponse signUpByOAuthMember(OAuthMemberSignUpRequest request) {
-
 //        validateDuplicateMember(request);
         SocialType socialType = SocialType.from(request.getSocialType());
         MemberEntity findMember = memberRepository.findBySocialTypeAndSocialId(socialType, request.getSocialId())
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
-        PointEntity pointEntity = PointEntity.createPoint(findMember);
-        pointRepository.save(pointEntity);
 
         findMember.updateNickname(request.getNickname());
 

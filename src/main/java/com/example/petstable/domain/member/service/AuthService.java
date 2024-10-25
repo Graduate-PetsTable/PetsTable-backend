@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.petstable.domain.member.message.MemberMessage.*;
@@ -112,6 +113,10 @@ public class AuthService {
                             .role(RoleType.MEMBER)
                             .status(Status.ACTIVE)
                             .fcmToken(fcmToken)
+                            .pets(new ArrayList<>())
+                            .bookmarks(new ArrayList<>())
+                            .report(new ArrayList<>())
+                            .points(new ArrayList<>())
                             .build();
                     MemberEntity savedMember = memberRepository.save(oauthMember);
                     String accessToken = issueAccessToken(savedMember);

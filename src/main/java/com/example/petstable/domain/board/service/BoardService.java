@@ -53,7 +53,7 @@ public class BoardService {
         boardRepository.save(post);
 
         // 포인트 증가
-        pointService.increasePoints(memberId);
+        pointService.increasePoints(member, 10, "레시피 작성");
 
         return BoardPostResponse.builder()
                 .id(post.getId())
