@@ -15,6 +15,7 @@ public class BoardReadResponse {
     private Long id;
     private String title; // 제목
     private String imageUrl; // 썸네일 이미지
+    private String author; // 작성자
     private boolean bookmarkStatus;
     private List<String> tagName; // 태그 이름 목록
     private List<String> ingredient; // 재료 이름 목록
@@ -23,6 +24,7 @@ public class BoardReadResponse {
         this.id = post.getId();
         this.title = post.getTitle();
         this.imageUrl = post.getThumbnail_url();
+        this.author = post.getMember().getNickName();
         if (post.getTags() != null) {
             this.tagName = post.getTags()
                     .stream()
@@ -42,6 +44,7 @@ public class BoardReadResponse {
         this.title = post.getTitle();
         this.imageUrl = post.getThumbnail_url();
         this.bookmarkStatus = status;
+        this.author = getAuthor();
         if (post.getTags() != null) {
             this.tagName = post.getTags()
                     .stream()
