@@ -14,7 +14,7 @@ public class BoardPostRequest {
     @Schema(description = "제목", example = "말티즈를 위한 닭죽 만들기")
     private String title;
 
-    @ArraySchema(schema = @Schema(implementation = DescriptionRequest.class, description = "설명 리스d"))
+    @ArraySchema(schema = @Schema(implementation = DescriptionRequest.class, description = "설명 리스트"))
     private List<DescriptionRequest> descriptions;
 
     @ArraySchema(schema = @Schema(implementation = TagRequest.class, description = "태그 리스트"))

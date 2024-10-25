@@ -1,8 +1,7 @@
 package com.example.petstable.domain.point.entity;
 
 import com.example.petstable.global.exception.PetsTableException;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -11,10 +10,11 @@ import static com.example.petstable.domain.member.message.MemberMessage.INVALID_
 
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public enum TransactionType {
     POINT_GAINED("획득"), POINT_USED("차감");
 
-    private final String description;
+    private String description;
 
     public static TransactionType from(String value) {
         return Arrays.stream(values())
