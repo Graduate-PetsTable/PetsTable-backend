@@ -32,7 +32,7 @@ public class PointService {
                 .map(pointEntity -> PointResponse.builder()
                         .point(pointEntity.getPoint())
                         .description(pointEntity.getDescription())
-                        .transactionType(pointEntity.getTransactionType().getDescription())
+                        .transactionType(pointEntity.getTransactionType())
                         .createTime(pointEntity.getCreatedTime())
                         .build())
                 .collect(Collectors.toList());

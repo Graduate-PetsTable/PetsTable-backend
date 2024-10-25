@@ -1,5 +1,6 @@
 package com.example.petstable.domain.point.dto.response;
 
+import com.example.petstable.domain.point.entity.TransactionType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PointResponse {
     private int point;
-    private String transactionType;
+    private TransactionType transactionType;
     private String description;
     private LocalDateTime createTime;
 }

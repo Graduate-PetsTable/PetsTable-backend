@@ -10,11 +10,10 @@ import static com.example.petstable.domain.member.message.MemberMessage.INVALID_
 
 @Getter
 @RequiredArgsConstructor
-@AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public enum TransactionType {
     POINT_GAINED("획득"), POINT_USED("차감");
 
-    private String description;
+    private final String description;
 
     public static TransactionType from(String value) {
         return Arrays.stream(values())
