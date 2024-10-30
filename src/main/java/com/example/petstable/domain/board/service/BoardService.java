@@ -283,9 +283,7 @@ public class BoardService {
 
     @Transactional
     public void deletePost(Long userId, Long boardId) {
-
         BoardEntity post = validMemberAndPost(userId, boardId);
-
         boardRepository.delete(post);
     }
 
