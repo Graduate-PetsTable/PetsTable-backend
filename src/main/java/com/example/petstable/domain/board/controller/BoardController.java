@@ -69,10 +69,8 @@ public class BoardController implements BoardApi {
 
 
     @DeleteMapping(value = "/{boardId}")
-    public ResponseEntity<String> deletePostDetail (@LoginUserId Long userId, @PathVariable("boardId") Long boardId) {
-
+    public ResponseEntity<String> deletePost (@LoginUserId Long userId, @PathVariable("boardId") Long boardId) {
         boardService.deletePost(userId, boardId);
-
         return ResponseEntity.ok(DELETE_POST_SUCCESS.getMessage());
     }
 

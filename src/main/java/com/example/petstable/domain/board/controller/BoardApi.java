@@ -27,8 +27,8 @@ import java.util.List;
 public interface BoardApi {
     @Operation(summary = "레시피 작성 API", description = "레시피를 작성하는 API 입니다.", responses = {
             @ApiResponse(responseCode = "200", content = @Content(
-                            schema = @Schema(implementation = BoardPostRequest.class),
-                            examples = @ExampleObject(value = """
+                    schema = @Schema(implementation = BoardPostRequest.class),
+                    examples = @ExampleObject(value = """
                                     {
                                           "title": "말티즈를 위한 닭죽 만들기",
                                           "descriptions": [
@@ -50,7 +50,7 @@ public interface BoardApi {
                                           ]
                                     }
                                     """)
-                    ),
+            ),
                     description = "게시글 작성에 성공하였습니다."
             ),
             @ApiResponse(
@@ -225,9 +225,9 @@ public interface BoardApi {
     @Operation(summary = "레시피 상세 조회 API", description = "특정 레시피의 상세 정보를 조회하는 API입니다.",
             parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
             responses = {
-            @ApiResponse(responseCode = "200", content = @Content(
-                    schema = @Schema(implementation = BoardDetailReadResponse.class),
-                    examples = @ExampleObject(value = """
+                    @ApiResponse(responseCode = "200", content = @Content(
+                            schema = @Schema(implementation = BoardDetailReadResponse.class),
+                            examples = @ExampleObject(value = """
                     {
                       "id": 1,
                       "title": "말티즈를 위한 닭죽 만들기",
@@ -265,13 +265,13 @@ public interface BoardApi {
                       ]
                     }
                     """)
-            ),
-                    description = "레시피 상세 조회에 성공하였습니다."
-            ),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 레시피를 찾을 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
+                    ),
+                            description = "레시피 상세 조회에 성공하였습니다."
+                    ),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "해당 레시피를 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
     PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(
             @Parameter(hidden = true) @LoginUserId Long memberId,
             @PathVariable("boardId") Long boardId
@@ -280,19 +280,19 @@ public interface BoardApi {
     @Operation(summary = "레시피 삭제 API", description = "해당 레시피를 삭제하는 API 입니다.",
             parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
             responses = {
-            @ApiResponse(responseCode = "200", description = "레시피 삭제에 성공하였습니다.", content = @Content(
-                    examples = @ExampleObject(value = """
+                    @ApiResponse(responseCode = "200", description = "레시피 삭제에 성공하였습니다.", content = @Content(
+                            examples = @ExampleObject(value = """
                     {
                         "message": "레시피 삭제에 성공하였습니다.",
                         "status": 200
                     }
                     """)
-            )),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "레시피를 찾을 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
-    ResponseEntity<String> deletePostDetail(
+                    )),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "레시피를 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
+    ResponseEntity<String> deletePost(
             @Parameter(hidden = true) @LoginUserId Long userId,
             @PathVariable("boardId") Long boardId
     );
@@ -302,20 +302,20 @@ public interface BoardApi {
                     @Parameter(name = "boardId", description = "레시피 id", required = true)
             },
             responses = {
-            @ApiResponse(responseCode = "200", description = "레시피 제목 수정에 성공하였습니다.", content = @Content(
-                    schema = @Schema(implementation = PetsTableApiResponse.class),
-                    examples = @ExampleObject(value = """
+                    @ApiResponse(responseCode = "200", description = "레시피 제목 수정에 성공하였습니다.", content = @Content(
+                            schema = @Schema(implementation = PetsTableApiResponse.class),
+                            examples = @ExampleObject(value = """
                     {
                         "message": "레시피 제목 수정에 성공하였습니다.",
                         "status": 200
                     }
                     """)
-            )),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "레시피를 찾을 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
+                    )),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "레시피를 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
     ResponseEntity<String> updatePostTitle(
             @Parameter(hidden = true) @LoginUserId Long userId,
             @PathVariable("boardId") Long boardId,
@@ -327,20 +327,20 @@ public interface BoardApi {
                     @Parameter(name = "boardId", description = "레시피 id", required = true),
             },
             responses = {
-            @ApiResponse(responseCode = "200", description = "레시피 태그 수정에 성공하였습니다.", content = @Content(
-                    schema = @Schema(implementation = PetsTableApiResponse.class),
-                    examples = @ExampleObject(value = """
+                    @ApiResponse(responseCode = "200", description = "레시피 태그 수정에 성공하였습니다.", content = @Content(
+                            schema = @Schema(implementation = PetsTableApiResponse.class),
+                            examples = @ExampleObject(value = """
                     {
                         "message": "레시피 태그 수정에 성공하였습니다.",
                         "status": 200
                     }
                     """)
-            )),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 레시피의 태그를 찾을 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
+                    )),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "해당 레시피의 태그를 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
     ResponseEntity<String> updatePostTag(
             @Parameter(hidden = true) @LoginUserId Long userId,
             @PathVariable("boardId") Long boardId,
@@ -353,21 +353,21 @@ public interface BoardApi {
                     @Parameter(name = "detailId", description = "상세 내용 id", required = true)
             },
             responses = {
-            @ApiResponse(responseCode = "200", description = "레시피 상세 내용 수정에 성공하였습니다.", content = @Content(
-                    schema = @Schema(implementation = PetsTableApiResponse.class),
-                    mediaType = "application/json",
-                    examples = @ExampleObject(value = """
+                    @ApiResponse(responseCode = "200", description = "레시피 상세 내용 수정에 성공하였습니다.", content = @Content(
+                            schema = @Schema(implementation = PetsTableApiResponse.class),
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
                     {
                         "message": "레시피 상세 내용 수정에 성공하였습니다.",
                         "status": 200
                     }
                     """)
-            )),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 레시피의 상세 내용을 찾을 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
+                    )),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "해당 레시피의 상세 내용을 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
     ResponseEntity<String> updatePostDetail(
             @Parameter(hidden = true) @LoginUserId Long userId,
             @PathVariable("boardId") Long boardId,
@@ -382,20 +382,20 @@ public interface BoardApi {
                     @Parameter(name = "detailId", description = "상세 내용 id", required = true)
             },
             responses = {
-            @ApiResponse(responseCode = "200", description = "레시피 상세 내용 삭제에 성공하였습니다.", content = @Content(
-                    schema = @Schema(implementation = DetailResponse.class),
-                    examples = @ExampleObject(value = """
+                    @ApiResponse(responseCode = "200", description = "레시피 상세 내용 삭제에 성공하였습니다.", content = @Content(
+                            schema = @Schema(implementation = DetailResponse.class),
+                            examples = @ExampleObject(value = """
                     {
                         "image_url": "https://example.com/detail-image1.jpg",
                         "description": "1단계: 물 500mL를 끓인다."
                     }
                     """)
-            )),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 레시피의 상세 내용을 찾을 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
+                    )),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "해당 레시피의 상세 내용을 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
     PetsTableApiResponse<DetailResponse> deletePostDetail(
             @Parameter(hidden = true) @LoginUserId Long userId,
             @PathVariable("boardId") Long boardId,
