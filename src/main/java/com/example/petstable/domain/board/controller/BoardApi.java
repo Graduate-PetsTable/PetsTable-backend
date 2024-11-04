@@ -117,6 +117,56 @@ public interface BoardApi {
             @Parameter(hidden = true) @LoginUserId Long memberId
     );
 
+    @Operation(summary = "레시피 목록 전체 조회 API", description = "레시피 목록을 전체 조회하는 API 입니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(
+                    schema = @Schema(implementation = BoardReadAllResponse.class),
+                    examples = @ExampleObject(value = """
+                    {
+                      "recipes": [
+                        {
+                          "id": 1,
+                          "title": "말티즈를 위한 닭죽 만들기",
+                          "imageUrl": "https://example.com/image1.jpg",
+                          "bookmarkStatus": true,
+                          "tagName": [
+                            "모질개선",
+                            "저알러지"
+                          ]
+                        },
+                        {
+                          "id": 2,
+                          "title": "포메라니안을 위한 건강 수프",
+                          "imageUrl": "https://example.com/image2.jpg",
+                          "bookmarkStatus": false,
+                          "tagName": [
+                            "체중조절",
+                            "영양강화"
+                          ]
+                        }
+                      ],
+                      "pageResponse": {
+                        "totalPages": 10,
+                        "currentPage": 1,
+                        "totalElements": 100,
+                        "isPageLast": false,
+                        "size": 10,
+                        "numberOfElements": 10,
+                        "isPageFirst": true,
+                        "isEmpty": false
+                      }
+                    }
+                    """)
+            ),
+                    description = "레시피 목록 조회에 성공하였습니다."
+            ),
+            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+    })
+    PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(
+            Pageable pageable,
+            @Parameter(hidden = true) @LoginUserId Long memberId
+    );
+
     @Operation(summary = "특정 조건으로 검색 및 정렬된 레시피 게시글 조회 API",
             description = "제목 또는 내용 혹은 태그 이름과 재료로 레시피 게시글을 검색합니다.\n 인기순/최신순 으로 정렬하기 위해선 sort 에 createdTime / mostViewed 넣으면 됩니다.",
             responses = {
@@ -273,6 +323,61 @@ public interface BoardApi {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
     })
     PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(
+            @Parameter(hidden = true) @LoginUserId Long memberId,
+            @PathVariable("boardId") Long boardId
+    );
+
+    @Operation(summary = "레시피 상세 조회 API", description = "특정 레시피의 상세 정보를 조회하는 API입니다.",
+            parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(
+                            schema = @Schema(implementation = BoardDetailReadResponse.class),
+                            examples = @ExampleObject(value = """
+                    {
+                      "id": 1,
+                      "title": "말티즈를 위한 닭죽 만들기",
+                      "viewCount": 1041,
+                      "bookmarkStatus": true,
+                      "details": [
+                        {
+                          "image_url": "https://example.com/detail-image1.jpg",
+                          "description": "1단계: 물 500mL를 끓인다."
+                        },
+                        {
+                          "image_url": "https://example.com/detail-image2.jpg",
+                          "description": "2단계: 닭고기를 넣고 20분간 끓인다."
+                        }
+                      ],
+                      "tags": [
+                        {
+                          "tagType": "기능별",
+                          "tagName": "모질개선"
+                        },
+                        {
+                          "tagType": "기능별",
+                          "tagName": "저알러지"
+                        }
+                      ],
+                      "ingredients": [
+                        {
+                          "name": "닭고기",
+                          "weight": "200g"
+                        },
+                        {
+                          "name": "당근",
+                          "weight": "50g"
+                        }
+                      ]
+                    }
+                    """)
+                    ),
+                            description = "레시피 상세 조회에 성공하였습니다."
+                    ),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "해당 레시피를 찾을 수 없습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
+    PetsTableApiResponse<BoardDetailReadResponse> getPostDetailV2(
             @Parameter(hidden = true) @LoginUserId Long memberId,
             @PathVariable("boardId") Long boardId
     );
