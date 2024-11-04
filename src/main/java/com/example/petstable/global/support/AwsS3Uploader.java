@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.petstable.global.config.AmazonConfig;
 import com.example.petstable.global.exception.PetsTableException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +28,8 @@ public class AwsS3Uploader {
     private static final List<String> IMAGE_EXTENSIONS = Arrays.asList("image/jpeg", "image/png", "image/jpg", "image/webp", "image/heic", "image/heif");
     private static final Long MAX_FILE_SIZE = 5 * 1024 * 1024L; // 최대 5MB
 
+    private final AmazonConfig amazonConfig;
     private final AmazonS3 amazonS3Client;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
 
     public String uploadImage(String directoryPath, MultipartFile multipartFile) {
         String fileName = directoryPath + generateImageFileName(multipartFile);  // 이미지 파일 이름 생성
@@ -44,18 +43,18 @@ public class AwsS3Uploader {
         objectMetadata.setContentLength(multipartFile.getSize());
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+            amazonS3Client.putObject(new PutObjectRequest(amazonConfig.getBucket(), fileName, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             throw new PetsTableException(FILE_UPLOAD_FAIL.getStatus(), FILE_UPLOAD_FAIL.getMessage(), 400);
         }
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+        return amazonConfig.getCloudfrontUri() + amazonS3Client.getUrl(amazonConfig.getBucket(), fileName).toString();
     }
 
     public void deleteImage(String directoryPath, String fileName) {
         String fullPath = directoryPath + fileName; // 파일의 전체 경로
         try {
-            amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fullPath));
+            amazonS3Client.deleteObject(new DeleteObjectRequest(amazonConfig.getBucket(), fullPath));
         } catch (Exception e) {
             throw new PetsTableException(FILE_DELETE_FAIL.getStatus(), FILE_DELETE_FAIL.getMessage(), 400);
         }
