@@ -23,7 +23,7 @@ public class BoardReadResponse {
     public BoardReadResponse(BoardEntity post) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.imageUrl = post.getThumbnail_url();
+        this.imageUrl = post.getThumbnail_url() + "?size=preview";
         this.author = post.getMember().getNickName();
         if (post.getTags() != null) {
             this.tagName = post.getTags()
@@ -42,7 +42,7 @@ public class BoardReadResponse {
     public BoardReadResponse(BoardEntity post, boolean status) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.imageUrl = post.getThumbnail_url();
+        this.imageUrl = post.getThumbnail_url() + "?size=preview";
         this.bookmarkStatus = status;
         this.author = getAuthor();
         if (post.getTags() != null) {
