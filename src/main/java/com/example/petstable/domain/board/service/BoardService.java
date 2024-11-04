@@ -8,6 +8,7 @@ import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.point.service.PointService;
+import com.example.petstable.global.config.AmazonConfig;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class BoardService {
     private final TagRepository tagRepository;
     private final IngredientRepository ingredientRepository;
     private final PointService pointService;
+    private final AmazonConfig amazonConfig;
 
     @Transactional
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
@@ -176,6 +178,24 @@ public class BoardService {
         return new BoardReadAllResponse(postResponses, pageResponse);
     }
 
+    public BoardReadAllResponse getAllPostV2(Pageable pageable, Long memberId) {
+        Page<BoardEntity> postPage = boardRepository.findAllWithMembers(pageable);
+        List<BoardReadResponse> postResponses = postPage.stream()
+                .map(post -> {
+                    boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, post.getId());
+                    // 만약 기존에 저장된 이미지의 url이 s3 도메인이라면 cloudfront 도메인으로 변경
+                    String thumbnailUrl = post.getThumbnail_url();
+                    post.setThumbnail_url(convertThumbnailUrlToCloudFront(thumbnailUrl));
+                    return new BoardReadResponse(post, isBookmarked);
+                })
+                .collect(Collectors.toList());
+        PageResponse pageResponse = new PageResponse(postPage);
+        if (postResponses.isEmpty()) {
+            throw new PetsTableException(RECIPE_IS_EMPTY.getStatus(), RECIPE_IS_EMPTY.getMessage(), 204);
+        }
+        return new BoardReadAllResponse(postResponses, pageResponse);
+    }
+
     public List<BoardReadResponse> findPostsByTitleAndContent(BoardFilteringRequest request, Pageable pageable, Long memberId) {
         return boardRepository.findRecipesByQueryDslWithTitleAndContent(request, memberId, pageable);
     }
@@ -204,6 +224,32 @@ public class BoardService {
         boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
 
         return BoardDetailReadResponse.from(boardEntity, isBookmarked);
+    }
+
+    @Transactional
+    public BoardDetailReadResponse findDetailByBoardIdV2(Long memberId, Long boardId) {
+        BoardEntity boardEntity = boardRepository.findById(boardId)
+                .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
+        boardEntity.increaseViewCount(); // 조회수 증가
+        String updatedThumbnailUrl = updateThumbnailUrlIfNeeded(boardEntity.getThumbnail_url());
+        boardEntity.setThumbnail_url(updatedThumbnailUrl);
+        updateDetailImageUrls(boardEntity);
+        boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
+        return BoardDetailReadResponse.from(boardEntity, isBookmarked);
+    }
+
+    private void updateDetailImageUrls(BoardEntity boardEntity) {
+        for (DetailEntity detail : boardEntity.getDetails()) {
+            String updatedImageUrl = updateThumbnailUrlIfNeeded(detail.getImage_url());
+            detail.updateImageUrl(updatedImageUrl); // 변경된 이미지 URL을 설정
+        }
+    }
+
+    private String updateThumbnailUrlIfNeeded(String url) {
+        if (url.startsWith(amazonConfig.getS3Uri())) {
+            return url.replace(amazonConfig.getS3Uri(), amazonConfig.getCloudfrontUri());
+        }
+        return url;
     }
 
     @Transactional
@@ -294,11 +340,22 @@ public class BoardService {
         }
         List<BoardReadResponse> recipes = myRecipe
                 .stream()
-                .map(recipe -> new BoardReadResponse(recipe))
+                .map(recipe -> {
+                    String cloudfrontUrl = convertThumbnailUrlToCloudFront(recipe.getThumbnail_url());
+                    recipe.setThumbnail_url(cloudfrontUrl);
+                    return new BoardReadResponse(recipe);
+                })
                 .toList();
         return BoardResponse.builder()
                 .count(recipes.size())
                 .recipes(recipes)
                 .build();
+    }
+
+    private String convertThumbnailUrlToCloudFront(String image) {
+        if (image.startsWith(amazonConfig.getS3Uri())) {
+            return image.replace(amazonConfig.getS3Uri(), amazonConfig.getCloudfrontUri());
+        }
+        return image;
     }
 }

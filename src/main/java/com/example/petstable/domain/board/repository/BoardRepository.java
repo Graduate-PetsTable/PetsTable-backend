@@ -1,6 +1,8 @@
 package com.example.petstable.domain.board.repository;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +17,9 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, Board
     Optional<BoardEntity> findById(Long id);
 
     Optional<BoardEntity> findByTitle(String title);
+
+    @Query("SELECT b FROM BoardEntity b JOIN FETCH b.member")
+    Page<BoardEntity> findAllWithMembers(Pageable pageable);
 
     @Query("select b from BoardEntity b where b.member.id = :memberId")
     List<BoardEntity> findAllByMemberId(@Param("memberId") Long memberId);

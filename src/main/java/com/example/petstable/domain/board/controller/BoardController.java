@@ -37,6 +37,12 @@ public class BoardController implements BoardApi {
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
     }
 
+    @GetMapping("/v2")
+    public PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(Pageable pageable, @LoginUserId Long memberId) {
+        BoardReadAllResponse response = boardService.getAllPostV2(pageable, memberId);
+        return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
+    }
+
     @GetMapping("/search")
     public PetsTableApiResponse<List<BoardReadResponse>> readPostsByFiltering(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -64,6 +70,12 @@ public class BoardController implements BoardApi {
 
         BoardDetailReadResponse response = boardService.findDetailByBoardId(memberId, boardId);
 
+        return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
+    }
+
+    @GetMapping("/v2/{boardId}")
+    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetailV2(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
+        BoardDetailReadResponse response = boardService.findDetailByBoardIdV2(memberId, boardId);
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 

@@ -24,10 +24,9 @@ public class BoardDetailReadResponse {
     private List<IngredientResponse> ingredients;
 
     public static BoardDetailReadResponse from(BoardEntity boardEntity, boolean status) {
-
         List<DetailResponse> details = boardEntity.getDetails().stream()
                 .map(detail -> DetailResponse.builder()
-                        .image_url(detail.getImage_url())
+                        .image_url(detail.getImage_url() + "?size=step")
                         .description(detail.getDescription())
                         .build())
                 .toList();
@@ -49,7 +48,7 @@ public class BoardDetailReadResponse {
         return BoardDetailReadResponse.builder()
                 .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
-                .thumbnail(boardEntity.getThumbnail_url())
+                .thumbnail(boardEntity.getThumbnail_url() + "?size=thumbnail")
                 .author(boardEntity.getMember().getNickName())
                 .viewCount(boardEntity.getView_count())
                 .createdAt(boardEntity.getCreatedTime())
