@@ -27,27 +27,11 @@ import java.util.List;
 public interface BoardApi {
     @Operation(summary = "레시피 작성 API", description = "레시피를 작성하는 API 입니다.", responses = {
             @ApiResponse(responseCode = "200", content = @Content(
-                    schema = @Schema(implementation = BoardPostRequest.class),
+                    schema = @Schema(implementation = BoardPostResponse.class),
                     examples = @ExampleObject(value = """
                                     {
-                                          "title": "말티즈를 위한 닭죽 만들기",
-                                          "descriptions": [
-                                            {
-                                              "description": "1단계 : 물 500mL 를 넣고 끓인다."
-                                            }
-                                          ],
-                                          "tags": [
-                                            {
-                                              "tagType": "기능별",
-                                              "tagName": "모질개선"
-                                            }
-                                          ],
-                                          "ingredients": [
-                                            {
-                                              "name": "당근",
-                                              "weight": "30g"
-                                            }
-                                          ]
+                                          "id": 1
+                                          "title": "말티즈를 위한 닭죽 만들기"
                                     }
                                     """)
             ),
@@ -65,6 +49,62 @@ public interface BoardApi {
             @RequestPart(value = "request", required = false) @Parameter(description = "레시피 내용 요청 데이터") BoardPostRequest request,
             @RequestPart(value = "thumbnail", required = false) @Parameter(description = "썸네일 이미지") MultipartFile thumbnail,
             @RequestPart(value = "images", required = false) @Parameter(description = "내용에 알맞는 이미지들") List<MultipartFile> images
+    );
+
+    @Operation(summary = "Presigned Url을 발급받는 API", description = "Presigned Url을 발급받는 API입니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(
+                    schema = @Schema(implementation = PreSignedUrlResponse.class),
+                    examples = @ExampleObject(value = """
+                                    {
+                                      "data": [
+                                        {
+                                          "preSignedUrl": "https://example-bucket.s3.amazonaws.com/image1.jpg?AWSAccessKeyId=AKIA...&Expires=1609459200&Signature=abc123..."
+                                        },
+                                        {
+                                          "preSignedUrl": "https://example-bucket.s3.amazonaws.com/image2.jpg?AWSAccessKeyId=AKIA...&Expires=1609459200&Signature=def456..."
+                                        },
+                                        {
+                                          "preSignedUrl": "https://example-bucket.s3.amazonaws.com/image3.jpg?AWSAccessKeyId=AKIA...&Expires=1609459200&Signature=ghi789..."
+                                        }
+                                      ]
+                                    }
+                                    """)
+            ),
+                    description = "게시글 작성에 성공하였습니다."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청입니다.",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content
+            )})
+    PetsTableApiResponse<List<PreSignedUrlResponse>> getPreSignedUrl(
+            @RequestBody(description = "Presigned Url을 가져오기 위한 요청 데이터") List<PreSignedUrlRequest> preSignedUrlRequestList
+    );
+
+    @Operation(summary = "레시피 작성 API V2", description = "레시피를 작성하는 API 입니다.", responses = {
+            @ApiResponse(responseCode = "200", content = @Content(
+                    schema = @Schema(implementation = BoardPostResponse.class),
+                    examples = @ExampleObject(value = """
+                                    {
+                                          "id": 1
+                                          "title": "말티즈를 위한 닭죽 만들기"
+                                    }
+                                    """)
+            ),
+                    description = "게시글 작성에 성공하였습니다."
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청입니다.",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content
+            )})
+    PetsTableApiResponse<BoardPostResponse> createPostV2(
+            @Parameter(hidden = true) @LoginUserId Long memberId,
+            @RequestBody(description = "레시피 내용 요청 데이터", required = false) BoardPostRequestWithPresignedUrl request
     );
 
     @Operation(summary = "레시피 목록 전체 조회 API", description = "레시피 목록을 전체 조회하는 API 입니다.", responses = {
@@ -117,7 +157,7 @@ public interface BoardApi {
             @Parameter(hidden = true) @LoginUserId Long memberId
     );
 
-    @Operation(summary = "레시피 목록 전체 조회 API", description = "레시피 목록을 전체 조회하는 API 입니다.", responses = {
+    @Operation(summary = "레시피 목록 전체 조회 API V2", description = "레시피 목록을 전체 조회하는 API 입니다.", responses = {
             @ApiResponse(responseCode = "200", content = @Content(
                     schema = @Schema(implementation = BoardReadAllResponse.class),
                     examples = @ExampleObject(value = """
@@ -327,7 +367,7 @@ public interface BoardApi {
             @PathVariable("boardId") Long boardId
     );
 
-    @Operation(summary = "레시피 상세 조회 API", description = "특정 레시피의 상세 정보를 조회하는 API입니다.",
+    @Operation(summary = "레시피 상세 조회 API V2", description = "특정 레시피의 상세 정보를 조회하는 API입니다.",
             parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
             responses = {
                     @ApiResponse(responseCode = "200", content = @Content(
