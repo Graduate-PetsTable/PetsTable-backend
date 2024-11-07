@@ -29,6 +29,18 @@ public class BoardController implements BoardApi {
         return PetsTableApiResponse.createResponse(response, WRITE_SUCCESS);
     }
 
+    @PostMapping("/preSignedUrl")
+    public PetsTableApiResponse<List<PreSignedUrlResponse>> getPreSignedUrl(@RequestBody List<PreSignedUrlRequest> preSignedUrlRequestList) {
+        List<PreSignedUrlResponse> response = boardService.getPresignedUrl(preSignedUrlRequestList);
+        return PetsTableApiResponse.createResponse(response, GET_PRESIGNED_URL_SUCCESS);
+    }
+
+    @PostMapping(value = "/withPreSignedUrl")
+    public PetsTableApiResponse<BoardPostResponse> createPostV2(@LoginUserId Long memberId, @RequestBody(required = false) BoardPostRequestWithPresignedUrl request) {
+        BoardPostResponse response = boardService.writePostV2(memberId, request);
+        return PetsTableApiResponse.createResponse(response, WRITE_SUCCESS);
+    }
+
     @GetMapping
     public PetsTableApiResponse<BoardReadAllResponse> readAllPost(Pageable pageable, @LoginUserId Long memberId) {
 
