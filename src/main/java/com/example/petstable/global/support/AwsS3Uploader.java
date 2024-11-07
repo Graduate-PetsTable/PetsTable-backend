@@ -1,23 +1,20 @@
 package com.example.petstable.global.support;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.Headers;
+import com.amazonaws.services.s3.model.*;
+import com.example.petstable.domain.board.dto.response.PreSignedUrlResponse;
 import com.example.petstable.global.config.AmazonConfig;
 import com.example.petstable.global.exception.PetsTableException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.net.URL;
+import java.util.*;
 
 import static com.example.petstable.global.support.UploadMessage.*;
 
@@ -100,5 +97,34 @@ public class AwsS3Uploader {
         if (multipartFile.isEmpty() || multipartFile.getSize() == 0) {
             throw new PetsTableException(FILE_INVALID_EMPTY.getStatus(), FILE_INVALID_EMPTY.getMessage(), 400);
         }
+    }
+
+    public PreSignedUrlResponse getPreSignedUrl(String prefix, String originalFilename) {
+        String fileName = createPath(prefix, originalFilename);
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(amazonConfig.getBucket(), fileName)
+                .withMethod(HttpMethod.PUT)
+                .withExpiration(getPreSignedUrlExpiration());
+        generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL, CannedAccessControlList.PublicRead.toString());
+        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return PreSignedUrlResponse.toPreSignedUrlResponse(url);
+    }
+
+    // presigned url 유효 기간 설정
+    private Date getPreSignedUrlExpiration() {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 60 * 24 * 7;
+        expiration.setTime(expTimeMillis);
+        return expiration;
+    }
+
+    private String createFileId() {
+        return UUID.randomUUID().toString();
+    }
+
+    // 파일의 전체 경로를 생성
+    private String createPath(String directoryPath, String fileName) {
+        String fileId = createFileId();
+        return String.format("%s/%s-%s", directoryPath, fileId, fileName);
     }
 }

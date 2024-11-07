@@ -58,7 +58,7 @@ dependencies {
     implementation 'com.google.api-client:google-api-client:1.32.1'
 
     // S3
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation group: 'io.awspring.cloud', name: 'spring-cloud-starter-aws', version: '2.4.0'
 
     // FCM
     implementation 'com.google.firebase:firebase-admin:9.2.0'

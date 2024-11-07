@@ -1,5 +1,10 @@
 package com.example.petstable.domain.board.service;
 
+import com.amazonaws.HttpMethod;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.Headers;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.entity.*;
@@ -18,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -55,6 +57,74 @@ public class BoardService {
         boardRepository.save(post);
 
         // 포인트 증가
+        pointService.increasePoints(member, 10, "레시피 작성");
+
+        return BoardPostResponse.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .build();
+    }
+
+    public List<PreSignedUrlResponse> getPresignedUrl(List<PreSignedUrlRequest> request) {
+        return request.stream()
+                .map(preSignedUrlRequest -> awsS3Uploader.getPreSignedUrl(preSignedUrlRequest.getPrefix(), preSignedUrlRequest.getFileName()))
+                .toList();
+    }
+
+    @Transactional
+    public BoardPostResponse writePostV2(Long memberId, BoardPostRequestWithPresignedUrl request) {
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
+        BoardEntity post = BoardEntity.builder()
+                .title(request.getTitle())
+                .thumbnail_url(Optional.ofNullable(request.getThumbnailUrl()).orElse(null))
+                .member(member)
+                .build();
+        member.addPost(post);
+
+        List<String> imageUrls = Optional.ofNullable(request.getImageUrl()).orElse(Collections.emptyList());
+        List<DetailEntity> detailEntities = Optional.ofNullable(request.getDescriptions())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(detailRequest -> {
+                    int index = request.getDescriptions().indexOf(detailRequest);
+                    String imageUrl = (index < imageUrls.size()) ? imageUrls.get(index) : null;
+                    return DetailEntity.builder()
+                            .image_url(imageUrl)
+                            .description(detailRequest.getDescription())
+                            .post(post)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        post.addDetails(detailEntities);
+
+        List<TagEntity> tags = Optional.ofNullable(request.getTags())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(tagRequest -> TagEntity.builder()
+                        .type(TagType.from(tagRequest.getTagType()))
+                        .name(tagRequest.getTagName())
+                        .post(post)
+                        .build())
+                .collect(Collectors.toList());
+        post.addTags(tags);
+
+        List<IngredientEntity> ingredients = Optional.ofNullable(request.getIngredients())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(ingredientRequest -> IngredientEntity.builder()
+                        .name(ingredientRequest.getName())
+                        .weight(ingredientRequest.getWeight())
+                        .post(post)
+                        .build())
+                .collect(Collectors.toList());
+        post.addIngredient(ingredients);
+
+        detailRepository.saveAll(detailEntities);
+        tagRepository.saveAll(tags);
+        ingredientRepository.saveAll(ingredients);
+        boardRepository.save(post);
+
         pointService.increasePoints(member, 10, "레시피 작성");
 
         return BoardPostResponse.builder()
