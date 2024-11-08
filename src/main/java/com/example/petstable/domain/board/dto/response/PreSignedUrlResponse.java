@@ -9,10 +9,12 @@ import java.net.URL;
 @Builder
 public class PreSignedUrlResponse {
     private String preSignedUrl;
+    private String fileUrl;
 
-    public static PreSignedUrlResponse toPreSignedUrlResponse(URL url) {
+    public static PreSignedUrlResponse toPreSignedUrlResponse(URL url, String fileUrl) {
         return PreSignedUrlResponse.builder()
                 .preSignedUrl(url.toString())
+                .fileUrl(fileUrl)
                 .build();
     }
 }
