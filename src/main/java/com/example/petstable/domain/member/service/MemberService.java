@@ -12,6 +12,7 @@ import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,5 +89,10 @@ public class MemberService {
                 .id(member.getId())
                 .imageUrl(null)
                 .build();
+    }
+
+    @CachePut(cacheNames = "member", key = "#member.id", unless = "#result == null", cacheManager = "memberCacheManager")
+    public MemberEntity saveMember(MemberEntity member) {
+        return memberRepository.save(member);
     }
 }
