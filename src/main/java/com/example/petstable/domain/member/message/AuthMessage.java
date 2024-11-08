@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum AuthMessage implements ResponseMessage {
 
     BAD_REQUEST_PUBLIC_KEY("로그인 중 Public Key 생성에 문제가 발생했습니다..", HttpStatus.BAD_REQUEST),
+    REDIS_CONNECTION_ERROR("Redis 연결에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_ID_TOKEN("Id Token 값이 유효하지 않습니다", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN("토큰 값이 유효하지 않습니다", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN("올바르지 않은 Refresh Token 입니다.", HttpStatus.UNAUTHORIZED),
