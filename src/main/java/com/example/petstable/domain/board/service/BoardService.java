@@ -1,10 +1,5 @@
 package com.example.petstable.domain.board.service;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.entity.*;
@@ -285,41 +280,11 @@ public class BoardService {
 
     @Transactional
     public BoardDetailReadResponse findDetailByBoardId(Long memberId, Long boardId) {
-
         BoardEntity boardEntity = boardRepository.findById(boardId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
-
         boardEntity.increaseViewCount();
-
         boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
-
-        return BoardDetailReadResponse.from(boardEntity, isBookmarked);
-    }
-
-    @Transactional
-    public BoardDetailReadResponse findDetailByBoardIdV2(Long memberId, Long boardId) {
-        BoardEntity boardEntity = boardRepository.findById(boardId)
-                .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
-        boardEntity.increaseViewCount(); // 조회수 증가
-        String updatedThumbnailUrl = updateThumbnailUrlIfNeeded(boardEntity.getThumbnail_url());
-        boardEntity.setThumbnail_url(updatedThumbnailUrl);
-        updateDetailImageUrls(boardEntity);
-        boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
-        return BoardDetailReadResponse.from(boardEntity, isBookmarked);
-    }
-
-    private void updateDetailImageUrls(BoardEntity boardEntity) {
-        for (DetailEntity detail : boardEntity.getDetails()) {
-            String updatedImageUrl = updateThumbnailUrlIfNeeded(detail.getImage_url());
-            detail.updateImageUrl(updatedImageUrl); // 변경된 이미지 URL을 설정
-        }
-    }
-
-    private String updateThumbnailUrlIfNeeded(String url) {
-        if (url.startsWith(amazonConfig.getS3Uri())) {
-            return url.replace(amazonConfig.getS3Uri(), amazonConfig.getCloudfrontUri());
-        }
-        return url;
+        return BoardDetailReadResponse.from(boardEntity, isBookmarked, amazonConfig);
     }
 
     @Transactional

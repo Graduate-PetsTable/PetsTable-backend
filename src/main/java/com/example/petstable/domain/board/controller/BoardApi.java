@@ -367,61 +367,6 @@ public interface BoardApi {
             @PathVariable("boardId") Long boardId
     );
 
-    @Operation(summary = "레시피 상세 조회 API V2", description = "특정 레시피의 상세 정보를 조회하는 API입니다.",
-            parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
-            responses = {
-                    @ApiResponse(responseCode = "200", content = @Content(
-                            schema = @Schema(implementation = BoardDetailReadResponse.class),
-                            examples = @ExampleObject(value = """
-                    {
-                      "id": 1,
-                      "title": "말티즈를 위한 닭죽 만들기",
-                      "viewCount": 1041,
-                      "bookmarkStatus": true,
-                      "details": [
-                        {
-                          "image_url": "https://example.com/detail-image1.jpg",
-                          "description": "1단계: 물 500mL를 끓인다."
-                        },
-                        {
-                          "image_url": "https://example.com/detail-image2.jpg",
-                          "description": "2단계: 닭고기를 넣고 20분간 끓인다."
-                        }
-                      ],
-                      "tags": [
-                        {
-                          "tagType": "기능별",
-                          "tagName": "모질개선"
-                        },
-                        {
-                          "tagType": "기능별",
-                          "tagName": "저알러지"
-                        }
-                      ],
-                      "ingredients": [
-                        {
-                          "name": "닭고기",
-                          "weight": "200g"
-                        },
-                        {
-                          "name": "당근",
-                          "weight": "50g"
-                        }
-                      ]
-                    }
-                    """)
-                    ),
-                            description = "레시피 상세 조회에 성공하였습니다."
-                    ),
-                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "해당 레시피를 찾을 수 없습니다.", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-            })
-    PetsTableApiResponse<BoardDetailReadResponse> getPostDetailV2(
-            @Parameter(hidden = true) @LoginUserId Long memberId,
-            @PathVariable("boardId") Long boardId
-    );
-
     @Operation(summary = "레시피 삭제 API", description = "해당 레시피를 삭제하는 API 입니다.",
             parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
             responses = {

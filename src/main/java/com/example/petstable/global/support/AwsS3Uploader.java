@@ -45,7 +45,7 @@ public class AwsS3Uploader {
         } catch (IOException e) {
             throw new PetsTableException(FILE_UPLOAD_FAIL.getStatus(), FILE_UPLOAD_FAIL.getMessage(), 400);
         }
-        return amazonConfig.getCloudfrontUri() + amazonS3Client.getUrl(amazonConfig.getBucket(), fileName).toString();
+        return amazonS3Client.getUrl(amazonConfig.getBucket(), fileName).toString();
     }
 
     public void deleteImage(String directoryPath, String fileName) {
@@ -105,8 +105,13 @@ public class AwsS3Uploader {
                 .withMethod(HttpMethod.PUT)
                 .withExpiration(getPreSignedUrlExpiration());
         generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL, CannedAccessControlList.PublicRead.toString());
-        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-        return PreSignedUrlResponse.toPreSignedUrlResponse(url);
+        URL presignedUrl = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        String fileUrl = generateFileAccessUrl(fileName); // 최종 경로 URL 생성
+        return PreSignedUrlResponse.toPreSignedUrlResponse(presignedUrl, fileUrl);
+    }
+
+    private String generateFileAccessUrl(String fileName) {
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", amazonConfig.getCloudfrontUri(), amazonConfig.getRegion(), fileName);
     }
 
     // presigned url 유효 기간 설정
