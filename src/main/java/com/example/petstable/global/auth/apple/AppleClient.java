@@ -1,5 +1,6 @@
 package com.example.petstable.global.auth.apple;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "apple-public-key-client", url = "https://appleid.apple.com/auth")
 public interface AppleClient {
 
+    @Cacheable(value = "oauthPublicKeyCache", cacheManager = "oauthPublicKeyCacheManager")
     @GetMapping("/keys")
     ApplePublicKeys getApplePublicKeys();
 
