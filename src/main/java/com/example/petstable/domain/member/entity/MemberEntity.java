@@ -60,6 +60,9 @@ public class MemberEntity extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<PointEntity> points;
+    @Builder.Default
+    @Setter
+    private int totalPoint = 0;
 
     // 연관 관계 메서드
     public void addPets(PetEntity pet) {

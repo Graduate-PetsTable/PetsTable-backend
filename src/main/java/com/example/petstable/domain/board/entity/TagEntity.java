@@ -25,6 +25,15 @@ public class TagEntity {
     @JoinColumn(name = "board_id")
     private BoardEntity post;
 
+    public static TagEntity create(String type, String name, BoardEntity recipe) {
+        TagEntity tagEntity = TagEntity.builder()
+                .type(TagType.valueOf(type))
+                .name(name)
+                .build();
+        tagEntity.setPost(recipe);
+        return tagEntity;
+    }
+
     // 연관 관계 설정
     public void setPost(BoardEntity post) {
         this.post = post;

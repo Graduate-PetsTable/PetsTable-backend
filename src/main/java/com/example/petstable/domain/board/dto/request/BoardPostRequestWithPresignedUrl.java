@@ -19,11 +19,8 @@ public class BoardPostRequestWithPresignedUrl {
     @Schema(description = "썸네일 URI")
     private String thumbnailUrl;
 
-    @Schema(description = "과정 이미지 URI")
-    private List<String> imageUrl;
-
-    @ArraySchema(schema = @Schema(implementation = DescriptionRequest.class, description = "설명 리스트"))
-    private List<DescriptionRequest> descriptions;
+    @ArraySchema(schema = @Schema(implementation = PreSignedUrlAndDescriptionRequest.class, description = "조리 과정"))
+    private List<PreSignedUrlAndDescriptionRequest> details;
 
     @ArraySchema(schema = @Schema(implementation = TagRequest.class, description = "태그 리스트"))
     private List<TagRequest> tags;

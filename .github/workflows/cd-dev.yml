@@ -94,5 +94,5 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
             sudo docker stop app-container || true
             sudo docker rm app-container || true
-            sudo docker run -d -p 8080:8080 --name dogker --network ${{ secrets.WAS_NETWORK }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO}}
+            sudo docker run -d -p 8080:8080 --name dogkerTest --network ${{ secrets.WAS_NETWORK }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO}}
             sudo docker image prune -f

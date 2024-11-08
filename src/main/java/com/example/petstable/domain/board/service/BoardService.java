@@ -7,13 +7,15 @@ import com.example.petstable.domain.board.repository.*;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
-import com.example.petstable.domain.point.service.PointService;
+import com.example.petstable.domain.point.dto.request.PointRequest;
+import com.example.petstable.domain.point.entity.TransactionType;
 import com.example.petstable.global.config.AmazonConfig;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,8 +39,9 @@ public class BoardService {
     private final AwsS3Uploader awsS3Uploader;
     private final TagRepository tagRepository;
     private final IngredientRepository ingredientRepository;
-    private final PointService pointService;
     private final AmazonConfig amazonConfig;
+    private final AsyncService asyncService;
+    private final BoardRollbackService boardRollbackService;
 
     @Transactional
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
@@ -50,9 +53,6 @@ public class BoardService {
         BoardEntity post = createPostWithDetailsAndTagsAndIngredientRequest(boardRequest, member);
 
         boardRepository.save(post);
-
-        // 포인트 증가
-        pointService.increasePoints(member, 10, "레시피 작성");
 
         return BoardPostResponse.builder()
                 .id(post.getId())
@@ -75,53 +75,14 @@ public class BoardService {
                 .thumbnail_url(Optional.ofNullable(request.getThumbnailUrl()).orElse(null))
                 .member(member)
                 .build();
-        member.addPost(post);
-
-        List<String> imageUrls = Optional.ofNullable(request.getImageUrl()).orElse(Collections.emptyList());
-        List<DetailEntity> detailEntities = Optional.ofNullable(request.getDescriptions())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(detailRequest -> {
-                    int index = request.getDescriptions().indexOf(detailRequest);
-                    String imageUrl = (index < imageUrls.size()) ? imageUrls.get(index) : null;
-                    return DetailEntity.builder()
-                            .image_url(imageUrl)
-                            .description(detailRequest.getDescription())
-                            .post(post)
-                            .build();
-                })
-                .collect(Collectors.toList());
-        post.addDetails(detailEntities);
-
-        List<TagEntity> tags = Optional.ofNullable(request.getTags())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(tagRequest -> TagEntity.builder()
-                        .type(TagType.from(tagRequest.getTagType()))
-                        .name(tagRequest.getTagName())
-                        .post(post)
-                        .build())
-                .collect(Collectors.toList());
-        post.addTags(tags);
-
-        List<IngredientEntity> ingredients = Optional.ofNullable(request.getIngredients())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(ingredientRequest -> IngredientEntity.builder()
-                        .name(ingredientRequest.getName())
-                        .weight(ingredientRequest.getWeight())
-                        .post(post)
-                        .build())
-                .collect(Collectors.toList());
-        post.addIngredient(ingredients);
-
-        detailRepository.saveAll(detailEntities);
-        tagRepository.saveAll(tags);
-        ingredientRepository.saveAll(ingredients);
+        BoardEntity newRecipe = boardRepository.save(post);
+        RecipeWithDetailsAndTagsDto recipeWithDetailsAndTagsDto = asyncService.runAsyncTasks(RecipeCreateEvent.of(newRecipe, request.getDetails(), request.getTags(), request.getIngredients()));
+        detailRepository.saveAll(recipeWithDetailsAndTagsDto.details());
+        tagRepository.saveAll(recipeWithDetailsAndTagsDto.tags());
+        ingredientRepository.saveAll(recipeWithDetailsAndTagsDto.ingredients());
         boardRepository.save(post);
-
-        pointService.increasePoints(member, 10, "레시피 작성");
-
+        RecordId recordId = asyncService.publishEventMemberPoint(memberId, PointRequest.of(10, TransactionType.POINT_GAINED, "레시피 작성"));
+        boardRollbackService.rollbackCourse(recordId);
         return BoardPostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
