@@ -19,8 +19,7 @@ public class PointEntity extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "point_id")
     private Long id;
-    private int point; // 적립 혹은 차감 시 잔액
-    private int balance; // 잔액
+    private int point;
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -34,14 +33,9 @@ public class PointEntity extends BaseTimeEntity {
         this.member = member;
     }
 
-    public void initBalance() {
-        this.balance = 0;
-    }
-
-    public static PointEntity createPointEntity(MemberEntity member, int newBalance, int point, TransactionType transactionType, String description) {
+    public static PointEntity createPointEntity(MemberEntity member, int point, TransactionType transactionType, String description) {
         PointEntity pointEntity = PointEntity.builder()
                 .member(member)
-                .balance(newBalance)
                 .point(point)
                 .transactionType(transactionType)
                 .description(description)

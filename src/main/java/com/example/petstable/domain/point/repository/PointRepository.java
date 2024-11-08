@@ -6,12 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PointRepository extends JpaRepository<PointEntity, Long> {
 
     @Query("select p from PointEntity p where p.member.id = :memberId")
     List<PointEntity> findByMemberId(@Param("memberId") Long memberId);
-
-    PointEntity findFirstByMemberIdOrderByCreatedTimeDesc(Long memberId);
 }
