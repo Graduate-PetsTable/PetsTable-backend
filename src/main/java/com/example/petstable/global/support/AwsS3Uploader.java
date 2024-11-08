@@ -45,7 +45,7 @@ public class AwsS3Uploader {
         } catch (IOException e) {
             throw new PetsTableException(FILE_UPLOAD_FAIL.getStatus(), FILE_UPLOAD_FAIL.getMessage(), 400);
         }
-        return amazonConfig.getCloudfrontUri() + amazonS3Client.getUrl(amazonConfig.getBucket(), fileName).toString();
+        return amazonS3Client.getUrl(amazonConfig.getBucket(), fileName).toString();
     }
 
     public void deleteImage(String directoryPath, String fileName) {
