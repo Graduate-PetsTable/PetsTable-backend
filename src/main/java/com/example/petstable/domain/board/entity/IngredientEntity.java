@@ -23,6 +23,16 @@ public class IngredientEntity {
     @JoinColumn(name = "board_id")
     private BoardEntity post;
 
+    public static IngredientEntity create(String name, String weight, BoardEntity recipe) {
+        IngredientEntity ingredientEntity = IngredientEntity.builder()
+                .name(name)
+                .weight(weight)
+                .post(recipe)
+                .build();
+        ingredientEntity.setPost(recipe);
+        return ingredientEntity;
+    }
+
     // 연관 관계 설정
     public void setPost(BoardEntity post) {
         this.post = post;

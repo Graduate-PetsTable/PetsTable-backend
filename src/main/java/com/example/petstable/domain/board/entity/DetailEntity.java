@@ -24,6 +24,16 @@ public class DetailEntity {
     @JoinColumn(name = "board_id")
     private BoardEntity post;
 
+    public static DetailEntity create(String imageUrl, String description, BoardEntity recipe) {
+        DetailEntity detailEntity = DetailEntity.builder()
+                .image_url(imageUrl)
+                .description(description)
+                .post(recipe)
+                .build();
+        detailEntity.setPost(recipe);
+        return detailEntity;
+    }
+
     // 연관관계 설정
     public void setPost(BoardEntity post) {
         this.post = post;
