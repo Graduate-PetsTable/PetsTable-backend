@@ -85,13 +85,6 @@ public class BoardController implements BoardApi {
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 
-    @GetMapping("/v2/{boardId}")
-    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetailV2(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
-        BoardDetailReadResponse response = boardService.findDetailByBoardIdV2(memberId, boardId);
-        return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
-    }
-
-
     @DeleteMapping(value = "/{boardId}")
     public ResponseEntity<String> deletePost (@LoginUserId Long userId, @PathVariable("boardId") Long boardId) {
         boardService.deletePost(userId, boardId);
