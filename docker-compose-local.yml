@@ -1,0 +1,102 @@
+version: "3"
+
+services:
+  redis:
+    container_name: redis
+    image: redis
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
+    networks:
+      - bridgeRedis
+
+  predixy:
+    image: haandol/predixy
+    container_name: predixy
+    hostname: predixy
+    command: predixy etc/predixy/conf/predixy.conf
+    volumes:
+      - /opt/predixy/conf:/etc/predixy/conf
+      - ./predixy.log:/etc/logs/predixy.log
+    ports:
+      - "7617:7617"
+    networks:
+      - redis-net
+
+  master1:
+    image: redis:latest
+    container_name: master1
+    volumes:
+      - /opt/redis/7000/7001.conf:/usr/local/etc/redis_7001.conf
+      - ./start.sh:/start.sh
+    command: sh -c "redis-server /usr/local/etc/redis_7001.conf"
+    ports:
+      - "7001:7001"
+      - "17001:17001"
+    networks:
+      - redis-net
+
+  master2:
+    image: redis:latest
+    container_name: master2
+    volumes:
+      - /opt/redis/7000/7002.conf:/usr/local/etc/redis_7002.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_7002.conf"
+    ports:
+      - "7002:7002"
+      - "17002:17002"
+    networks:
+      - redis-net
+
+  master3:
+    image: redis:latest
+    container_name: master3
+    volumes:
+      - /opt/redis/7000/7003.conf:/usr/local/etc/redis_7003.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_7003.conf"
+    ports:
+      - "7003:7003"
+      - "17003:17003"
+    networks:
+      - redis-net
+
+  slave1:
+    image: redis:latest
+    container_name: slave1
+    volumes:
+      - /opt/redis/7100/7101.conf:/usr/local/etc/redis_7101.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_7101.conf"
+    ports:
+      - "7101:7101"
+      - "17101:17101"
+    networks:
+      - redis-net
+
+  slave2:
+    image: redis:latest
+    container_name: slave2
+    volumes:
+      - /opt/redis/7100/7102.conf:/usr/local/etc/redis_7102.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_7102.conf"
+    ports:
+      - "7102:7102"
+      - "17102:17102"
+    networks:
+      - redis-net
+
+  slave3:
+    image: redis:latest
+    container_name: slave3
+    volumes:
+      - /opt/redis/7100/7103.conf:/usr/local/etc/redis_7103.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_7103.conf"
+    ports:
+      - "7103:7103"
+      - "17103:17103"
+    networks:
+      - redis-net
+
+networks:
+  redis-net:
+    driver: bridge
