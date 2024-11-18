@@ -1,5 +1,6 @@
 package com.example.petstable.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -18,10 +22,27 @@ import java.time.Duration;
 @EnableCaching
 public class RedisCacheConfig {
 
-    private final RedisConnectionFactory redisConnectionFactory;
+    @Value("${spring.data.redis.host}")
+    private String host;
+    @Value("${spring.data.redis.port}")
+    private int port;
+    @Value("${spring.data.redis.password")
+    private String password;
 
-    public RedisCacheConfig(RedisConnectionFactory redisConnectionFactory) {
-        this.redisConnectionFactory = redisConnectionFactory;
+    @Bean
+    public RedisConnectionFactory redisConnectionFactoryForOne() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
+        config.setPassword(password);
+        return new LettuceConnectionFactory(config);
+    }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplateForOne() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactoryForOne());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        return redisTemplate;
     }
 
     @Bean
@@ -34,7 +55,7 @@ public class RedisCacheConfig {
         RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
                 .entryTtl(Duration.ofDays(3L));
         return RedisCacheManager.RedisCacheManagerBuilder
-                .fromConnectionFactory(redisConnectionFactory)
+                .fromConnectionFactory(redisConnectionFactoryForOne())
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
     }
@@ -44,7 +65,7 @@ public class RedisCacheConfig {
         RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
                 .entryTtl(Duration.ofMinutes(60L));
         return RedisCacheManager.RedisCacheManagerBuilder
-                .fromConnectionFactory(redisConnectionFactory)
+                .fromConnectionFactory(redisConnectionFactoryForOne())
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
     }

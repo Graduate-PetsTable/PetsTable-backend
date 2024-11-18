@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisStreamSubscriber {
     private final PointEventListener pointEventListener;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplateForPredixy;
     private final RedisConnectionFactory redisConnectionFactory;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private StreamMessageListenerContainer<String, MapRecord<String, String, String>> pointListenerContainer;
@@ -35,9 +35,9 @@ public class RedisStreamSubscriber {
     }
 
     public void createStreamConsumerGroup(String streamKey, final String consumerGroupName) {
-        boolean streamExists = Boolean.TRUE.equals(redisTemplate.hasKey(streamKey));
+        boolean streamExists = Boolean.TRUE.equals(redisTemplateForPredixy.hasKey(streamKey));
         if (!streamExists) {
-            redisTemplate.execute((RedisCallback<Void>) connection -> {
+            redisTemplateForPredixy.execute((RedisCallback<Void>) connection -> {
                 byte[] streamKeyBytes = streamKey.getBytes();
                 byte[] consumerGroupNameBytes = consumerGroupName.getBytes();
                 connection.execute("XGROUP", "CREATE".getBytes(), streamKeyBytes, consumerGroupNameBytes,
@@ -45,12 +45,12 @@ public class RedisStreamSubscriber {
                 return null;
             });
         } else if (!isStreamConsumerGroupExist(streamKey, consumerGroupName)) {
-            redisTemplate.opsForStream().createGroup(streamKey, ReadOffset.from("0"), consumerGroupName);
+            redisTemplateForPredixy.opsForStream().createGroup(streamKey, ReadOffset.from("0"), consumerGroupName);
         }
     }
 
     public boolean isStreamConsumerGroupExist(final String streamKey, final String consumerGroupName) {
-        return redisTemplate
+        return redisTemplateForPredixy
                 .opsForStream().groups(streamKey).stream()
                 .anyMatch(group -> group.groupName().equals(consumerGroupName));
     }
