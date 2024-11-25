@@ -82,7 +82,7 @@ public class BoardService {
         ingredientRepository.saveAll(recipeWithDetailsAndTagsDto.ingredients());
         boardRepository.save(post);
         RecordId recordId = asyncService.publishEventMemberPoint(memberId, PointRequest.of(10, TransactionType.POINT_GAINED, "레시피 작성"));
-        boardRollbackService.rollbackCourse(recordId);
+        boardRollbackService.rollbackReipce(recordId);
         return BoardPostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
