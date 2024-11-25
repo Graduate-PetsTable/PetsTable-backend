@@ -27,7 +27,7 @@ public class TagEntity {
 
     public static TagEntity create(String type, String name, BoardEntity recipe) {
         TagEntity tagEntity = TagEntity.builder()
-                .type(TagType.valueOf(type))
+                .type(TagType.from(type))
                 .name(name)
                 .build();
         tagEntity.setPost(recipe);
