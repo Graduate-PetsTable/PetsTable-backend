@@ -38,21 +38,26 @@ public class BoardEntity extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private MemberEntity member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     @BatchSize(size = 10)
-    private List<DetailEntity> details; // 상세 설명
+    private List<DetailEntity> details = new ArrayList<>(); // 상세 설명
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<TagEntity> tags; // 게시글 태그 목록
+    private List<TagEntity> tags = new ArrayList<>(); // 게시글 태그 목록
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<BookmarkEntity> bookmarks; // 북마크
+    private List<BookmarkEntity> bookmarks = new ArrayList<>(); // 북마크
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<ReportEntity> reports; // 신고
+    private List<ReportEntity> reports = new ArrayList<>(); // 신고
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<IngredientEntity> ingredients; // 재료
+    private List<IngredientEntity> ingredients = new ArrayList<>(); // 재료
 
     // 연관 관계 설정 - 상세 설명
     public void addDetails(List<DetailEntity> detailEntities) {
