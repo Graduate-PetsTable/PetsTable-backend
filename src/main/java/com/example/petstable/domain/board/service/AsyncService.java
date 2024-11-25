@@ -13,7 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.RecordId;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,16 +27,16 @@ import static com.example.petstable.domain.member.message.AuthMessage.REDIS_CONN
 @RequiredArgsConstructor
 @Slf4j
 public class AsyncService {
-    private final StringRedisTemplate redisTemplate;
     private final DetailService detailService;
     private final TagService tagService;
     private final IngredientService ingredientService;
+    private final RedisTemplate<String, String> redisTemplateForCluster;
 
     @Transactional
     public RecordId publishEventMemberPoint(Long memberId, PointRequest request) {
         try {
             PointMessage pointMessage = PointMessage.of(memberId, request);
-            return redisTemplate.opsForStream().add("recipePoint", pointMessage.toMap());
+            return redisTemplateForCluster.opsForStream().add("recipePoint", pointMessage.toMap());
         } catch (QueryTimeoutException e) {
             log.error("Redis command timed out for userId: {} - Retrying...", memberId, e);
             throw new PetsTableException(REDIS_CONNECTION_ERROR.getStatus(), REDIS_CONNECTION_ERROR.getMessage(), 500);

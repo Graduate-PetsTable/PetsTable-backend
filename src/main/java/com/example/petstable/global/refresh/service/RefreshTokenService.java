@@ -18,7 +18,7 @@ public class RefreshTokenService {
 
     private final long validityRefreshTokenInMilliseconds;
     private final MemberRepository memberRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplateForOne;
 
     public RefreshTokenService(@Value("${spring.jwt.refresh-key-expire-length}")
                                long validityRefreshTokenInMilliseconds,
@@ -26,7 +26,7 @@ public class RefreshTokenService {
                                RedisTemplate<String, Object> redisTemplate) {
         this.validityRefreshTokenInMilliseconds = validityRefreshTokenInMilliseconds;
         this.memberRepository = memberRepository;
-        this.redisTemplate = redisTemplate;
+        this.redisTemplateForOne = redisTemplate;
     }
 
     public void saveTokenInfo(Long memberId, String refreshToken, String accessToken) {
@@ -37,8 +37,8 @@ public class RefreshTokenService {
                 .expiration(validityRefreshTokenInMilliseconds)
                 .build();
 
-        redisTemplate.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
-        redisTemplate.opsForValue().set("memberId:" + memberId, refreshToken, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
+        redisTemplateForOne.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
+        redisTemplateForOne.opsForValue().set("memberId:" + memberId, refreshToken, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
     }
 
     public MemberEntity getMemberFromRefreshToken(String refreshToken) {
@@ -52,7 +52,7 @@ public class RefreshTokenService {
     }
 
     public RefreshToken findTokenByRefreshToken(String refreshToken) {
-        RefreshToken token = (RefreshToken) redisTemplate.opsForValue().get(refreshToken);
+        RefreshToken token = (RefreshToken) redisTemplateForOne.opsForValue().get(refreshToken);
         if (token != null) {
             return token;
         }
@@ -60,16 +60,16 @@ public class RefreshTokenService {
     }
 
     public void updateToken(RefreshToken token) {
-        redisTemplate.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
-        redisTemplate.delete("memberId:" + token.getId());
-        redisTemplate.opsForValue().set("memberId:" + token.getId(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
+        redisTemplateForOne.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
+        redisTemplateForOne.delete("memberId:" + token.getId());
+        redisTemplateForOne.opsForValue().set("memberId:" + token.getId(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
     }
 
     public void deleteRefreshTokenByMemberId (Long memberId) {
-        String refreshToken = (String) redisTemplate.opsForValue().get("memberId:" + memberId);
+        String refreshToken = (String) redisTemplateForOne.opsForValue().get("memberId:" + memberId);
         if (refreshToken != null) {
-            redisTemplate.delete("memberId:" + memberId);
-            redisTemplate.delete(refreshToken);
+            redisTemplateForOne.delete("memberId:" + memberId);
+            redisTemplateForOne.delete(refreshToken);
         } else {
             throw new PetsTableException(INVALID_REFRESH_TOKEN.getStatus(), INVALID_REFRESH_TOKEN.getMessage(), 401);
         }

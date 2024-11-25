@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -22,22 +23,23 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@EnableScheduling
 public class RedisStreamSubscriber {
     private final PointEventListener pointEventListener;
-    private final RedisTemplate<String, String> redisTemplateForPredixy;
-    private final RedisConnectionFactory redisConnectionFactory;
+    private final RedisTemplate<String, String> redisTemplateForCluster;
+    private final RedisConnectionFactory redisConnectionFactoryForCluster;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private StreamMessageListenerContainer<String, MapRecord<String, String, String>> pointListenerContainer;
 
     @PostConstruct
     public void createConsumer() {
-        createStreamConsumerGroup("recipePoint", "coursePointGroup");
+        createStreamConsumerGroup("recipePoint", "recipePointGroup");
     }
 
     public void createStreamConsumerGroup(String streamKey, final String consumerGroupName) {
-        boolean streamExists = Boolean.TRUE.equals(redisTemplateForPredixy.hasKey(streamKey));
+        boolean streamExists = Boolean.TRUE.equals(redisTemplateForCluster.hasKey(streamKey));
         if (!streamExists) {
-            redisTemplateForPredixy.execute((RedisCallback<Void>) connection -> {
+            redisTemplateForCluster.execute((RedisCallback<Void>) connection -> {
                 byte[] streamKeyBytes = streamKey.getBytes();
                 byte[] consumerGroupNameBytes = consumerGroupName.getBytes();
                 connection.execute("XGROUP", "CREATE".getBytes(), streamKeyBytes, consumerGroupNameBytes,
@@ -45,12 +47,12 @@ public class RedisStreamSubscriber {
                 return null;
             });
         } else if (!isStreamConsumerGroupExist(streamKey, consumerGroupName)) {
-            redisTemplateForPredixy.opsForStream().createGroup(streamKey, ReadOffset.from("0"), consumerGroupName);
+            redisTemplateForCluster.opsForStream().createGroup(streamKey, ReadOffset.from("0"), consumerGroupName);
         }
     }
 
     public boolean isStreamConsumerGroupExist(final String streamKey, final String consumerGroupName) {
-        return redisTemplateForPredixy
+        return redisTemplateForCluster
                 .opsForStream().groups(streamKey).stream()
                 .anyMatch(group -> group.groupName().equals(consumerGroupName));
     }
@@ -76,7 +78,7 @@ public class RedisStreamSubscriber {
                 }).build();
 
         StreamMessageListenerContainer<String, MapRecord<String, String, String>> container =
-                StreamMessageListenerContainer.create(redisConnectionFactory, containerOptions);
+                StreamMessageListenerContainer.create(redisConnectionFactoryForCluster, containerOptions);
 
         container.register(
                 StreamMessageListenerContainer.StreamReadRequest.builder(
