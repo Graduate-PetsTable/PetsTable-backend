@@ -28,7 +28,7 @@ import static com.example.petstable.domain.point.message.PointMessage.POINT_CREA
 public class PointEventListener implements StreamListener<String, MapRecord<String, String, String>> {
     private final PointRepository pointRepository;
     private final MemberService memberService;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplateForCluster;
 
     @Override
     @Transactional
@@ -54,7 +54,7 @@ public class PointEventListener implements StreamListener<String, MapRecord<Stri
             }
             memberService.saveMember(member);
             pointRepository.save(PointEntity.createPointEntity(member, point, type, description));
-            redisTemplate.opsForStream().acknowledge("recipePoint", "recipePointGroup", recordId);
+            redisTemplateForCluster.opsForStream().acknowledge("recipePoint", "recipePointGroup", recordId);
             log.info("Redis onMessage[POINT]:{}:{}:BEFORE:{} => AFTER:{}", member.getId(), type.getDescription(), beforePoint, member.getTotalPoint());
         } catch (RedisSystemException e) {
             log.error("Redis Listener Error: ERROR: {}", e.getMessage());

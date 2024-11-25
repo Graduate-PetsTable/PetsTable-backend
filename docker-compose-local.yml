@@ -9,19 +9,6 @@ services:
     ports:
       - 6379:6379
     networks:
-      - bridgeRedis
-
-  predixy:
-    image: haandol/predixy
-    container_name: predixy
-    hostname: predixy
-    command: predixy etc/predixy/conf/predixy.conf
-    volumes:
-      - /opt/predixy/conf:/etc/predixy/conf
-      - ./predixy.log:/etc/logs/predixy.log
-    ports:
-      - "7617:7617"
-    networks:
       - redis-net
 
   master1:
