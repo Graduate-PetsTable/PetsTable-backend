@@ -5,7 +5,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,31 +21,30 @@ import java.time.Duration;
 @EnableCaching
 public class RedisCacheConfig {
 
-    @Value("${spring.data.redis.host}")
+    @Value("${spring.data.redis.primary.host}")
     private String host;
-    @Value("${spring.data.redis.port}")
+    @Value("${spring.data.redis.primary.port}")
     private int port;
-    @Value("${spring.data.redis.password")
+    @Value("${spring.data.redis.primary.password}")
     private String password;
 
-    @Bean
+    @Bean("redisConnectionFactoryForOne")
     public RedisConnectionFactory redisConnectionFactoryForOne() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         config.setPassword(password);
         return new LettuceConnectionFactory(config);
     }
 
-    @Bean
-    public RedisTemplate<String, String> redisTemplateForOne() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+    @Bean("redisTemplateForOne")
+    public RedisTemplate<String, Object> redisTemplateForOne() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactoryForOne());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return redisTemplate;
     }
 
-    @Bean
-    @Primary
+    @Bean("oauthPublicKeyCacheManager")
     public CacheManager oauthPublicKeyCacheManager() {
         /*
          * public key 갱신은 1년에 몇 번 안되므로 ttl 3일로 설정
@@ -60,7 +58,7 @@ public class RedisCacheConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("memberCacheManager")
     public CacheManager memberCacheManager() {
         RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
                 .entryTtl(Duration.ofMinutes(60L));
