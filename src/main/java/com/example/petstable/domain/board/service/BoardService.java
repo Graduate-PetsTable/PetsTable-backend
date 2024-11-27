@@ -50,13 +50,9 @@ public class BoardService {
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
-
         BoardWithDetailsAndTagsAndIngredients boardRequest = createBoardRequest(request, thumbnail, images);
-
         BoardEntity post = createPostWithDetailsAndTagsAndIngredientRequest(boardRequest, member);
-
         boardRepository.save(post);
-
         return BoardPostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -125,7 +121,6 @@ public class BoardService {
                 }).orElse(Collections.emptyList());
         List<TagRequest> tags = Optional.ofNullable(request.getTags()).orElse(Collections.emptyList());
         List<IngredientRequest> ingredients = Optional.ofNullable(request.getIngredients()).orElse(Collections.emptyList());
-
         return BoardWithDetailsAndTagsAndIngredients.builder()
                 .title(request.getTitle())
                 .thumbnail(Optional.ofNullable(thumbnail).orElse(null))
@@ -139,15 +134,12 @@ public class BoardService {
         String thumbnailUrl = Optional.ofNullable(request.getThumbnail())
                 .map(thumbnail -> awsS3Uploader.uploadImage("recipe", thumbnail))
                 .orElse(null);
-
         BoardEntity post = BoardEntity.builder()
                 .title(request.getTitle())
                 .thumbnail_url(thumbnailUrl)
                 .build();
-
         member.addPost(post);
         post.setMember(member);
-
         Optional.ofNullable(request.getDetails())
                 .ifPresent(details -> {
                     List<DetailEntity> detailEntities = details.stream()
@@ -166,7 +158,6 @@ public class BoardService {
                     post.addDetails(detailEntities);
                     detailRepository.saveAll(detailEntities);
                 });
-
         List<TagEntity> tags = request.getTags().stream()
                 .map(tagRequest -> TagEntity.builder()
                         .type(TagType.from(tagRequest.getTagType()))
@@ -176,7 +167,6 @@ public class BoardService {
                 .toList();
         post.addTags(tags);
         tagRepository.saveAll(tags);
-
         List<IngredientEntity> ingredients = request.getIngredients().stream()
                 .map(ingredientRequest -> IngredientEntity.builder()
                         .name(ingredientRequest.getName())
@@ -185,26 +175,21 @@ public class BoardService {
                 .toList();
         post.addIngredient(ingredients);
         ingredientRepository.saveAll(ingredients);
-
         return post;
     }
 
     public BoardReadAllResponse getAllPost(Pageable pageable, Long memberId) {
         Page<BoardEntity> postPage = boardRepository.findAll(pageable);
-
         List<BoardReadResponse> postResponses = postPage.stream()
                 .map(post -> {
                     boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, post.getId());
                     return new BoardReadResponse(post, isBookmarked);
                 })
                 .collect(Collectors.toList());
-
         PageResponse pageResponse = new PageResponse(postPage);
-
         if (postResponses.isEmpty()) {
             throw new PetsTableException(RECIPE_IS_EMPTY.getStatus(), RECIPE_IS_EMPTY.getMessage(), 204);
         }
-
         return new BoardReadAllResponse(postResponses, pageResponse);
     }
 
@@ -251,10 +236,8 @@ public class BoardService {
     }
 
     public BoardEntity validMemberAndPost(Long userId, Long boardId) {
-
-        MemberEntity member = memberRepository.findById(userId)
+        memberRepository.findById(userId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
-
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
     }
@@ -271,11 +254,8 @@ public class BoardService {
     @Transactional
     @CacheEvict(value = "recipe", allEntries = true)
     public void updatePostTitle(Long userId, Long boardId, BoardUpdateTitleRequest request) {
-
         BoardEntity post = validMemberAndPost(userId, boardId);
-
         post.updateTitle(request.getTitle());
-
         boardRepository.save(post);
     }
 
@@ -285,12 +265,9 @@ public class BoardService {
             @CacheEvict(value = "myRecipe", key = "#memberId")
     })
     public void updatePostTags(Long memberId, Long boardId, List<BoardUpdateTagRequest> request) {
-
         BoardEntity post = validMemberAndPost(memberId, boardId);
-
         post.clearTags();
         tagRepository.deleteByPostId(boardId);
-
         List<TagEntity> newTags = request.stream()
                 .map(tagRequest -> TagEntity.builder()
                         .type(TagType.from(tagRequest.getTagType()))
@@ -298,54 +275,40 @@ public class BoardService {
                         .post(post)
                         .build())
                 .toList();
-
         post.addTags(newTags);
         tagRepository.saveAll(newTags);
     }
 
     @Transactional
     public void updatePostDetail(Long userId, Long boardId, Long detailId, DetailUpdateRequest request, MultipartFile image) {
-
-        BoardEntity post = validMemberAndPost(userId, boardId);
-
+        validMemberAndPost(userId, boardId);
         DetailEntity detail = detailRepository.findById(detailId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_INFO.getStatus(), POST_NOT_INFO.getMessage(), 400));
-
         String newDescription = request.getDescription();
-
         if (image != null && newDescription != null) { // 사진, 설명 변경
             String newImageUrl = awsS3Uploader.uploadImage("recipe", image);
             detail.updateImageUrlAndDescription(newImageUrl, newDescription);
-
         } else if (image != null) { // 사진만 변경
             String newImageUrl = awsS3Uploader.uploadImage("recipe", image);
             detail.updateImageUrl(newImageUrl);
-
         } else { // 설명만 변경
             detail.updateDescription(newDescription);
         }
-
         detailRepository.save(detail);
     }
 
     @Transactional
     @CacheEvict(value = {"recipe", "myRecipe"}, allEntries = true)
     public DetailResponse deletePostDetail(Long userId, Long boardId, Long detailId) {
-
         BoardEntity post = validMemberAndPost(userId, boardId);
-
         DetailEntity detail = detailRepository.findById(detailId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_INFO.getStatus(), POST_NOT_INFO.getMessage(), 400));
-
         DetailResponse response = DetailResponse.builder()
                 .description(detail.getDescription())
                 .image_url(detail.getImage_url())
                 .build();
-
         post.getDetails().remove(detail);
-
         detailRepository.delete(detail);
-
         return response;
     }
 
