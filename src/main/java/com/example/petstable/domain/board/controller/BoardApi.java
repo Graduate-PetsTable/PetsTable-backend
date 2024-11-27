@@ -157,10 +157,20 @@ public interface BoardApi {
             @Parameter(hidden = true) @LoginUserId Long memberId
     );
 
-    @Operation(summary = "레시피 목록 전체 조회 API V2", description = "레시피 목록을 전체 조회하는 API 입니다.", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(
-                    schema = @Schema(implementation = BoardReadAllResponse.class),
-                    examples = @ExampleObject(value = """
+    @Operation(summary = "레시피 목록 전체 조회 API V2", description = "정렬된 레시피 목록을 전체 조회하는 API 입니다.",
+            parameters = {
+                    @Parameter(
+                            name = "sortBy",
+                            description = "레시피를 인기순/최신순 으로 조회하는 API입니다..",
+                            required = true,
+                            schema = @Schema(type = "string", allowableValues = {"POPULAR", "LATEST"}),
+                            example = "POPULAR"
+                    )
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(
+                            schema = @Schema(implementation = BoardReadAllResponse.class),
+                            examples = @ExampleObject(value = """
                     {
                       "recipes": [
                         {
@@ -196,15 +206,16 @@ public interface BoardApi {
                       }
                     }
                     """)
-            ),
-                    description = "레시피 목록 조회에 성공하였습니다."
-            ),
-            @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
-    })
+                    ),
+                            description = "레시피 목록 조회에 성공하였습니다."
+                    ),
+                    @ApiResponse(responseCode = "401", description = "액세스 토큰이 올바르지 않습니다.", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.", content = @Content)
+            })
     PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(
             Pageable pageable,
-            @Parameter(hidden = true) @LoginUserId Long memberId
+            @Parameter(hidden = true) @LoginUserId Long memberId,
+            @RequestParam String sortBy
     );
 
     @Operation(summary = "특정 조건으로 검색 및 정렬된 레시피 게시글 조회 API",

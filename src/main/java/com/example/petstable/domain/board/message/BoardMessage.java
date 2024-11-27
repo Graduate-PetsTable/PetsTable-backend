@@ -16,6 +16,7 @@ public enum BoardMessage implements ResponseMessage {
     GET_MY_RECIPE_COUNT("나의 레시피 조회 성공", HttpStatus.OK),
     GET_PRESIGNED_URL_SUCCESS("Presigned Url 가져오기 성공", HttpStatus.OK),
     MY_RECIPE_NOT_FOUND("나의 레시피가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    SORT_TYPE_NOT_FOUND("정렬 타입을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     WRITE_SUCCESS("레시피 작성 성공", HttpStatus.OK),
     UPDATE_SUCCESS("레시피 수정 성공", HttpStatus.OK),
     POST_NOT_UPDATED("변경된 내용이 없습니다.",  HttpStatus.BAD_REQUEST),

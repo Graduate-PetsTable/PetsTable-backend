@@ -43,15 +43,13 @@ public class BoardController implements BoardApi {
 
     @GetMapping
     public PetsTableApiResponse<BoardReadAllResponse> readAllPost(Pageable pageable, @LoginUserId Long memberId) {
-
         BoardReadAllResponse response = boardService.getAllPost(pageable, memberId);
-
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
     }
 
     @GetMapping("/v2")
-    public PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(Pageable pageable, @LoginUserId Long memberId) {
-        BoardReadAllResponse response = boardService.getAllPostV2(pageable, memberId);
+    public PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(Pageable pageable, @LoginUserId Long memberId, @RequestParam("sortBy") String sortBy) {
+        BoardReadAllResponse response = boardService.getAllPostV2(pageable, memberId, sortBy);
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
     }
 
@@ -79,9 +77,7 @@ public class BoardController implements BoardApi {
 
     @GetMapping("/{boardId}")
     public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
-
         BoardDetailReadResponse response = boardService.findDetailByBoardId(memberId, boardId);
-
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 
@@ -93,33 +89,25 @@ public class BoardController implements BoardApi {
 
     @PatchMapping(value = "/{boardId}/title")
     public ResponseEntity<String> updatePostTitle(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @RequestBody BoardUpdateTitleRequest request) {
-
         boardService.updatePostTitle(userId, boardId, request);
-
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 
     @PostMapping(value = "/{boardId}/tag/{tagId}")
     public ResponseEntity<String> updatePostTag(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @RequestBody List<BoardUpdateTagRequest> request) {
-
         boardService.updatePostTags(userId, boardId, request);
-
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 
     @PatchMapping(value = "/{boardId}/details/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updatePostDetail(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId, @RequestPart(name = "request", required = false) DetailUpdateRequest request, @RequestPart(name = "image", required = false) MultipartFile image) {
-
         boardService.updatePostDetail(userId, boardId, detailId, request, image);
-
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 
     @DeleteMapping(value = "/{boardId}/details/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PetsTableApiResponse<DetailResponse> deletePostDetail (@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId) {
-
         DetailResponse response = boardService.deletePostDetail(userId, boardId, detailId);
-
         return PetsTableApiResponse.createResponse(response, DELETE_DETAIL_SUCCESS);
     }
 }
