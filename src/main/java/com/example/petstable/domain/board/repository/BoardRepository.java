@@ -29,4 +29,9 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, Board
 
     @Query("select m.id from BoardEntity m where m.title = :title")
     Long findIdByTitle(@Param("title") String title);
+
+    @Query("SELECT b from BoardEntity  b ORDER BY b.view_count DESC")
+    Page<BoardEntity> findTopRecipeByViews(Pageable pageable);
+    @Query("SELECT b FROM BoardEntity b ORDER BY b.createdTime DESC")
+    Page<BoardEntity> findTopRecipeByCreatedTime(Pageable pageable);
 }
