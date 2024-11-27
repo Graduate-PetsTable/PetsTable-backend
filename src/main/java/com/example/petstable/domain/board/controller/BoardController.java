@@ -50,8 +50,8 @@ public class BoardController implements BoardApi {
     }
 
     @GetMapping("/v2")
-    public PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(Pageable pageable, @LoginUserId Long memberId) {
-        BoardReadAllResponse response = boardService.getAllPostV2(pageable, memberId);
+    public PetsTableApiResponse<BoardReadAllResponse> readAllPostV2(Pageable pageable, @LoginUserId Long memberId, @RequestParam("sortBy") String sortBy) {
+        BoardReadAllResponse response = boardService.getAllPostV2(pageable, memberId, sortBy);
         return PetsTableApiResponse.createResponse(response, GET_POST_ALL_SUCCESS);
     }
 
