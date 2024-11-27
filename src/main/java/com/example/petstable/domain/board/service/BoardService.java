@@ -204,8 +204,23 @@ public class BoardService {
         return new BoardReadAllResponse(postResponses, pageResponse);
     }
 
-    public BoardReadAllResponse getAllPostV2(Pageable pageable, Long memberId) {
-        Page<BoardEntity> postPage = boardRepository.findAllWithMembers(pageable);
+    private Page<BoardEntity> getRecipeSortedByLikes(Pageable pageable) {
+        return boardRepository.findTopRecipeByViews(pageable);
+    }
+
+    private Page<BoardEntity> getCoursesSortedByLatest(Pageable pageable) {
+        return boardRepository.findTopRecipeByCreatedTime(pageable);
+    }
+
+    public BoardReadAllResponse getAllPostV2(Pageable pageable, Long memberId, String sortBy) {
+        Page<BoardEntity> postPage;
+        if (sortBy.equalsIgnoreCase("POPULAR")) {
+            postPage = getRecipeSortedByLikes(pageable);
+        } else if (sortBy.equalsIgnoreCase("LATEST")) {
+            postPage = getCoursesSortedByLatest(pageable);
+        } else {
+            throw new PetsTableException(SORT_TYPE_NOT_FOUND.getStatus(), SORT_TYPE_NOT_FOUND.getMessage(), 404);
+        }
         List<BoardReadResponse> postResponses = postPage.stream()
                 .map(post -> {
                     boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, post.getId());
