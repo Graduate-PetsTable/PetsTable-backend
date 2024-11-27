@@ -13,6 +13,9 @@ import com.example.petstable.global.config.AmazonConfig;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.connection.stream.RecordId;
@@ -67,6 +70,7 @@ public class BoardService {
     }
 
     @Transactional
+    @CacheEvict(value = "recipe", allEntries = true)
     public BoardPostResponse writePostV2(Long memberId, BoardPostRequestWithPresignedUrl request) {
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
@@ -212,6 +216,7 @@ public class BoardService {
         return boardRepository.findTopRecipeByCreatedTime(pageable);
     }
 
+    @Cacheable(value = "recipe", key = "#sortBy + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public BoardReadAllResponse getAllPostV2(Pageable pageable, Long memberId, String sortBy) {
         Page<BoardEntity> postPage;
         if (sortBy.equalsIgnoreCase("POPULAR")) {
@@ -264,6 +269,7 @@ public class BoardService {
     }
 
     @Transactional
+    @CacheEvict(value = "recipe", allEntries = true)
     public void updatePostTitle(Long userId, Long boardId, BoardUpdateTitleRequest request) {
 
         BoardEntity post = validMemberAndPost(userId, boardId);
@@ -274,6 +280,10 @@ public class BoardService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "recipe", allEntries = true),
+            @CacheEvict(value = "myRecipe", key = "#memberId")
+    })
     public void updatePostTags(Long memberId, Long boardId, List<BoardUpdateTagRequest> request) {
 
         BoardEntity post = validMemberAndPost(memberId, boardId);
@@ -319,6 +329,7 @@ public class BoardService {
     }
 
     @Transactional
+    @CacheEvict(value = {"recipe", "myRecipe"}, allEntries = true)
     public DetailResponse deletePostDetail(Long userId, Long boardId, Long detailId) {
 
         BoardEntity post = validMemberAndPost(userId, boardId);
@@ -339,11 +350,16 @@ public class BoardService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "recipe"),
+            @CacheEvict(value = "myRecipe", key = "#userId")
+    })
     public void deletePost(Long userId, Long boardId) {
         BoardEntity post = validMemberAndPost(userId, boardId);
         boardRepository.delete(post);
     }
 
+    @Cacheable(value = "myRecipe", key = "#memberId")
     public BoardResponse getMyRecipe(Long memberId) {
         List<BoardEntity> myRecipe = boardRepository.findAllByMemberId(memberId);
         if (myRecipe == null || myRecipe.isEmpty()) {
