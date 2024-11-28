@@ -6,6 +6,11 @@ import com.example.petstable.domain.pet.dto.request.PetRegisterNewPetRequest;
 import com.example.petstable.domain.pet.dto.request.PetRegisterRequest;
 import com.example.petstable.domain.pet.dto.request.PetUpdateRequest;
 import com.example.petstable.domain.pet.dto.response.PetInfoResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +35,9 @@ public class PetEntity extends BaseTimeEntity {
     private String name; // 이름
     private int age; // 나이
     private double weight; // 몸무게
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birth; // 생년월일
     private String ageApproximation; // 이건 생년월일 정확하지 않을 때 대체
     private String size; // 크기 ( 소형, 중형, 대형 )
