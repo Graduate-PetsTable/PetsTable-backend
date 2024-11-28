@@ -69,12 +69,13 @@ dependencies {
     // Slack
     implementation 'com.slack.api:slack-api-client:1.39.0'
 
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
     // querydsl for spring boot 3.x
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
     // Querydsl 설정부
     def generated = 'src/main/generated'
 
