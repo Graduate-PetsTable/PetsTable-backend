@@ -4,6 +4,7 @@ import com.example.petstable.domain.board.entity.BoardEntity;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
 import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
 import com.example.petstable.domain.member.dto.response.BookmarkMyList;
+import com.example.petstable.domain.member.dto.response.MemberCacheDTO;
 import com.example.petstable.domain.member.dto.response.MemberProfileImageResponse;
 import com.example.petstable.domain.member.dto.response.OAuthMemberSignUpResponse;
 import com.example.petstable.domain.member.entity.MemberEntity;
@@ -92,7 +93,8 @@ public class MemberService {
     }
 
     @CachePut(cacheNames = "member", key = "#member.id", unless = "#result == null", cacheManager = "memberCacheManager")
-    public MemberEntity saveMember(MemberEntity member) {
-        return memberRepository.save(member);
+    public MemberCacheDTO saveMember(MemberEntity member) {
+        MemberEntity savedMember = memberRepository.save(member);
+        return new MemberCacheDTO(savedMember); // DTO 변환
     }
 }
