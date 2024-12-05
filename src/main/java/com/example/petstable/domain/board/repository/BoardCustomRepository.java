@@ -10,4 +10,5 @@ public interface BoardCustomRepository {
 
     List<BoardReadResponse> findRecipesByQueryDslWithTitleAndContent(BoardFilteringRequest filteringRequest, Long memberId, Pageable pageable);
     List<BoardReadResponse> findRecipesByQueryDslWithTagAndIngredients(BoardFilteringRequest filteringRequest, Long memberId, Pageable pageable);
+    void addViewCntFromRedis(Long postId, int addCnt);
 }

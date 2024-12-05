@@ -138,4 +138,13 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository {
         }
         return new OrderSpecifier(Order.DESC, boardEntity.modifiedTime);
     }
+
+    @Override
+    public void addViewCntFromRedis(Long postId, int addCnt) {
+        jpaQueryFactory
+                .update(boardEntity)
+                .set(boardEntity.view_count, addCnt)
+                .where(boardEntity.id.eq(postId))
+                .execute();
+    }
 }
