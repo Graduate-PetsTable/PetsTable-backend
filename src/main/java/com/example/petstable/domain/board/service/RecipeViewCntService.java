@@ -42,7 +42,7 @@ public class RecipeViewCntService {
                 .getConnection()
                 .scan(scanOptions);
         while (keys.hasNext()) {
-            String data = Arrays.toString(keys.next());
+            String data = new String(keys.next());
             Long postId = Long.parseLong(data.split(":")[1]);
             String value = redisTemplateForCluster.opsForValue().get(data);
             if(value != null) {
