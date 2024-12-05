@@ -246,7 +246,6 @@ public class BoardService {
     public BoardDetailReadResponse findDetailByBoardId(Long memberId, Long boardId) {
         BoardEntity boardEntity = boardRepository.findById(boardId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
-        boardEntity.increaseViewCount();
         boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
         return BoardDetailReadResponse.from(boardEntity, isBookmarked, amazonConfig);
     }

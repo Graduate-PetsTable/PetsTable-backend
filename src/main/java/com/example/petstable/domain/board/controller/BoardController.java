@@ -3,6 +3,7 @@ package com.example.petstable.domain.board.controller;
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.service.BoardService;
+import com.example.petstable.domain.board.service.RecipeViewCntService;
 import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ import static com.example.petstable.domain.board.message.BoardMessage.*;
 @RequestMapping("/recipe")
 @RequiredArgsConstructor
 public class BoardController implements BoardApi {
-
     private final BoardService boardService;
+    private final RecipeViewCntService recipeViewCntService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PetsTableApiResponse<BoardPostResponse> createPost(@LoginUserId Long memberId, @RequestPart(value = "request", required = false) BoardPostRequest request, @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail, @RequestPart(value = "images", required = false) List<MultipartFile> images) {
@@ -77,6 +78,7 @@ public class BoardController implements BoardApi {
 
     @GetMapping("/{boardId}")
     public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
+        recipeViewCntService.incrementViewCount(boardId);
         BoardDetailReadResponse response = boardService.findDetailByBoardId(memberId, boardId);
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }

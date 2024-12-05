@@ -32,7 +32,7 @@ public class BoardEntity extends BaseTimeEntity {
     private String thumbnail_url; // 썸네일 ( 완성 사진 )
     private int reportCount; // 신고 횟수
 
-    private int view_count; // 조회수
+    private int view_count = 0; // 조회수
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -149,12 +149,6 @@ public class BoardEntity extends BaseTimeEntity {
             this.tags.clear();
         }
     }
-
-    // 조회수 증가
-    public void increaseViewCount() {
-        this.view_count += 1;
-    }
-
     public void updateTitle(String newTitle) {
         this.title = newTitle;
     }

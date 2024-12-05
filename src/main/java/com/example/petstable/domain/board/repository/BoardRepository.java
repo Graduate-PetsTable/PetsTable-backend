@@ -34,4 +34,6 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, Board
     Page<BoardEntity> findTopRecipeByViews(Pageable pageable);
     @Query("SELECT b FROM BoardEntity b ORDER BY b.createdTime DESC")
     Page<BoardEntity> findTopRecipeByCreatedTime(Pageable pageable);
+    @Query("SELECT b.view_count FROM BoardEntity b WHERE b.id = :postId")
+    int findViewCntByPostId(Long postId);
 }
