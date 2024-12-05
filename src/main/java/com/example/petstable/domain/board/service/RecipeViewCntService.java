@@ -35,7 +35,7 @@ public class RecipeViewCntService {
         log.info("value:{}",valueOperations.get(key));
     }
 
-    @Scheduled(cron = "0 0/15 * * * ?") // 3분에 한 번씩 조회수 갱신
+    @Scheduled(cron = "0 0/15 * * * ?") // 15분에 한 번씩 조회수 갱신
     public void deleteViewCntCacheFromRedis() {
         ScanOptions scanOptions = ScanOptions.scanOptions().match(KEY_PREFIX + "*").count(100).build(); // 100개
         Cursor<byte[]> keys = redisTemplateForCluster.getConnectionFactory()
