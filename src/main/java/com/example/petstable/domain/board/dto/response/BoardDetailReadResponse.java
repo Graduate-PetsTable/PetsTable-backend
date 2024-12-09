@@ -23,13 +23,13 @@ public class BoardDetailReadResponse {
     private List<TagResponse> tags;
     private List<IngredientResponse> ingredients;
 
-    public static BoardDetailReadResponse from(BoardEntity boardEntity, boolean status, AmazonConfig amazonConfig) {
+    public static BoardDetailReadResponse from(BoardEntity boardEntity, boolean status, int viewCnt, AmazonConfig amazonConfig) {
         return BoardDetailReadResponse.builder()
                 .id(boardEntity.getId())
                 .title(boardEntity.getTitle())
                 .thumbnail(updateThumbnailUrlIfNeeded(boardEntity.getThumbnail_url() + "?size=thumbnail", amazonConfig))
                 .author(boardEntity.getMember().getNickName())
-                .viewCount(boardEntity.getView_count())
+                .viewCount(viewCnt)
                 .createdAt(boardEntity.getCreatedTime())
                 .bookmarkStatus(status)
                 .details(boardEntity.getDetails().stream()

@@ -78,7 +78,7 @@ public class BoardController implements BoardApi {
 
     @GetMapping("/{boardId}")
     public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
-        recipeViewCntService.incrementViewCount(boardId);
+        recipeViewCntService.updateViewCount(memberId, boardId);
         BoardDetailReadResponse response = boardService.findDetailByBoardId(memberId, boardId);
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
