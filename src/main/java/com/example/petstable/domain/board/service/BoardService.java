@@ -45,6 +45,7 @@ public class BoardService {
     private final AmazonConfig amazonConfig;
     private final AsyncService asyncService;
     private final BoardRollbackService boardRollbackService;
+    private final RecipeViewCntService recipeViewCntService;
 
     @Transactional
     public BoardPostResponse writePost(Long memberId, BoardPostRequest request, MultipartFile thumbnail, List<MultipartFile> images) {
@@ -247,7 +248,8 @@ public class BoardService {
         BoardEntity boardEntity = boardRepository.findById(boardId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
         boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
-        return BoardDetailReadResponse.from(boardEntity, isBookmarked, amazonConfig);
+        int viewCnt = recipeViewCntService.getViewCnt(boardId);
+        return BoardDetailReadResponse.from(boardEntity, isBookmarked, viewCnt, amazonConfig);
     }
 
     @Transactional
