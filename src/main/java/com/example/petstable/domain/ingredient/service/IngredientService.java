@@ -1,8 +1,8 @@
-package com.example.petstable.domain.board.service;
+package com.example.petstable.domain.ingredient.service;
 
-import com.example.petstable.domain.board.dto.request.IngredientRequest;
+import com.example.petstable.domain.ingredient.dto.request.IngredientRequest;
 import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.IngredientEntity;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

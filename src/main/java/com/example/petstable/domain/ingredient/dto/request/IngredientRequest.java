@@ -1,4 +1,4 @@
-package com.example.petstable.domain.board.dto.request;
+package com.example.petstable.domain.ingredient.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class IngredientRequest {
-
     @Schema(description = "재료 이름", example = "당근")
     private String name;
 

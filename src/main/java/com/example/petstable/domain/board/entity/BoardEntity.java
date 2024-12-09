@@ -2,9 +2,12 @@ package com.example.petstable.domain.board.entity;
 
 import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.bookmark.entity.BookmarkEntity;
+import com.example.petstable.domain.detail.entity.DetailEntity;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
 import com.example.petstable.domain.member.entity.BaseTimeEntity;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.report.entity.ReportEntity;
+import com.example.petstable.domain.tag.entity.TagEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -20,7 +23,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Builder
 @Table(name = "board")
 public class BoardEntity extends BaseTimeEntity {
-
     private static final int REPORT_POST_THRESHOLD_COUNT = 5;
 
     @Id

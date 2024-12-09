@@ -15,14 +15,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.example.petstable.domain.board.entity.QBoardEntity.boardEntity;
-import static com.example.petstable.domain.board.entity.QDetailEntity.detailEntity;
-import static com.example.petstable.domain.board.entity.QIngredientEntity.ingredientEntity;
-import static com.example.petstable.domain.board.entity.QTagEntity.tagEntity;
+import static com.example.petstable.domain.detail.entity.QDetailEntity.detailEntity;
+import static com.example.petstable.domain.ingredient.entity.QIngredientEntity.ingredientEntity;
+import static com.example.petstable.domain.tag.entity.QTagEntity.tagEntity;
 import static com.example.petstable.domain.bookmark.entity.QBookmarkEntity.bookmarkEntity;
 
 @Repository
 public class BoardCustomRepositoryImpl implements BoardCustomRepository {
-
     private final JPAQueryFactory jpaQueryFactory;
 
     public BoardCustomRepositoryImpl(JPAQueryFactory jpaQueryFactory) {

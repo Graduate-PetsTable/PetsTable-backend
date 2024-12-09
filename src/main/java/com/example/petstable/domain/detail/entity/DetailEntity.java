@@ -1,5 +1,6 @@
-package com.example.petstable.domain.board.entity;
+package com.example.petstable.domain.detail.entity;
 
+import com.example.petstable.domain.board.entity.BoardEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder
 @Table(name = "detail")
 public class DetailEntity {
-
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "detail_id")
     private Long id;

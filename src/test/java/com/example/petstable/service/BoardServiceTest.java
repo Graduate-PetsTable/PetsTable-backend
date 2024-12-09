@@ -5,15 +5,22 @@ import com.example.petstable.domain.board.dto.response.BoardDetailReadResponse;
 import com.example.petstable.domain.board.dto.response.BoardReadAllResponse;
 import com.example.petstable.domain.board.entity.*;
 import com.example.petstable.domain.board.repository.BoardRepository;
-import com.example.petstable.domain.board.repository.DetailRepository;
-import com.example.petstable.domain.board.repository.IngredientRepository;
-import com.example.petstable.domain.board.repository.TagRepository;
+import com.example.petstable.domain.detail.dto.request.DetailUpdateRequest;
+import com.example.petstable.domain.detail.repository.DetailRepository;
+import com.example.petstable.domain.ingredient.dto.request.IngredientRequest;
+import com.example.petstable.domain.ingredient.repository.IngredientRepository;
+import com.example.petstable.domain.tag.dto.request.TagRequest;
+import com.example.petstable.domain.tag.repository.TagRepository;
 import com.example.petstable.domain.board.service.BoardService;
+import com.example.petstable.domain.detail.entity.DetailEntity;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
 import com.example.petstable.domain.member.dto.request.OAuthMemberSignUpRequest;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.member.service.MemberService;
+import com.example.petstable.domain.tag.entity.TagEntity;
+import com.example.petstable.domain.tag.entity.TagType;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
 import org.junit.jupiter.api.AfterEach;
@@ -35,33 +42,24 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BoardServiceTest {
-
     @Autowired
     private MemberService memberService;
-
     @Autowired
     private BoardService boardService;
-
     @MockBean
     private AwsS3Uploader awsS3Uploader;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private BoardRepository boardRepository;
-
     @Autowired
     private DetailRepository detailRepository;
-
     @Autowired
     private TagRepository tagRepository;
-
     @Autowired
     private IngredientRepository ingredientRepository;
 
@@ -189,7 +187,7 @@ public class BoardServiceTest {
         BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
-        BoardDetailReadResponse actual = boardService.findDetailByBoardId(member.getId(), post.getId());
+        BoardDetailReadResponse actual = boardService.findDetailByPostId(member.getId(), post.getId());
         LocalDateTime expectedCreatedTime = post.getCreatedTime();
 
         // then
@@ -229,7 +227,7 @@ public class BoardServiceTest {
         BoardEntity post = boardRepository.findByTitle("레시피 테스트").orElseThrow();
 
         // when
-        boardService.findDetailByBoardId(member.getId(), post.getId());
+        boardService.findDetailByPostId(member.getId(), post.getId());
         BoardEntity actual = boardRepository.findById(post.getId()).orElseThrow();
 
         // then
@@ -528,7 +526,7 @@ public class BoardServiceTest {
         boardService.deletePost(member.getId(), post.getId());
 
         // then
-        assertThatThrownBy(() -> boardService.findDetailByBoardId(member.getId(), post.getId())).isInstanceOf(PetsTableException.class);
+        assertThatThrownBy(() -> boardService.findDetailByPostId(member.getId(), post.getId())).isInstanceOf(PetsTableException.class);
     }
 
     @DisplayName("게시글 작성 시 재료도 추가한다.")

@@ -1,8 +1,8 @@
 package com.example.petstable.domain.board.dto.response;
 
-import com.example.petstable.domain.board.entity.DetailEntity;
-import com.example.petstable.domain.board.entity.IngredientEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
+import com.example.petstable.domain.detail.entity.DetailEntity;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
+import com.example.petstable.domain.tag.entity.TagEntity;
 import lombok.Builder;
 
 import java.util.List;

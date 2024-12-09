@@ -4,9 +4,13 @@ import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.BoardReadResponse;
 import com.example.petstable.domain.board.entity.*;
 import com.example.petstable.domain.board.repository.*;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
+import com.example.petstable.domain.ingredient.repository.IngredientRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.entity.SocialType;
 import com.example.petstable.domain.member.repository.MemberRepository;
+import com.example.petstable.domain.tag.entity.TagEntity;
+import com.example.petstable.domain.tag.repository.TagRepository;
 import com.example.petstable.global.config.QueryDSLConfig;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
@@ -28,7 +32,6 @@ import java.util.List;
 @Import({BoardCustomRepositoryImpl.class, QueryDSLConfig.class})
 @Transactional
 public class BoardCustomRepositoryImplTest {
-
     @Autowired
     private BoardCustomRepositoryImpl boardCustomRepositoryImpl;
     @Autowired

@@ -2,11 +2,14 @@ package com.example.petstable.domain.board.service;
 
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.RecipeWithDetailsAndTagsDto;
-import com.example.petstable.domain.board.entity.DetailEntity;
-import com.example.petstable.domain.board.entity.IngredientEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
+import com.example.petstable.domain.detail.entity.DetailEntity;
+import com.example.petstable.domain.detail.service.DetailService;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
+import com.example.petstable.domain.ingredient.service.IngredientService;
+import com.example.petstable.domain.tag.entity.TagEntity;
 import com.example.petstable.domain.point.dto.request.PointMessage;
 import com.example.petstable.domain.point.dto.request.PointRequest;
+import com.example.petstable.domain.tag.service.TagService;
 import com.example.petstable.global.exception.PetsTableException;
 import jakarta.persistence.QueryTimeoutException;
 import jakarta.transaction.Transactional;

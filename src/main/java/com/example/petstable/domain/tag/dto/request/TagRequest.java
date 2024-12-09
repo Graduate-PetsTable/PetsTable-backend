@@ -1,4 +1,4 @@
-package com.example.petstable.domain.board.dto.request;
+package com.example.petstable.domain.tag.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class TagRequest {
-
     @Schema(description = "태그 타입", allowableValues = {"기능별", "나이별", "건조별", "크기별", "준비 시간"})
     private String tagType;
 

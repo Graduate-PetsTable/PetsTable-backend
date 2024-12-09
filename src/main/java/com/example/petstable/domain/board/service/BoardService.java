@@ -5,10 +5,22 @@ import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.entity.*;
 import com.example.petstable.domain.board.repository.*;
 import com.example.petstable.domain.bookmark.repository.BookmarkRepository;
+import com.example.petstable.domain.detail.dto.request.DetailRequest;
+import com.example.petstable.domain.detail.dto.request.DetailUpdateRequest;
+import com.example.petstable.domain.detail.dto.response.DetailResponse;
+import com.example.petstable.domain.detail.entity.DetailEntity;
+import com.example.petstable.domain.detail.repository.DetailRepository;
+import com.example.petstable.domain.ingredient.dto.request.IngredientRequest;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
+import com.example.petstable.domain.ingredient.repository.IngredientRepository;
 import com.example.petstable.domain.member.entity.MemberEntity;
 import com.example.petstable.domain.member.repository.MemberRepository;
 import com.example.petstable.domain.point.dto.request.PointRequest;
 import com.example.petstable.domain.point.entity.TransactionType;
+import com.example.petstable.domain.tag.dto.request.TagRequest;
+import com.example.petstable.domain.tag.entity.TagEntity;
+import com.example.petstable.domain.tag.entity.TagType;
+import com.example.petstable.domain.tag.repository.TagRepository;
 import com.example.petstable.global.config.AmazonConfig;
 import com.example.petstable.global.exception.PetsTableException;
 import com.example.petstable.global.support.AwsS3Uploader;
@@ -34,7 +46,6 @@ import static com.example.petstable.domain.member.message.MemberMessage.MEMBER_N
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardService {
-
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
     private final DetailRepository detailRepository;
@@ -236,26 +247,26 @@ public class BoardService {
         return boardRepository.findRecipesByQueryDslWithTagAndIngredients(request, memberId, pageable);
     }
 
-    public BoardEntity validMemberAndPost(Long userId, Long boardId) {
-        memberRepository.findById(userId)
+    public BoardEntity validMemberAndPost(Long memberId, Long postId) {
+        memberRepository.findById(memberId)
                 .orElseThrow(() -> new PetsTableException(MEMBER_NOT_FOUND.getStatus(), MEMBER_NOT_FOUND.getMessage(), 404));
-        return boardRepository.findById(boardId)
+        return boardRepository.findById(postId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
     }
 
     @Transactional
-    public BoardDetailReadResponse findDetailByBoardId(Long memberId, Long boardId) {
-        BoardEntity boardEntity = boardRepository.findById(boardId)
+    public BoardDetailReadResponse findDetailByPostId(Long memberId, Long postId) {
+        BoardEntity boardEntity = boardRepository.findById(postId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_FOUND.getStatus(), POST_NOT_FOUND.getMessage(), 404));
-        boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, boardId);
-        int viewCnt = recipeViewCntService.getViewCnt(boardId);
+        boolean isBookmarked = bookmarkRepository.existsByMemberIdAndPostId(memberId, postId);
+        int viewCnt = recipeViewCntService.getViewCnt(postId);
         return BoardDetailReadResponse.from(boardEntity, isBookmarked, viewCnt, amazonConfig);
     }
 
     @Transactional
     @CacheEvict(value = "recipe", allEntries = true)
-    public void updatePostTitle(Long userId, Long boardId, BoardUpdateTitleRequest request) {
-        BoardEntity post = validMemberAndPost(userId, boardId);
+    public void updatePostTitle(Long memberId, Long postId, BoardUpdateTitleRequest request) {
+        BoardEntity post = validMemberAndPost(memberId, postId);
         post.updateTitle(request.getTitle());
         boardRepository.save(post);
     }
@@ -265,10 +276,10 @@ public class BoardService {
             @CacheEvict(value = "recipe", allEntries = true),
             @CacheEvict(value = "myRecipe", key = "#memberId")
     })
-    public void updatePostTags(Long memberId, Long boardId, List<BoardUpdateTagRequest> request) {
-        BoardEntity post = validMemberAndPost(memberId, boardId);
+    public void updatePostTags(Long memberId, Long postId, List<BoardUpdateTagRequest> request) {
+        BoardEntity post = validMemberAndPost(memberId, postId);
         post.clearTags();
-        tagRepository.deleteByPostId(boardId);
+        tagRepository.deleteByPostId(postId);
         List<TagEntity> newTags = request.stream()
                 .map(tagRequest -> TagEntity.builder()
                         .type(TagType.from(tagRequest.getTagType()))
@@ -281,8 +292,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void updatePostDetail(Long userId, Long boardId, Long detailId, DetailUpdateRequest request, MultipartFile image) {
-        validMemberAndPost(userId, boardId);
+    public void updatePostDetail(Long memberId, Long postId, Long detailId, DetailUpdateRequest request, MultipartFile image) {
+        validMemberAndPost(memberId, postId);
         DetailEntity detail = detailRepository.findById(detailId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_INFO.getStatus(), POST_NOT_INFO.getMessage(), 400));
         String newDescription = request.getDescription();
@@ -300,8 +311,8 @@ public class BoardService {
 
     @Transactional
     @CacheEvict(value = {"recipe", "myRecipe"}, allEntries = true)
-    public DetailResponse deletePostDetail(Long userId, Long boardId, Long detailId) {
-        BoardEntity post = validMemberAndPost(userId, boardId);
+    public DetailResponse deletePostDetail(Long memberId, Long postId, Long detailId) {
+        BoardEntity post = validMemberAndPost(memberId, postId);
         DetailEntity detail = detailRepository.findById(detailId)
                 .orElseThrow(() -> new PetsTableException(POST_NOT_INFO.getStatus(), POST_NOT_INFO.getMessage(), 400));
         DetailResponse response = DetailResponse.builder()
@@ -316,10 +327,10 @@ public class BoardService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "recipe"),
-            @CacheEvict(value = "myRecipe", key = "#userId")
+            @CacheEvict(value = "myRecipe", key = "#memberId")
     })
-    public void deletePost(Long userId, Long boardId) {
-        BoardEntity post = validMemberAndPost(userId, boardId);
+    public void deletePost(Long memberId, Long postId) {
+        BoardEntity post = validMemberAndPost(memberId, postId);
         boardRepository.delete(post);
     }
 

@@ -16,14 +16,11 @@ import static com.example.petstable.domain.bookmark.message.BookmarkMessage.*;
 @RequiredArgsConstructor
 @RequestMapping("")
 public class BookmarkController implements BookmarkApi{
-
     private final BookmarkService bookmarkService;
 
-    @PostMapping("/{boardId}/bookmark")
-    public PetsTableApiResponse<BookmarkRegisterResponse> addBookmark(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
-
-        BookmarkRegisterResponse response = bookmarkService.registerBookmark(memberId, boardId);
-
+    @PostMapping("/{postId}/bookmark")
+    public PetsTableApiResponse<BookmarkRegisterResponse> addBookmark(@LoginUserId Long memberId, @PathVariable("postId") Long postId) {
+        BookmarkRegisterResponse response = bookmarkService.registerBookmark(memberId, postId);
         if (response.isStatus()) {
             return PetsTableApiResponse.createResponse(response, SUCCESS_REGISTER_BOOKMARK);
         } else {
