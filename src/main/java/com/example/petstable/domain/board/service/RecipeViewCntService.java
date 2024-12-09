@@ -7,19 +7,16 @@ import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-
+@Transactional(readOnly = true)
 public class RecipeViewCntService {
-
     private final RedisTemplate<String, String> redisTemplateForCluster;
     private static final String KEY_PREFIX = "recipe-views";
     private final BoardRepository boardRepository;
@@ -32,11 +29,11 @@ public class RecipeViewCntService {
             valueOperations.set(key, String.valueOf(boardRepository.findViewCntByPostId(postId)), Duration.ofMinutes(5));
         }
         valueOperations.increment(key);
-        log.info("value:{}",valueOperations.get(key));
+        log.info("value:{}", valueOperations.get(key));
     }
 
-    @Scheduled(cron = "0 0/15 * * * ?") // 15분에 한 번씩 조회수 갱신
-    public void deleteViewCntCacheFromRedis() {
+    @Transactional
+    public void syncViewCountsFromRedis() {
         ScanOptions scanOptions = ScanOptions.scanOptions().match(KEY_PREFIX + "*").count(100).build(); // 100개
         Cursor<byte[]> keys = redisTemplateForCluster.getConnectionFactory()
                 .getConnection()
