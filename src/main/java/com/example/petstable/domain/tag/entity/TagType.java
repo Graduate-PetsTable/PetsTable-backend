@@ -1,4 +1,4 @@
-package com.example.petstable.domain.board.entity;
+package com.example.petstable.domain.tag.entity;
 
 import com.example.petstable.global.exception.PetsTableException;
 import lombok.AllArgsConstructor;
@@ -8,14 +8,13 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.example.petstable.domain.board.message.TagMessage.*;
+import static com.example.petstable.domain.tag.message.TagMessage.*;
 
 
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
 public enum TagType {
-
     SIZE("크기별"),
     AGE("나이별"),
     DRY("건조별"),

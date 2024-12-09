@@ -1,8 +1,8 @@
 package com.example.petstable.domain.board.dto.response;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.IngredientEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
+import com.example.petstable.domain.ingredient.entity.IngredientEntity;
+import com.example.petstable.domain.tag.entity.TagEntity;
 import lombok.*;
 
 import java.util.List;
@@ -11,7 +11,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardReadResponse {
-
     private Long id;
     private String title; // 제목
     private String imageUrl; // 썸네일 이미지

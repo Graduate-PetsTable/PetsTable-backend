@@ -2,6 +2,8 @@ package com.example.petstable.domain.board.controller;
 
 import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
+import com.example.petstable.domain.detail.dto.request.DetailUpdateRequest;
+import com.example.petstable.domain.detail.dto.response.DetailResponse;
 import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -324,7 +326,7 @@ public interface BoardApi {
     );
 
     @Operation(summary = "레시피 상세 조회 API", description = "특정 레시피의 상세 정보를 조회하는 API입니다.",
-            parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
+            parameters = @Parameter(name = "postId", description = "레시피 id", required = true),
             responses = {
                     @ApiResponse(responseCode = "200", content = @Content(
                             schema = @Schema(implementation = BoardDetailReadResponse.class),
@@ -375,11 +377,11 @@ public interface BoardApi {
             })
     PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(
             @Parameter(hidden = true) @LoginUserId Long memberId,
-            @PathVariable("boardId") Long boardId
+            @PathVariable("postId") Long postId
     );
 
     @Operation(summary = "레시피 삭제 API", description = "해당 레시피를 삭제하는 API 입니다.",
-            parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
+            parameters = @Parameter(name = "postId", description = "레시피 id", required = true),
             responses = {
                     @ApiResponse(responseCode = "200", description = "레시피 삭제에 성공하였습니다.", content = @Content(
                             examples = @ExampleObject(value = """
@@ -395,12 +397,12 @@ public interface BoardApi {
             })
     ResponseEntity<String> deletePost(
             @Parameter(hidden = true) @LoginUserId Long userId,
-            @PathVariable("boardId") Long boardId
+            @PathVariable("postId") Long postId
     );
 
     @Operation(summary = "레시피 제목 수정 API", description = "특정 레시피의 제목을 수정하는 API 입니다.",
             parameters = {
-                    @Parameter(name = "boardId", description = "레시피 id", required = true)
+                    @Parameter(name = "postId", description = "레시피 id", required = true)
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "레시피 제목 수정에 성공하였습니다.", content = @Content(
@@ -419,13 +421,13 @@ public interface BoardApi {
             })
     ResponseEntity<String> updatePostTitle(
             @Parameter(hidden = true) @LoginUserId Long userId,
-            @PathVariable("boardId") Long boardId,
+            @PathVariable("postId") Long postId,
             @RequestBody(description = "제목 수정 요청 데이터", required = true) BoardUpdateTitleRequest request
     );
 
     @Operation(summary = "레시피 태그 수정 API", description = "특정 레시피의 태그를 수정하는 API입니다.",
             parameters = {
-                    @Parameter(name = "boardId", description = "레시피 id", required = true),
+                    @Parameter(name = "postId", description = "레시피 id", required = true),
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "레시피 태그 수정에 성공하였습니다.", content = @Content(
@@ -444,13 +446,13 @@ public interface BoardApi {
             })
     ResponseEntity<String> updatePostTag(
             @Parameter(hidden = true) @LoginUserId Long userId,
-            @PathVariable("boardId") Long boardId,
+            @PathVariable("postId") Long postId,
             @RequestBody(description = "태그 수정 요청 데이터", required = true) List<BoardUpdateTagRequest> request
     );
 
     @Operation(summary = "레시피 상세 내용 수정 API", description = "특정 레시피의 상세 내용을 수정하는 API 입니다.",
             parameters = {
-                    @Parameter(name = "boardId", description = "레시피 id", required = true),
+                    @Parameter(name = "postId", description = "레시피 id", required = true),
                     @Parameter(name = "detailId", description = "상세 내용 id", required = true)
             },
             responses = {
@@ -471,7 +473,7 @@ public interface BoardApi {
             })
     ResponseEntity<String> updatePostDetail(
             @Parameter(hidden = true) @LoginUserId Long userId,
-            @PathVariable("boardId") Long boardId,
+            @PathVariable("postId") Long postId,
             @PathVariable("detailId") Long detailId,
             @RequestPart(name = "request", required = false) @Parameter(description = "변경할 내용") DetailUpdateRequest request,
             @RequestPart(name = "image", required = false) @Parameter(description = "내용에 알맞는 이미지") MultipartFile image
@@ -479,7 +481,7 @@ public interface BoardApi {
 
     @Operation(summary = "레시피 상세 내용 삭제 API", description = "특정 레시피의 상세 내용을 삭제하는 API 입니다.",
             parameters = {
-                    @Parameter(name = "boardId", description = "레시피 id", required = true),
+                    @Parameter(name = "postId", description = "레시피 id", required = true),
                     @Parameter(name = "detailId", description = "상세 내용 id", required = true)
             },
             responses = {
@@ -499,7 +501,7 @@ public interface BoardApi {
             })
     PetsTableApiResponse<DetailResponse> deletePostDetail(
             @Parameter(hidden = true) @LoginUserId Long userId,
-            @PathVariable("boardId") Long boardId,
+            @PathVariable("postId") Long postId,
             @PathVariable("detailId") Long detailId
     );
 }

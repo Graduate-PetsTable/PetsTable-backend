@@ -1,6 +1,5 @@
 package com.example.petstable.domain.board.dto.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BoardUpdateTagRequest {
-
     @Schema(description = "태그 타입", type = "string", allowableValues = {"기능별", "나이별", "건조별", "크기별", "준비 시간"}, example = "기능별")
     private String tagType;
 

@@ -1,6 +1,9 @@
 package com.example.petstable.domain.board.dto.response;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
+import com.example.petstable.domain.detail.dto.response.DetailResponse;
+import com.example.petstable.domain.ingredient.dto.response.IngredientResponse;
+import com.example.petstable.domain.tag.dto.response.TagResponse;
 import com.example.petstable.global.config.AmazonConfig;
 import lombok.Builder;
 import lombok.Getter;

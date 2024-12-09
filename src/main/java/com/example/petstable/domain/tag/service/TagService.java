@@ -1,8 +1,8 @@
-package com.example.petstable.domain.board.service;
+package com.example.petstable.domain.tag.service;
 
-import com.example.petstable.domain.board.dto.request.TagRequest;
+import com.example.petstable.domain.tag.dto.request.TagRequest;
 import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.TagEntity;
+import com.example.petstable.domain.tag.entity.TagEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

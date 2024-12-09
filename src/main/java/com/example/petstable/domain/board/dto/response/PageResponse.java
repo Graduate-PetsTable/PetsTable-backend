@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 @Data
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PageResponse {
-
     private Integer totalPages;
     private Integer currentPage;
     private Long totalElements;

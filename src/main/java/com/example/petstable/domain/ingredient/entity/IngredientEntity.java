@@ -1,5 +1,6 @@
-package com.example.petstable.domain.board.entity;
+package com.example.petstable.domain.ingredient.entity;
 
+import com.example.petstable.domain.board.entity.BoardEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,6 @@ import static jakarta.persistence.FetchType.*;
 @Builder
 @Table(name = "ingredient")
 public class IngredientEntity {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ingredient_id")
     private Long id;

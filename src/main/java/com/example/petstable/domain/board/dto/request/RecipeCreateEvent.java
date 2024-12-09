@@ -1,6 +1,8 @@
 package com.example.petstable.domain.board.dto.request;
 
 import com.example.petstable.domain.board.entity.BoardEntity;
+import com.example.petstable.domain.ingredient.dto.request.IngredientRequest;
+import com.example.petstable.domain.tag.dto.request.TagRequest;
 import lombok.*;
 
 import java.util.List;

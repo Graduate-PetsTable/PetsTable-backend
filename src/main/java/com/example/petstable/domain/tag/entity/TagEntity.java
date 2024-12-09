@@ -1,5 +1,6 @@
-package com.example.petstable.domain.board.entity;
+package com.example.petstable.domain.tag.entity;
 
+import com.example.petstable.domain.board.entity.BoardEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,6 @@ import static jakarta.persistence.FetchType.*;
 @Builder
 @Table(name = "tag")
 public class TagEntity {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
     private Long id;

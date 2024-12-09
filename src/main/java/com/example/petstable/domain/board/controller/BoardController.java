@@ -4,6 +4,8 @@ import com.example.petstable.domain.board.dto.request.*;
 import com.example.petstable.domain.board.dto.response.*;
 import com.example.petstable.domain.board.service.BoardService;
 import com.example.petstable.domain.board.service.RecipeViewCntService;
+import com.example.petstable.domain.detail.dto.request.DetailUpdateRequest;
+import com.example.petstable.domain.detail.dto.response.DetailResponse;
 import com.example.petstable.global.auth.LoginUserId;
 import com.example.petstable.global.exception.PetsTableApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -76,40 +78,40 @@ public class BoardController implements BoardApi {
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 
-    @GetMapping("/{boardId}")
-    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("boardId") Long boardId) {
-        recipeViewCntService.updateViewCount(memberId, boardId);
-        BoardDetailReadResponse response = boardService.findDetailByBoardId(memberId, boardId);
+    @GetMapping("/{postId}")
+    public PetsTableApiResponse<BoardDetailReadResponse> getPostDetail(@LoginUserId Long memberId, @PathVariable("postId") Long postId) {
+        recipeViewCntService.updateViewCount(memberId, postId);
+        BoardDetailReadResponse response = boardService.findDetailByPostId(memberId, postId);
         return PetsTableApiResponse.createResponse(response, GET_POST_DETAIL_SUCCESS);
     }
 
-    @DeleteMapping(value = "/{boardId}")
-    public ResponseEntity<String> deletePost (@LoginUserId Long userId, @PathVariable("boardId") Long boardId) {
-        boardService.deletePost(userId, boardId);
+    @DeleteMapping(value = "/{postId}")
+    public ResponseEntity<String> deletePost (@LoginUserId Long userId, @PathVariable("postId") Long postId) {
+        boardService.deletePost(userId, postId);
         return ResponseEntity.ok(DELETE_POST_SUCCESS.getMessage());
     }
 
-    @PatchMapping(value = "/{boardId}/title")
-    public ResponseEntity<String> updatePostTitle(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @RequestBody BoardUpdateTitleRequest request) {
-        boardService.updatePostTitle(userId, boardId, request);
+    @PatchMapping(value = "/{postId}/title")
+    public ResponseEntity<String> updatePostTitle(@LoginUserId Long userId, @PathVariable("postId") Long postId, @RequestBody BoardUpdateTitleRequest request) {
+        boardService.updatePostTitle(userId, postId, request);
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 
-    @PostMapping(value = "/{boardId}/tag/{tagId}")
-    public ResponseEntity<String> updatePostTag(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @RequestBody List<BoardUpdateTagRequest> request) {
-        boardService.updatePostTags(userId, boardId, request);
+    @PostMapping(value = "/{postId}/tag/{tagId}")
+    public ResponseEntity<String> updatePostTag(@LoginUserId Long userId, @PathVariable("postId") Long postId, @RequestBody List<BoardUpdateTagRequest> request) {
+        boardService.updatePostTags(userId, postId, request);
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 
-    @PatchMapping(value = "/{boardId}/details/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updatePostDetail(@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId, @RequestPart(name = "request", required = false) DetailUpdateRequest request, @RequestPart(name = "image", required = false) MultipartFile image) {
-        boardService.updatePostDetail(userId, boardId, detailId, request, image);
+    @PatchMapping(value = "/{postId}/details/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updatePostDetail(@LoginUserId Long userId, @PathVariable("postId") Long postId, @PathVariable("detailId") Long detailId, @RequestPart(name = "request", required = false) DetailUpdateRequest request, @RequestPart(name = "image", required = false) MultipartFile image) {
+        boardService.updatePostDetail(userId, postId, detailId, request, image);
         return ResponseEntity.ok(UPDATE_SUCCESS.getMessage());
     }
 
-    @DeleteMapping(value = "/{boardId}/details/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public PetsTableApiResponse<DetailResponse> deletePostDetail (@LoginUserId Long userId, @PathVariable("boardId") Long boardId, @PathVariable("detailId") Long detailId) {
-        DetailResponse response = boardService.deletePostDetail(userId, boardId, detailId);
+    @DeleteMapping(value = "/{postId}/details/{detailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public PetsTableApiResponse<DetailResponse> deletePostDetail (@LoginUserId Long userId, @PathVariable("postId") Long postId, @PathVariable("detailId") Long detailId) {
+        DetailResponse response = boardService.deletePostDetail(userId, postId, detailId);
         return PetsTableApiResponse.createResponse(response, DELETE_DETAIL_SUCCESS);
     }
 }

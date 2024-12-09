@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Tag(name = "북마크 관련 API")
 public interface BookmarkApi {
-
     @Operation(summary = "북마크 등록 및 취소 API", description = "북마크를 등록 혹은 취소하는 API 입니다.",
-            parameters = @Parameter(name = "boardId", description = "레시피 id", required = true),
+            parameters = @Parameter(name = "postId", description = "레시피 id", required = true),
             responses =  {
             @ApiResponse(responseCode = "200", content = @Content(
                     schema = @Schema(implementation = BookmarkRegisterResponse.class),
@@ -39,6 +38,6 @@ public interface BookmarkApi {
     @SecurityRequirement(name = "JWT")
     public PetsTableApiResponse<BookmarkRegisterResponse> addBookmark(
             @LoginUserId Long memberId,
-            @PathVariable("boardId") Long boardId
+            @PathVariable("postId") Long postId
     );
 }

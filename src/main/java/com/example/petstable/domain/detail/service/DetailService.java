@@ -1,8 +1,8 @@
-package com.example.petstable.domain.board.service;
+package com.example.petstable.domain.detail.service;
 
 import com.example.petstable.domain.board.dto.request.PreSignedUrlAndDescriptionRequest;
 import com.example.petstable.domain.board.entity.BoardEntity;
-import com.example.petstable.domain.board.entity.DetailEntity;
+import com.example.petstable.domain.detail.entity.DetailEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

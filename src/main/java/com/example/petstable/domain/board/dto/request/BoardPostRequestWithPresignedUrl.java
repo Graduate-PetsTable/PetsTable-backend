@@ -1,5 +1,7 @@
 package com.example.petstable.domain.board.dto.request;
 
+import com.example.petstable.domain.ingredient.dto.request.IngredientRequest;
+import com.example.petstable.domain.tag.dto.request.TagRequest;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -12,7 +14,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardPostRequestWithPresignedUrl {
-
     @Schema(description = "제목", example = "말티즈를 위한 닭죽 만들기")
     private String title;
 
