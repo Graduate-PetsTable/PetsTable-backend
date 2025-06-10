@@ -1,4 +1,4 @@
-# 💻PetsTable backend
+# 💻Dogker backend
 ## 🚀 소개
 ### 기술적 특징
 • 이미지 업로드: Presigned URL을 활용한 비동기 업로드 방식 적용<br>
